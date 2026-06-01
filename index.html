@@ -304,11 +304,12 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .gallery .wide{grid-column:span 2}
 @media(max-width:680px){.gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:128px}.gallery .big,.gallery .wide{grid-column:span 2}}
 
-.spot{display:grid;grid-template-columns:108px 1fr;gap:16px;align-items:stretch;background:var(--surface);border:2px solid var(--line);
-  border-radius:var(--r);padding:14px;box-shadow:var(--shadow-sm);margin-bottom:13px;transition:.15s}
+.spot{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:center;background:var(--surface);border:2px solid var(--line);
+  border-radius:var(--r);padding:13px;box-shadow:var(--shadow-sm);margin-bottom:13px;transition:.15s}
 .spot:hover{transform:translateX(4px);border-color:var(--line-2)}
 .spot:hover .spot-pic img{transform:scale(1.06)}
-.spot-pic{margin:0;position:relative;width:108px;align-self:stretch;min-height:104px;border-radius:15px;flex:none;overflow:hidden}
+.spot-pic{margin:0;position:relative;width:104px;height:104px;border-radius:15px;overflow:hidden;align-self:start}
+@media(max-width:480px){.spot{grid-template-columns:84px 1fr;gap:13px}.spot-pic{width:84px;height:84px}}
 .spot-pic .spot-num{position:absolute;top:7px;left:7px;z-index:5;min-width:27px;height:27px;padding:0 7px;border-radius:9px;
   background:rgba(255,255,255,.94);color:var(--coral-d);font-family:var(--display);font-weight:800;font-size:1rem;
   display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px rgba(0,0,0,.22)}
@@ -5610,25 +5611,77 @@ let quizBest=loadQuizBest();
 let quizState=null;
 function qshuffle(arr,seed){ const a=[...arr]; let s=seed||1;
   for(let i=a.length-1;i>0;i--){ s=(s*9301+49297)%233280; const j=Math.floor(s/233280*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function buildQuiz(d){
-  const ci=d.country_info, others=DESTS.filter(x=>x.id!==d.id);
-  const distract=picker=>{ const seen=new Set(), out=[];
-    qshuffle(others,d.id.length*7).forEach(o=>{ const v=picker(o); if(v && !seen.has(v)){ seen.add(v); out.push(v); } }); return out; };
-  const seed=d.id.length+d.name.length;
-  const mk=(q,correct,pool,note)=>{ const wrong=pool.filter(v=>v!==correct).slice(0,3);
-    const opts=qshuffle([correct,...wrong],seed+q.length).slice(0,Math.min(4,1+wrong.length)); return {q,opts,correct,note}; };
-  const candidates=[];
-  if(ci.capital)  candidates.push(mk(`What is the capital linked to ${d.name}?`, ci.capital, distract(o=>o.country_info.capital), ''));
-  if(ci.currency) candidates.push(mk(`What money do people use in ${d.country}?`, ci.currency, distract(o=>o.country_info.currency), ''));
-  if(ci.language) candidates.push(mk(`Which language would you hear in ${d.country}?`, ci.language, distract(o=>o.country_info.language), ''));
-  candidates.push(mk(`Poppie filed ${d.name} under which kind of adventure?`, d.region, ['Beach','City','Snow','Wildlife'], ''));
-  return qshuffle(candidates,seed).slice(0,3);
+const QUIZ_LEN=5;
+/* Build a BIG pool of questions (often 30+) from every scrap of the destination's
+   data, then show a fresh, varied random 5 each play. */
+function buildQuizPool(d){
+  const ci=d.country_info||{}, others=DESTS.filter(x=>x.id!==d.id);
+  const seed=Math.floor(Math.random()*1e9);
+  const mk=(type,q,correct,wrongPool)=>{
+    if(correct==null||correct==='') return null;
+    const seen=new Set([correct]), wrong=[];
+    qshuffle(wrongPool||[],q.length+seed).forEach(v=>{ if(v!=null&&v!==''&&!seen.has(v)){ seen.add(v); wrong.push(v); } });
+    if(!wrong.length) return null;
+    const opts=qshuffle([correct].concat(wrong.slice(0,3)),q.length+seed+1);
+    return {type,q,opts,correct};
+  };
+  const pool=[], add=x=>{ if(x) pool.push(x); };
+  const names=others.map(o=>o.name);
+  /* country facts — each its own type for variety */
+  add(mk('capital',`What's the capital linked to ${d.name}?`, ci.capital, others.map(o=>o.country_info&&o.country_info.capital)));
+  add(mk('money',`What money do people use in ${d.country}?`, ci.currency, others.map(o=>o.country_info&&o.country_info.currency)));
+  add(mk('lang',`Which language would you hear in ${d.country}?`, ci.language, others.map(o=>o.country_info&&o.country_info.language)));
+  add(mk('people',`About how many people live in ${d.country}?`, ci.population, others.map(o=>o.country_info&&o.country_info.population)));
+  add(mk('region',`Poppie filed ${d.name} under which kind of adventure?`, d.region, ['Beach','City','Snow','Wildlife','Island','Mountains']));
+  add(mk('flag',`Which flag belongs to ${d.country}?`, d.flag, others.map(o=>o.flag)));
+  if(typeof WORLD_COUNTRIES!=='undefined'){ const wc=WORLD_COUNTRIES.find(c=>wcKey(c.name)===wcKey(d.country));
+    if(wc) add(mk('continent',`Which continent is ${d.country} in?`, wc.continent, ['Europe','Asia','Africa','North America','South America','Oceania'])); }
+  /* things to see / do — answer is a real place name, so it varies */
+  const otherSee=[]; others.forEach(o=>(o.attractions||[]).forEach(a=>otherSee.push(a[1])));
+  const otherDo=[];  others.forEach(o=>(o.kids||[]).forEach(k=>otherDo.push(k[1])));
+  (d.attractions||[]).slice(0,8).forEach(a=>add(mk('see',`Which of these can you see in ${d.name}?`, a[1], otherSee)));
+  (d.kids||[]).slice(0,8).forEach(k=>add(mk('do',`Which fun thing can you do in ${d.name}?`, k[1], otherDo)));
+  /* "which is true" — from the real fun/kid facts */
+  const otherFacts=[]; others.forEach(o=>{ const c=o.country_info||{}; (c.fun||[]).concat(c.kid||[]).forEach(f=>otherFacts.push(f)); });
+  (ci.fun||[]).concat(ci.kid||[]).slice(0,6).forEach(f=>add(mk('fact',`Which of these is true about ${d.country}?`, f, otherFacts)));
+  /* must-do highlights */
+  const otherHi=[]; others.forEach(o=>(o.highlights||[]).forEach(x=>otherHi.push(x)));
+  (d.highlights||[]).slice(0,5).forEach(x=>add(mk('highlight',`What's a must-do in ${d.name}?`, x, otherHi)));
+  /* local cat */
+  if(typeof LOCAL_CATS!=='undefined'&&LOCAL_CATS[d.id]){ const cats=DESTS.map(o=>LOCAL_CATS[o.id]&&LOCAL_CATS[o.id].name).filter(Boolean);
+    add(mk('cat',`What is the name of ${d.name}'s local cat?`, LOCAL_CATS[d.id].name, cats)); }
+  /* phrases */
+  const lk=(typeof DEST_LANG!=='undefined')&&DEST_LANG[d.id], L=(lk&&typeof LANG_PHRASES!=='undefined')?LANG_PHRASES[lk]:null;
+  if(L&&L.phrases&&L.phrases.length>=4){ const locals=L.phrases.map(p=>p.local), ens=L.phrases.map(p=>p.en);
+    qshuffle(L.phrases,seed+5).slice(0,5).forEach(p=>add(mk('phrase',`In ${L.native||lk}, how do you say “${p.en}”?`, p.local, locals)));
+    qshuffle(L.phrases,seed+6).slice(0,4).forEach(p=>add(mk('rphrase',`In ${L.native||lk}, what does “${p.local}” mean?`, p.en, ens))); }
+  /* comparisons against the wider world — work for any country in the dataset */
+  if(typeof WORLD_COUNTRIES!=='undefined'){
+    const me=WORLD_COUNTRIES.find(c=>wcKey(c.name)===wcKey(d.country));
+    if(me){
+      qshuffle(WORLD_COUNTRIES.filter(c=>wcKey(c.name)!==wcKey(d.country)&&c.area),seed+11).slice(0,4).forEach((o,i)=>
+        add({type:'bigger',q:`Which country is bigger: ${d.country} or ${o.name}?`,opts:qshuffle([d.country,o.name],seed+i),correct:(me.area>=o.area?d.country:o.name)}));
+      qshuffle(WORLD_COUNTRIES.filter(c=>wcKey(c.name)!==wcKey(d.country)&&c.population),seed+13).slice(0,4).forEach((o,i)=>
+        add({type:'morepeople',q:`Which country has more people: ${d.country} or ${o.name}?`,opts:qshuffle([d.country,o.name],seed+i+1),correct:(me.population>=o.population?d.country:o.name)}));
+    }
+  }
+  return {pool, seed};
 }
+/* pick n questions spread across types so a single round feels varied */
+function pickVaried(pool,n,seed){
+  const byType={}; qshuffle(pool,seed).forEach(q=>{(byType[q.type]=byType[q.type]||[]).push(q);});
+  const order=qshuffle(Object.keys(byType),seed+9); const out=[]; let i=0;
+  while(out.length<n && order.length){ const t=order[i%order.length];
+    if(byType[t]&&byType[t].length) out.push(byType[t].shift());
+    else { order.splice(i%order.length,1); continue; } i++; }
+  return out.slice(0,n);
+}
+function buildQuiz(d){ const {pool,seed}=buildQuizPool(d); return pickVaried(pool,Math.min(QUIZ_LEN,pool.length),seed); }
 function quizPanelHTML(d){
-  const best=quizBest[d.id];
+  const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
   return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>
-    <p class="sub">Three quick questions about ${esc(d.name)}</p>
-    ${best!=null?`<div class="qbest">🏅 Your best: ${best} / 3</div>`:''}
+    <p class="sub">${QUIZ_LEN} questions, picked fresh from ${total>QUIZ_LEN?('over '+(Math.floor(total/5)*5)):total} about ${esc(d.name)} — play again for new ones!</p>
+    ${best!=null?`<div class="qbest">🏅 Your best: ${best} / ${QUIZ_LEN}</div>`:''}
     <div id="quizBody"></div>
     <button class="btn btn-teal" id="quizStart" type="button">▶️ Start the quiz</button></div>`;
 }
@@ -5650,21 +5703,23 @@ function renderQuizQuestions(){
   }));
 }
 function finishQuiz(){
-  const st=quizState, d=st.dest; let score=0;
+  const st=quizState, d=st.dest, n=st.qs.length; let score=0;
   st.qs.forEach((q,qi)=>{ if(q.opts[st.answered[qi]]===q.correct) score++; });
   if(quizBest[d.id]==null||score>quizBest[d.id]){ quizBest[d.id]=score; saveQuizBest(quizBest); }
   const lines=['Keep exploring — you’ll get them next time! 🐱','Nice try, little explorer! 🌍',
-    'Great job — you really know your stuff! ⭐','WOW! A perfect score — you’re a true Globetrotter! 🏆'];
+    'Good going — you know your stuff! 🧭','Great job — you really know your stuff! ⭐','WOW! A perfect score — you’re a true Globetrotter! 🏆'];
+  const li=Math.min(lines.length-1,Math.round(score/Math.max(1,n)*(lines.length-1)));
+  const perfect=score===n;
   const body=document.getElementById('quizBody');
   body.insertAdjacentHTML('beforeend',`<div class="quiz-result">
-    ${poppiePic(score===3?'yay':'hi','','Poppie')}
-    <h4>${score===3?'Perfect!':'All done!'}</h4><div class="score">You scored ${score} / 3</div>
-    ${stars(score/3*5)}<p class="sub" style="margin:10px 0 16px">${lines[score]}</p>
-    <button class="btn btn-yellow" id="quizRetry" type="button">🔁 Play again</button></div>`);
+    ${poppiePic(perfect?'yay':'hi','','Poppie')}
+    <h4>${perfect?'Perfect!':'All done!'}</h4><div class="score">You scored ${score} / ${n}</div>
+    ${stars(score/Math.max(1,n)*5)}<p class="sub" style="margin:10px 0 16px">${lines[li]}</p>
+    <button class="btn btn-yellow" id="quizRetry" type="button">🔁 Play again (new questions!)</button></div>`);
   const rb=document.getElementById('quizRetry');
   if(rb) rb.addEventListener('click',()=>{ const host=document.getElementById('panel-quiz'); host.innerHTML=quizPanelHTML(d);
     const qs=document.getElementById('quizStart'); if(qs) qs.addEventListener('click',startQuiz); });
-  if(score===3 && !reduceMotion) confetti();
+  if(perfect && !reduceMotion) confetti();
   const rr=body.querySelector('.quiz-result'); if(rr) rr.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'nearest'});
 }
 
