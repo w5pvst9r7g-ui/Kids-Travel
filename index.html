@@ -177,6 +177,14 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 
 /* ============ filters ============ */
 .filters{display:flex;gap:9px;flex-wrap:wrap}
+.searchbar{position:relative;display:flex;align-items:center;margin:0 0 18px}
+.searchbar .si{position:absolute;left:15px;font-size:1.05rem;pointer-events:none;opacity:.7}
+.searchbar input{width:100%;border:2px solid var(--line);background:var(--surface);border-radius:999px;
+  padding:13px 44px 13px 44px;font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--ink);box-shadow:var(--shadow-sm);transition:.15s}
+.searchbar input::placeholder{color:var(--muted);font-weight:700}
+.searchbar input:focus{outline:none;border-color:var(--teal)}
+.searchbar .sclear{position:absolute;right:9px;width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-2);color:var(--ink-2);font-weight:800;cursor:pointer;font-size:.9rem}
+.searchbar .sclear:hover{background:var(--line);color:var(--ink)}
 .chip{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:9px 17px;
   font-weight:800;font-size:.92rem;color:var(--ink-2);transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .chip:hover{transform:translateY(-2px);color:var(--ink)}
@@ -962,6 +970,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <div><span class="eyebrow">The whole atlas</span><h2>Explore places</h2></div>
       <div class="filters" id="filters"></div>
     </div>
+    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search a place or country…" oninput="setDestSearch(this.value)" aria-label="Search destinations"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
     <div id="destGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tap any place to explore it! ⭐ ratings &amp; map pins come from Google Maps.</p>
   </section>
@@ -4827,9 +4836,14 @@ function groupHTML(eyebrow,emoji,title,cards){
     <h3>${emoji} ${title} <span class="cnt">${cards.length}</span></h3></div>
     <div class="deck">${cards.join('')}</div></section>`;
 }
+let destSearch='';
+function setDestSearch(v){ destSearch=(v||'').trim().toLowerCase(); const c=document.querySelector('.searchbar .sclear'); if(c) c.hidden=!destSearch; renderGrid(); }
+function clearDestSearch(){ const i=document.getElementById('destSearch'); if(i) i.value=''; setDestSearch(''); }
 function renderGrid(){
   const host=document.getElementById('destGroups'),vis=visitedDestIds(),soon=plannedDestIds();
-  const list=DESTS.filter(d=>activeRegion==='All'||d.region===activeRegion);
+  const q=destSearch;
+  const match=d=>!q||((d.name+' '+d.country+' '+(d.short||'')+' '+(d.tagline||'')).toLowerCase().indexOf(q)>=0);
+  const list=DESTS.filter(d=>(activeRegion==='All'||d.region===activeRegion)&&match(d));
   const explored=[],wishlist=[];
   list.forEach(d=>{
     if(soon.has(d.id)) return;                       /* upcoming lives in its own tab */
@@ -4839,7 +4853,7 @@ function renderGrid(){
   host.innerHTML =
       groupHTML('Where shall we go?','💭','Dream destinations',wishlist)
     + groupHTML('Our adventures','🧭','Places we’ve explored',explored)
-    || `<div class="empty">No places match this filter — try “All”.</div>`;
+    || `<div class="empty">${q?`No places match “${esc(destSearch)}”. <button class="btn-text" onclick="clearDestSearch()">Clear search</button>`:'No places match this filter — try “All”.'}</div>`;
 }
 function renderUpcoming(){
   const host=document.getElementById('upcomingGroups'); if(!host) return;
