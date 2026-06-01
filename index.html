@@ -278,7 +278,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .panel{display:none;padding:28px 0 6px}
 .panel.active{display:block;animation:fadeup .4s ease}
 @keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.panel h3.blockhead{font-size:1.55rem;margin-bottom:5px}
+.panel h3.blockhead{font-size:1.55rem;margin-bottom:5px;position:relative;display:inline-block}
+.panel h3.blockhead:after{content:"";position:absolute;left:0;width:46px;height:3px;bottom:-5px;border-radius:3px;opacity:.6;
+  background-image:repeating-linear-gradient(90deg,var(--teal) 0 9px,transparent 9px 17px)}
 .panel .sub{color:var(--muted);margin-bottom:20px;font-weight:700}
 
 /* —— Boarding-pass "Getting there" tile —— */
@@ -343,7 +345,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 @media(max-width:680px){.twocol{grid-template-columns:1fr}}
 
 .gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:150px;gap:12px}
-.gallery figure{margin:0;position:relative;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm)}
+.gallery figure{margin:0;position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;
+  box-shadow:inset 0 0 0 3px #fff,0 8px 16px -9px rgba(38,50,74,.35);transition:transform .18s,box-shadow .18s}
+.gallery figure:hover{transform:translateY(-3px) rotate(-.6deg);box-shadow:inset 0 0 0 3px #fff,0 16px 26px -12px rgba(38,50,74,.5)}
 .gallery figure .frame{position:absolute;inset:0}
 .gallery figcaption{position:absolute;left:0;right:0;bottom:0;z-index:4;color:#fff;font-size:.82rem;font-weight:800;
   padding:18px 12px 9px;background:linear-gradient(transparent,rgba(0,0,0,.62))}
