@@ -161,6 +161,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .hero .factnote b{color:var(--coral-d);font-family:var(--display);display:block;font-size:.72rem;
   letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
 @media(max-width:620px){.hero .factnote{display:none}}
+.hero .hero-spot{position:absolute;left:16px;top:16px;z-index:3;background:rgba(0,0,0,.42);color:#fff;border:1.5px solid rgba(255,255,255,.55);
+  backdrop-filter:blur(3px);border-radius:999px;padding:8px 15px;font-family:var(--display);font-weight:800;font-size:.84rem;cursor:pointer;transition:.15s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.hero .hero-spot:hover{background:rgba(0,0,0,.6);transform:translateY(-2px)}
 
 /* ============ featured ============ */
 .featured{display:grid;grid-template-columns:1.04fr 1fr;margin-top:22px;border-radius:var(--r-xl);
@@ -956,10 +959,11 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
         <path d="M6 78 C70 78 78 20 150 26 C214 31 220 70 300 40" stroke="var(--yellow)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9"/>
         <g fill="currentColor" transform="translate(296 34) rotate(-26)"><path d="M0 0 L22 7 L0 14 L6 7 Z"/><path d="M7 7 L18 -2 L13 8 Z" opacity=".75"/></g>
       </svg>
-      <div class="bg">
+      <div class="bg" id="heroBg">
         <img alt="" src="https://loremflickr.com/1280/720/maldives,aerial,island,ocean?lock=900" onerror="this.onerror=function(){this.classList.add('failed')};this.src='https://picsum.photos/seed/poppiehero/1280/720'">
         <div class="scrim"></div>
       </div>
+      <button class="hero-spot" id="heroSpot" type="button" hidden onclick="openHeroSpot()"></button>
       <div class="factnote"><span>💡</span><span><b>Did you know?</b><span id="heroFact">Loading a fun fact…</span></span></div>
       <div class="inner">
         <div class="who"><span class="globie" id="heroGlobie"></span><span class="globie-say" id="globieSay" role="status" aria-live="polite">Hi, I'm Poppie! 🐱</span></div>
@@ -5569,6 +5573,16 @@ const FACTS=(function(){ const seen=new Set(), out=FACTS_BASE.slice();
 /* start on a "fact of the day" so it feels fresh daily, then gently rotates */
 let factI=Math.floor(Date.now()/86400000)%Math.max(1,FACTS.length);
 function rotateFact(){const el=document.getElementById('heroFact'); if(el) el.textContent=FACTS[factI%FACTS.length]; factI++;}
+/* showcase a random real destination on the Explore hero (rotates the spotlight) */
+let heroSpotId=null;
+function setHeroSpotlight(){
+  if(typeof DESTS==='undefined'||!DESTS.length) return;
+  const d=DESTS[Math.floor(Math.random()*DESTS.length)]; heroSpotId=d.id;
+  const bg=document.getElementById('heroBg');
+  if(bg) bg.innerHTML=dpic(d.id,'hero',d.photos[0][2],1280,720,'',d.photos[0][0])+'<div class="scrim"></div>';
+  const chip=document.getElementById('heroSpot'); if(chip){ chip.hidden=false; chip.innerHTML='✨ Spotlight: '+esc(d.name)+' '+esc(d.flag||''); }
+}
+function openHeroSpot(){ if(heroSpotId) openDest(heroSpotId); }
 
 /* =====================================================================
    PWA polish
@@ -6015,7 +6029,7 @@ renderStats();checkAchievements({silent:true});
 const _sb=document.getElementById('surpriseBtn'); if(_sb) _sb.addEventListener('click',surpriseMe);
 poppieSpeak(); setInterval(poppieSpeak,7000);
 document.getElementById('fYear').value=new Date().getFullYear();
-rotateFact();setInterval(rotateFact,6000);observeReveals();
+rotateFact();setInterval(rotateFact,6000);setHeroSpotlight();observeReveals();
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
 addEventListener('resize',syncHeader); syncHeader();
 setupLogin(); showLogin();
