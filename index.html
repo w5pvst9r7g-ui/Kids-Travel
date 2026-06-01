@@ -527,6 +527,20 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .av-choice:hover{transform:translateY(-3px) scale(1.05);border-color:var(--teal)}
 .av-choice.sel{border-color:var(--teal);background:#e7faf8;box-shadow:0 0 0 3px rgba(19,181,172,.18)}
 .av-choice .av-svg{width:100%;height:100%}
+/* —— Poppie the guide accents —— */
+@keyframes poppiebob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.poppie-pic{display:inline-block;object-fit:contain}
+.section-head{position:relative}
+.poppie-peek{position:absolute;right:4px;bottom:-6px;width:84px;height:84px;object-fit:contain;pointer-events:none;
+  filter:drop-shadow(0 6px 8px rgba(40,32,20,.18));animation:poppiebob 4s ease-in-out infinite}
+@media(max-width:560px){.poppie-peek{width:60px;right:0;bottom:-2px}}
+.cd-poppie{position:absolute;right:14px;bottom:10px;z-index:3;width:120px;height:120px;object-fit:contain;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));animation:poppiebob 3.6s ease-in-out infinite}
+@media(max-width:560px){.cd-poppie{width:84px;right:6px;bottom:6px}}
+.empty .poppie-pic{width:120px;height:120px;margin:0 auto 10px;display:block;animation:poppiebob 4s ease-in-out infinite}
+.quiz-result .poppie-pic{width:104px;height:104px;margin:0 auto 6px;display:block}
+.ach-toast .poppie-pic{width:42px;height:42px;flex:none}
+@media(prefers-reduced-motion:reduce){.poppie-peek,.cd-poppie,.empty .poppie-pic{animation:none}}
 /* photo lightbox */
 .lightbox{position:fixed;inset:0;z-index:5600;display:flex;align-items:center;justify-content:center;gap:8px;
   padding:16px;background:rgba(15,17,30,.92);backdrop-filter:blur(4px)}
@@ -666,7 +680,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 
   <!-- ===================== UPCOMING ===================== -->
   <section id="upcoming" class="view">
-    <div class="section-head"><div><span class="eyebrow">Get excited</span><h2>Coming up next 🔜</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow">Get excited</span><h2>Coming up next 🔜</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-play.png"></div>
     <div id="featured" class="reveal"></div>
     <div id="upcomingGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Your booked adventures — tap one to explore it!</p>
@@ -691,7 +705,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 
   <!-- ===================== MAP ===================== -->
   <section id="map-view" class="view">
-    <div class="section-head"><div><span class="eyebrow teal">Every journey, charted</span><h2>My Atlas Map 🗺️</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow teal">Every journey, charted</span><h2>My Atlas Map 🗺️</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-walk.png"></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 18px">Each trip draws a flight path from home — 🇦🇺 Australia in the early years, 🇮🇪 Dublin now — across the world. Tap a marker to remember the adventure!</p>
     <div id="map" role="application" aria-label="World map of your trips. A text summary follows."></div>
     <div id="mapSummary" class="sr-only" aria-live="polite"></div>
@@ -706,7 +720,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 
   <!-- ===================== BADGES ===================== -->
   <section id="badges" class="view">
-    <div class="section-head"><div><span class="eyebrow">Collect them all</span><h2>Explorer Badges 🏅</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow">Collect them all</span><h2>Explorer Badges 🏅</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 16px">Earn badges as you explore the world. They update automatically from your travel journal!</p>
     <div id="explorerBadge"></div>
     <div id="achShelf" class="ach-shelf"></div>
@@ -714,7 +728,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 
   <!-- ===================== TRIPS ===================== -->
   <section id="trips" class="view">
-    <div class="section-head"><div><span class="eyebrow">Collect your stamps</span><h2>My Travel Journal 📔</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow">Collect your stamps</span><h2>My Travel Journal 📔</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-sit.png"></div>
     <div class="journal">
       <div class="formcard">
         <h3 id="formTitle">Add a trip</h3>
@@ -3312,6 +3326,9 @@ const POPPIE_FACE = `
   <path d="M31 68 L13 64 M31 71.5 L13 73 M69 68 L87 64 M69 71.5 L87 73" stroke="#26262B" stroke-width="1.3" stroke-linecap="round" opacity=".75"/>
   <path d="M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z" fill="#FF8A1E" stroke="#E0760E" stroke-width="1"/>`;
 const POPPIE = `<img class="globie" src="poppie.jpg" alt="Poppie the cat" onerror="this.onerror=null;this.outerHTML='<svg class=&quot;globie&quot; viewBox=&quot;0 0 100 100&quot;>'+POPPIE_FACE+'</svg>'">`;
+/* —— Poppie the guide: pose pack —— */
+const POPPIE_PICS={hi:'poppie-hi.png',yay:'poppie-yay.png',sit:'poppie-sit.png',play:'poppie-play.png',fish:'poppie-fish.png',walk:'poppie-walk.png',calm:'poppie-calm.png',stand:'poppie-stand.png',badge:'poppie-badge.png'};
+function poppiePic(name,cls,alt){return `<img class="poppie-pic ${cls||''}" loading="lazy" alt="${esc(alt||'Poppie')}" src="${POPPIE_PICS[name]||'poppie.jpg'}">`;}
 
 /* =====================================================================
    STATE + STORAGE
@@ -3409,7 +3426,8 @@ function renderFeatured(){
       <h2 class="cd-place">${esc(t.flag||'')} ${esc(t.city)}</h2>
       <div class="cd-date">📅 ${esc(dstr)}${wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:''}</div>
       ${d?`<button class="btn btn-yellow" onclick="openDest('${d.id}')">Explore ${esc(d.name)} →</button>`:''}
-    </div></div>`;
+    </div>
+    <img class="cd-poppie" loading="lazy" alt="Poppie can't wait!" src="poppie-fish.png"></div>`;
 }
 
 /* =====================================================================
@@ -3694,7 +3712,7 @@ function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').f
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
-    p.innerHTML=`<div class="empty">${POPPIE.replace('class="globie"','class="globie bob"')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
+    p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppie waiting')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
     return;
   }
   const sorted=[...trips].sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
@@ -3987,7 +4005,7 @@ function finishQuiz(){
     'Great job — you really know your stuff! ⭐','WOW! A perfect score — you’re a true Globetrotter! 🏆'];
   const body=document.getElementById('quizBody');
   body.insertAdjacentHTML('beforeend',`<div class="quiz-result">
-    ${POPPIE.replace('class="globie"','class="globie'+(reduceMotion?'':' bob')+'"')}
+    ${poppiePic(score===3?'yay':'hi','','Poppie')}
     <h4>${score===3?'Perfect!':'All done!'}</h4><div class="score">You scored ${score} / 3</div>
     ${stars(score/3*5)}<p class="sub" style="margin:10px 0 16px">${lines[score]}</p>
     <button class="btn btn-yellow" id="quizRetry" type="button">🔁 Play again</button></div>`);
