@@ -641,6 +641,20 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 @keyframes eggrise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .egg-tap{color:#fff;opacity:.7;margin-top:14px;font-weight:700;font-size:.85rem}
 @media(prefers-reduced-motion:reduce){.egg-cat.pop,.egg-bubble{animation:none}}
+/* first-run onboarding */
+.onb{position:fixed;inset:0;z-index:6200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,16,28,.7);backdrop-filter:blur(6px)}
+.onb.hidden{display:none}
+.onb-card{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow);max-width:440px;width:100%;padding:26px 24px 24px;text-align:center;position:relative;max-height:92vh;overflow:auto;animation:onbpop .4s cubic-bezier(.2,.8,.3,1.1) both}
+@keyframes onbpop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+.onb-cat{width:108px;height:108px;object-fit:contain;margin:-2px auto 4px;display:block;filter:drop-shadow(0 8px 14px rgba(0,0,0,.18))}
+.onb-card h2{font-family:var(--display);font-weight:800;font-size:1.7rem;color:var(--ink);margin-bottom:4px}
+.onb-lead{color:var(--ink-2);font-weight:700;margin:0 0 16px}
+.onb-lead b{color:var(--coral-d)}
+.onb-tips{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:11px;text-align:left}
+.onb-tips li{display:flex;align-items:flex-start;gap:13px;background:var(--surface-2);border:2px solid var(--line);border-radius:var(--r);padding:12px 14px;color:var(--ink-2);font-weight:700;font-size:.96rem}
+.onb-tips li b{color:var(--ink)}
+.onb-tips .oe{font-size:1.5rem;line-height:1;flex:none}
+@media(prefers-reduced-motion:reduce){.onb-card{animation:none}}
 .section-head{position:relative}
 .poppie-peek{position:absolute;right:4px;bottom:-6px;width:84px;height:84px;object-fit:contain;pointer-events:none;
   filter:drop-shadow(0 6px 8px rgba(40,32,20,.18));animation:poppiebob 4s ease-in-out infinite}
@@ -760,6 +774,33 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 @media(prefers-reduced-motion:reduce){.profile-btn:hover{transform:none}.shake{animation:none}}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
+/* —— printable passport page —— */
+#printArea{display:none}
+.pp-doc{font-family:var(--sans);color:#1f2433;padding:8px 4px}
+.pp-doc .pp-top{display:flex;align-items:center;gap:14px;border-bottom:3px solid #0F7D74;padding-bottom:12px;margin-bottom:14px}
+.pp-doc .pp-logo{width:52px;height:52px;border-radius:13px;object-fit:cover}
+.pp-doc .pp-kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#0F7D74;font-weight:800}
+.pp-doc h1{font-family:var(--display);font-size:1.9rem;font-weight:800;margin:0;color:#1f2433}
+.pp-doc .pp-rank{margin-left:auto;text-align:right;font-weight:800;color:#0F7D74}
+.pp-doc .pp-stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.pp-doc .pp-stat{font-weight:800}
+.pp-doc .pp-stat b{font-family:var(--display);font-size:1.5rem;color:#C2492F;display:block;line-height:1}
+.pp-doc .pp-stat span{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:#666}
+.pp-doc .pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pp-doc .pp-stamp{border:2.5px dashed #b08; border-radius:14px;padding:12px;text-align:center;page-break-inside:avoid}
+.pp-doc .pp-stamp.soon{border-color:#caa000}
+.pp-doc .pp-stamp .fl{font-size:2rem;line-height:1}
+.pp-doc .pp-stamp .ci{font-family:var(--display);font-weight:800;font-size:1.05rem;color:#1f2433;margin-top:3px}
+.pp-doc .pp-stamp .co{font-size:.78rem;color:#555;font-weight:700}
+.pp-doc .pp-stamp .yr{display:inline-block;margin-top:5px;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#b08}
+.pp-doc .pp-stamp.soon .yr{color:#9a7600}
+.pp-doc .pp-foot{margin-top:18px;text-align:center;color:#888;font-size:.8rem;font-weight:700}
+@media print{
+  html,body{background:#fff!important}
+  body>*{display:none!important}
+  #printArea{display:block!important}
+  @page{margin:14mm}
+}
 </style>
 </head>
 <body>
@@ -824,6 +865,21 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     <img class="egg-cat" src="poppie-hi.png" alt="Grumpy Poppie">
     <div class="egg-bubble" id="eggLine"></div>
     <div class="egg-tap">😼 (tap anywhere to close)</div>
+  </div>
+</div>
+
+<div id="onboard" class="onb hidden" role="dialog" aria-modal="true" aria-labelledby="onbTitle" onclick="if(event.target.id==='onboard')closeOnboard()">
+  <div class="onb-card">
+    <img class="onb-cat" loading="lazy" src="poppie-yay.png" alt="Poppie the cat, waving hello">
+    <h2 id="onbTitle">Welcome, explorer! 🐱</h2>
+    <p class="onb-lead">I'm <b>Poppie</b>, your travel cat. Here's how we explore together:</p>
+    <ul class="onb-tips">
+      <li><span class="oe" aria-hidden="true">🔜</span><div><b>Upcoming</b> — count down the sleeps to your next big trip!</div></li>
+      <li><span class="oe" aria-hidden="true">🌍</span><div><b>Explore</b> — tap any place for photos, fun facts, things to do and my local-cat story.</div></li>
+      <li><span class="oe" aria-hidden="true">🗺️</span><div><b>Atlas Map</b> — every adventure drawn as a flight path from home.</div></li>
+      <li><span class="oe" aria-hidden="true">🏅</span><div><b>Badges</b> — collect explorer badges and see all your countries.</div></li>
+    </ul>
+    <button class="btn btn-primary" id="onbGo" onclick="closeOnboard()" style="width:100%;justify-content:center">Let's explore! →</button>
   </div>
 </div>
 
@@ -979,6 +1035,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
           <div class="journal-tools">
             <button class="jtool" onclick="exportTrips()" title="Save a backup file">📤 Backup</button>
             <button class="jtool" onclick="document.getElementById('importFile').click()" title="Load a backup file">📥 Restore</button>
+            <button class="jtool" onclick="printPassport()" title="Print or save your passport page">🖨️ Passport</button>
             <button class="jtool" onclick="resetTrips()" title="Restore the sample family trips">↺ Sample trips</button>
             <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="importTrips(this)">
           </div>
@@ -4549,7 +4606,7 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 
 /* =====================================================================
@@ -5266,6 +5323,39 @@ function importTrips(input){ const file=input.files&&input.files[0]; if(!file) r
   r.readAsText(file); }
 function resetTrips(){ if(!confirm('Restore the original sample family trips? This replaces the current journal for this explorer.')) return;
   trips=JSON.parse(JSON.stringify(SEED_TRIPS)); saveTrips(); applyProfileData(); }
+function printPassport(){
+  const area=document.getElementById('printArea'); if(!area) return;
+  const prof=PROFILES.find(x=>x.id===currentProfile), name=(prof&&prof.name)||'Explorer';
+  const done=trips.filter(t=>!t.planned), planned=trips.filter(t=>t.planned);
+  const countries=new Set(done.map(t=>t.country).filter(Boolean)).size;
+  const continents=new Set(done.map(continentOf).filter(Boolean)).size;
+  let km=0; done.forEach(t=>{ if(t.lat!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
+  const levels=[{n:0,t:'Junior Explorer'},{n:1,t:'Pathfinder'},{n:3,t:'Globetrotter'},{n:5,t:'World Explorer'},{n:8,t:'Legendary Voyager'}];
+  let rank=levels[0].t; levels.forEach(l=>{ if(countries>=l.n) rank=l.t; });
+  const sorted=trips.slice().sort((a,b)=>(a.planned-b.planned)||((b.year||0)-(a.year||0)));
+  const stamps=sorted.map(t=>`<div class="pp-stamp ${t.planned?'soon':''}">
+      <div class="fl">${esc(t.flag||t.emoji||'🌍')}</div>
+      <div class="ci">${esc(t.city)}</div>
+      <div class="co">${esc(t.country||'')}</div>
+      <div class="yr">${t.planned?'Coming up':esc(t.year||'')}</div></div>`).join('');
+  area.innerHTML=`<div class="pp-doc">
+    <div class="pp-top">
+      <img class="pp-logo" src="poppie.jpg" alt="" onerror="this.style.display='none'">
+      <div><div class="pp-kick">Poppie's Atlas · Passport</div><h1>${esc(name)}'s Adventures</h1></div>
+      <div class="pp-rank">🏅 ${esc(rank)}</div>
+    </div>
+    <div class="pp-stats">
+      <div class="pp-stat"><b>${countries}</b><span>Countries</span></div>
+      <div class="pp-stat"><b>${continents}</b><span>Continents</span></div>
+      <div class="pp-stat"><b>${done.length}</b><span>Adventures</span></div>
+      <div class="pp-stat"><b>${km.toLocaleString()}</b><span>km flown</span></div>
+      <div class="pp-stat"><b>${planned.length}</b><span>Coming up</span></div>
+    </div>
+    <div class="pp-grid">${stamps}</div>
+    <div class="pp-foot">✈️ Printed from Poppie's Atlas — keep exploring! 🐱</div>
+  </div>`;
+  setTimeout(()=>{ try{window.print();}catch(e){} },150);
+}
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
@@ -5653,7 +5743,18 @@ function updateProfileChip(){ const c=document.getElementById('profileChip'); if
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
 function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
-function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); }
+function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); setTimeout(maybeOnboard,260); }
+function maybeOnboard(){
+  if(!currentProfile) return;
+  try{ if(localStorage.getItem('globie_onboard_'+currentProfile)) return; }catch(e){}
+  const p=PROFILES.find(x=>x.id===currentProfile), t=document.getElementById('onbTitle');
+  if(t&&p) t.textContent='Welcome, '+p.name+'! 🐱';
+  const o=document.getElementById('onboard'); if(o){ o.classList.remove('hidden'); const g=document.getElementById('onbGo'); if(g) setTimeout(()=>g.focus(),90); }
+}
+function closeOnboard(){
+  const o=document.getElementById('onboard'); if(o) o.classList.add('hidden');
+  if(currentProfile){ try{ localStorage.setItem('globie_onboard_'+currentProfile,'1'); }catch(e){} }
+}
 function renderProfilePick(){
   const wrap=document.getElementById('profilePick'); if(!wrap) return;
   wrap.innerHTML=PROFILES.map(p=>`<div class="profile-card">
@@ -5700,5 +5801,6 @@ function syncHeader(){const s=document.querySelector('.site'); if(s) document.do
 addEventListener('resize',syncHeader); syncHeader();
 setupLogin(); showLogin();
 </script>
+<div id="printArea" aria-hidden="true"></div>
 </body>
 </html>

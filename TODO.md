@@ -72,12 +72,12 @@ Last updated: 2026-06-01
 - [ ] Compress the Poppie PNGs (~20 MB → ~1.5 MB) for faster loads *(needs an image tool / external compressor)*
 - [ ] ~~Weather / best-time mini-widget~~ — **deprioritised**: real weather needs a network API, and each guide's boarding pass already shows the "Best time" to go
 
-### Polish / delight (next up)
-- [ ] First-run onboarding tip from Poppie
-- [ ] Per-destination "fun fact of the day" rotation
-- [ ] "Share / print a passport page" for a trip
-- [ ] Map: tap a country to filter guides to it
-- [ ] Remove unused Madagascar/Antarctica photo entries (cleanup)
+### Polish / delight
+- [x] **First-run onboarding** — friendly Poppie welcome (once per explorer, personalised, Esc/tap to close) explaining Upcoming / Explore / Map / Badges
+- [x] **Printable passport page** — 🖨️ button in the Journal opens a clean one-page passport (name, rank, stats + a stamp grid) you can print or save as PDF
+- [x] ~~Fun fact of the day~~ — already covered by the rotating "Did you know?" facts on the Explore hero
+- [ ] Map: tap a country to filter guides to it *(needs country polygons / GeoJSON — heavier)*
+- [ ] Remove unused Madagascar/Antarctica photo entries *(low value; they sit harmlessly inside a minified blob)*
 - [ ] Sound effects / haptics (subtle, toggleable)
 
 ### Needs Grant's input / accounts
