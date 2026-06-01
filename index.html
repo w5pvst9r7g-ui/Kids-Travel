@@ -3368,8 +3368,8 @@ function poppiePic(name,cls,alt){return `<img class="poppie-pic ${cls||''}" load
    ===================================================================== */
 /* —— Profiles: each explorer has their own journal, badges & quiz scores —— */
 const PROFILES=[
-  {id:'jeanluc', name:'Jean-Luc', emoji:'🦖', color:'#46B3F0'},
-  {id:'hailey',  name:'Hailey',   emoji:'🦄', color:'#FF7FB0'}
+  {id:'jeanluc', name:'Jean-Luc', emoji:'🦖', color:'#46B3F0', dob:2016},
+  {id:'hailey',  name:'Hailey',   emoji:'🦄', color:'#FF7FB0', dob:2019}
 ];
 const PROFILE_PIN='1985';            // simple family gate (not real security)
 let currentProfile=null;             // chosen at the login screen each visit
@@ -4108,7 +4108,8 @@ function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) ret
 function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
-function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); celebratedTrip=null;
+function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
+function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); }
 function renderProfilePick(){
