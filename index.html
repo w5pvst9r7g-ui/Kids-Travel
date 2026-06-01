@@ -2310,7 +2310,7 @@ const SEED_TRIPS = [
   {id:'t26', era:'ireland', destId:'brisbane', city:'Brisbane', country:'Australia', flag:'🇦🇺', emoji:'🏠', lat:-27.4698, lng:153.0251, year:2025, planned:false, rating:5, note:'Going back to visit our old home in Queensland.'},
   // —— Coming up ——
   {id:'t27', era:'ireland', destId:'maldives', city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'},
-  {id:'t28', era:'ireland', destId:'brisbane', city:'Australia (Christmas)', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-27.4698, lng:153.0251, year:2026, planned:true, rating:0, note:'Three weeks back home in Australia for Christmas!'}
+  {id:'t28', era:'ireland', destId:'sunshinecoast', city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-26.6500, lng:153.0667, year:2026, planned:true, rating:0, note:'Three weeks back on the Sunshine Coast for Christmas! 🎄🏖️'}
 ];
 
 /* =====================================================================
@@ -2351,7 +2351,7 @@ const PROFILES=[
 ];
 const PROFILE_PIN='1985';            // simple family gate (not real security)
 let currentProfile=null;             // chosen at the login screen each visit
-const dataKey=base=>'globie_atlas_'+base+'_v7_'+(currentProfile||'guest');
+const dataKey=base=>'globie_atlas_'+base+'_v8_'+(currentProfile||'guest');
 function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
@@ -2799,20 +2799,40 @@ const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Eur
   Australia:'Oceania','New Zealand':'Oceania',Vanuatu:'Oceania','United States':'North America'};
 const continentOf=t=>CONTINENT_OF[t.country]||null;
 const ACHIEVEMENTS=[
+  // —— getting started ——
   {id:'first_flight',em:'🛫',nm:'First Flight',ds:'Save your first trip',ac:'#13B5AC',test:c=>c.visited.length>=1},
-  {id:'down_under',em:'🦘',nm:'Down Under',ds:'Visit Australia',ac:'#43C28A',test:c=>c.countries.has('Australia')},
-  {id:'african_safari',em:'🦁',nm:'African Adventure',ds:'Visit Africa',ac:'#F0A91E',test:c=>c.continents.has('Africa')},
-  {id:'island_hopper',em:'🏝️',nm:'Island Hopper',ds:'Visit an island nation',ac:'#0FA7AF',test:c=>['Maldives','New Zealand','Vanuatu','Singapore','Iceland'].some(n=>c.countries.has(n))},
-  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland/Lapland)',ac:'#5BB8F0',test:c=>c.countries.has('Iceland')||c.countries.has('Finland')},
-  {id:'stars_stripes',em:'🗽',nm:'Stars & Stripes',ds:'Visit the United States',ac:'#46B3F0',test:c=>c.countries.has('United States')},
-  {id:'euro_explorer',em:'🏰',nm:'Euro Explorer',ds:'Visit 3 European countries',ac:'#F46A4B',test:c=>(c.continentCounts.Europe||0)>=3},
-  {id:'five_countries',em:'🖐️',nm:'5 Countries',ds:'Visit 5 different countries',ac:'#FFC23C',test:c=>c.countries.size>=5},
-  {id:'continent_hop',em:'🌐',nm:'Continent Hopper',ds:'Reach 3 continents',ac:'#7C6CF4',test:c=>c.continents.size>=3},
-  {id:'five_continents',em:'🌏',nm:'World Wanderer',ds:'Reach all 5 continents',ac:'#FF7FB0',test:c=>c.continents.size>=5},
-  {id:'around_world',em:'🌍',nm:'Around the World',ds:'Fly 40,000 km in total',ac:'#13B5AC',test:c=>c.km>=40000},
+  {id:'planner',em:'🗓️',nm:'Trip Planner',ds:'Have an upcoming trip',ac:'#7C6CF4',test:c=>c.planned.length>=1},
   {id:'super_fan',em:'⭐',nm:'Super Fan',ds:'Give a trip 5 fun stars',ac:'#F0A91E',test:c=>c.visited.some(t=>t.rating>=5)},
-  {id:'planner',em:'🗓️',nm:'Trip Planner',ds:'Plan an upcoming trip',ac:'#7C6CF4',test:c=>c.planned.length>=1},
-  {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 10 trips in all',ac:'#FF8366',test:c=>c.visited.length>=10}
+  {id:'five_star',em:'🌟',nm:'Five-Star Family',ds:'Love 5 trips (5 stars each)',ac:'#FFC23C',test:c=>c.visited.filter(t=>t.rating>=5).length>=5},
+  // —— counting ——
+  {id:'five_countries',em:'🖐️',nm:'High Five',ds:'Visit 5 countries',ac:'#FFC23C',test:c=>c.countries.size>=5},
+  {id:'ten_countries',em:'🔟',nm:'Ten Countries',ds:'Visit 10 countries',ac:'#FF8366',test:c=>c.countries.size>=10},
+  {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 10 trips',ac:'#F46A4B',test:c=>c.visited.length>=10},
+  {id:'globetrotter',em:'👑',nm:'Globetrotter',ds:'Take 20 trips',ac:'#7C6CF4',test:c=>c.visited.length>=20},
+  {id:'mega',em:'✈️',nm:'Mega Traveller',ds:'Take 30 trips',ac:'#0FA7AF',test:c=>c.visited.length>=30},
+  // —— continents ——
+  {id:'continent_hop',em:'🌐',nm:'Continent Hopper',ds:'Reach 3 continents',ac:'#7C6CF4',test:c=>c.continents.size>=3},
+  {id:'five_continents',em:'🌏',nm:'World Wanderer',ds:'Reach all 5 inhabited continents',ac:'#FF7FB0',test:c=>c.continents.size>=5},
+  {id:'around_world',em:'🌍',nm:'Around the World',ds:'Fly 40,000 km in total',ac:'#13B5AC',test:c=>c.km>=40000},
+  {id:'longhaul',em:'🚀',nm:'Long-Haul Legend',ds:'Fly 150,000 km in total',ac:'#F46A4B',test:c=>c.km>=150000},
+  // —— regions ——
+  {id:'beach_lover',em:'🏖️',nm:'Beach Lover',ds:'Visit a beach or island spot',ac:'#0FA7AF',test:c=>c.regions.has('Beach')},
+  {id:'city_slicker',em:'🏙️',nm:'City Slicker',ds:'Visit a big city',ac:'#F46A4B',test:c=>c.regions.has('City')},
+  {id:'safari',em:'🦒',nm:'Safari Spotter',ds:'Visit a wildlife spot',ac:'#43C28A',test:c=>c.regions.has('Wildlife')},
+  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland/Lapland)',ac:'#5BB8F0',test:c=>c.regions.has('Snow')||c.countries.has('Iceland')||c.countries.has('Finland')},
+  // —— places ——
+  {id:'down_under',em:'🦘',nm:'Down Under',ds:'Visit Australia',ac:'#43C28A',test:c=>c.countries.has('Australia')},
+  {id:'kiwi',em:'🥝',nm:'Kiwi Explorer',ds:'Visit New Zealand',ac:'#34B47E',test:c=>c.countries.has('New Zealand')},
+  {id:'pacific',em:'🌴',nm:'Pacific Pioneer',ds:'Visit a Pacific island',ac:'#13B5AC',test:c=>c.countries.has('Vanuatu')},
+  {id:'asia',em:'🏯',nm:'Asia Adventurer',ds:'Visit Asia',ac:'#FF7FB0',test:c=>c.continents.has('Asia')},
+  {id:'african_safari',em:'🦁',nm:'African Adventure',ds:'Visit Africa',ac:'#F0A91E',test:c=>c.continents.has('Africa')},
+  {id:'stars_stripes',em:'🗽',nm:'Stars & Stripes',ds:'Visit the United States',ac:'#46B3F0',test:c=>c.countries.has('United States')},
+  {id:'euro_explorer',em:'🏰',nm:'Euro Explorer',ds:'Visit 3 European countries',ac:'#7C6CF4',test:c=>(c.continentCounts.Europe||0)>=3},
+  {id:'med',em:'☀️',nm:'Mediterranean Magic',ds:'Visit Spain, Italy, Greece or Croatia',ac:'#F4A11E',test:c=>['Spain','Italy','Greece','Croatia'].some(n=>c.countries.has(n))},
+  {id:'island_hopper',em:'🏝️',nm:'Island Hopper',ds:'Visit an island nation',ac:'#0FA7AF',test:c=>['Maldives','New Zealand','Vanuatu','Singapore','Iceland'].some(n=>c.countries.has(n))},
+  {id:'maldives_dream',em:'🐠',nm:'Maldives Dreamer',ds:'Visit the Maldives',ac:'#22B0BE',test:c=>c.countries.has('Maldives')},
+  // —— still to earn ——
+  {id:'antarctic',em:'🐧',nm:'Polar Explorer',ds:'Reach Antarctica one day!',ac:'#48cae4',test:c=>c.continents.has('Antarctica')}
 ];
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
@@ -2836,9 +2856,10 @@ function renderAchievements(){
         <div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div>`;}).join('')}</div>`;
 }
 function checkAchievements(opts){
-  const ctx=achContext(); const fresh=[];
-  ACHIEVEMENTS.forEach(a=>{ if(!unlockedAch.has(a.id) && a.test(ctx)){ unlockedAch.add(a.id); fresh.push(a); } });
-  if(fresh.length) saveAch(unlockedAch);
+  const ctx=achContext(); const fresh=[]; const now=new Set();
+  /* reconcile: badges always reflect the CURRENT itinerary (drops stale ones) */
+  ACHIEVEMENTS.forEach(a=>{ if(a.test(ctx)){ now.add(a.id); if(!unlockedAch.has(a.id)) fresh.push(a); } });
+  unlockedAch=now; saveAch(unlockedAch);
   renderAchievements();
   if(fresh.length && !(opts&&opts.silent)){
     fresh.forEach((a,i)=>setTimeout(()=>showAchToast(a), i*900));
