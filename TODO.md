@@ -78,6 +78,8 @@ Last updated: 2026-06-01
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
+- [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppie → full-screen grumpy Poppie with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page
 - [x] Replace Poppie poses with transparent versions + use her bigger (hero + every destination hero)
