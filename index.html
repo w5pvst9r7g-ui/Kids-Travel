@@ -351,6 +351,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .badge-ribbon .sub{color:var(--ink-2);font-weight:700;font-size:.9rem}
 .badge-ribbon .bar{height:10px;background:var(--line);border-radius:10px;margin-top:7px;overflow:hidden;width:200px;max-width:46vw}
 .badge-ribbon .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--coral));border-radius:10px;transition:width .8s ease}
+.map-tools{display:flex;justify-content:flex-end;margin:0 0 10px}
+.map-tools .btn{padding:9px 16px}
 .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;color:var(--ink-2);font-weight:700;font-size:.85rem}
 .legend span{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 13px;box-shadow:var(--shadow-sm)}
 .leg-dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.04)}
@@ -1020,12 +1022,13 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   <section id="map-view" class="view">
     <div class="section-head"><div><span class="eyebrow teal">Every journey, charted</span><h2>My Atlas Map 🗺️</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-walk.png"></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 18px">Each trip draws a flight path from home — 🇦🇺 Australia in the early years, 🇮🇪 Dublin now — across the world. Tap a marker to remember the adventure!</p>
+    <div class="map-tools"><button class="btn btn-teal" id="flyNextBtn" type="button" onclick="flyToNextTrip()">✈️ Fly to next trip</button></div>
     <div id="map" role="application" aria-label="World map of your trips. A text summary follows."></div>
     <div id="mapSummary" class="sr-only" aria-live="polite"></div>
     <div class="legend">
       <span><span class="leg-dot" style="background:#FF8366"></span> Places visited</span>
       <span><span class="leg-dot" style="background:#FFC23C"></span> Coming up next</span>
-      <span><span class="leg-dot" style="background:#43C28A"></span> Home · Gold Coast 🇦🇺</span>
+      <span><span class="leg-dot" style="background:#43C28A"></span> Home · Sunshine Coast 🇦🇺</span>
       <span><span class="leg-dot" style="background:#13B5AC"></span> Home · Dublin 🇮🇪</span>
     </div>
     <div class="stats" id="stats"></div>
@@ -5115,6 +5118,11 @@ function clusterMarkers(){
   }
 }
 function zoomCluster(lat,lng){ if(map) map.flyTo([lat,lng],Math.min(map.getZoom()+3,9),{duration:.6}); }
+function flyToNextTrip(){
+  const np=nextPlanned();
+  if(!np||np.lat==null){ if(map) map.flyTo([20,0],2,{duration:.8}); return; }
+  if(map){ map.flyTo([np.lat,np.lng],4,{duration:1.1}); }
+}
 function drawArc(line){ if(reduceMotion) return;
   try{const p=line._path; if(!p||!p.getTotalLength) return; const len=p.getTotalLength();
     p.style.transition='none';p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.getBoundingClientRect();
@@ -5207,7 +5215,7 @@ function buildMap(){
     },70);
   }
   const sum=document.getElementById('mapSummary');
-  if(sum) sum.textContent='Home bases: Gold Coast, Australia and Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
+  if(sum) sum.textContent=`Home bases: ${HOMES.australia.name}, ${HOMES.australia.country} and ${HOMES.ireland.name}, ${HOMES.ireland.country}. `+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
   renderStats();
 }
 function renderStats(){
