@@ -3950,13 +3950,12 @@ function packStats(t){ const items=packList(t), st=packState[t.id]||{}, done=ite
 /* compact progress cards on the Upcoming page */
 function renderPacking(){
   const host=document.getElementById('packing'); if(!host) return;
-  const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
-  if(!planned.length){ host.innerHTML=''; return; }
-  host.innerHTML=planned.map(t=>{ const s=packStats(t);
-    return `<button class="pack-progress" onclick="showView('packing')">
-      <div class="pp-top"><span>🎒 Packing for ${esc(t.city)}</span><span class="pp-count">${s.done}/${s.total}</span></div>
-      <div class="pack-bar"><i style="width:${s.pct}%"></i></div>
-      <div class="pp-cta">${s.done===s.total?'🎉 All packed!':'Open packing list →'}</div></button>`; }).join('');
+  const t=nextPlanned(); if(!t){ host.innerHTML=''; return; }
+  const s=packStats(t);
+  host.innerHTML=`<button class="pack-progress" onclick="showView('packing')">
+    <div class="pp-top"><span>🎒 Packing for ${esc(t.city)}</span><span class="pp-count">${s.done}/${s.total}</span></div>
+    <div class="pack-bar"><i style="width:${s.pct}%"></i></div>
+    <div class="pp-cta">${s.done===s.total?'🎉 All packed!':'Open packing list →'}</div></button>`;
 }
 /* full checklist on the dedicated Packing screen */
 function packBoxHTML(t){ const s=packStats(t);
@@ -3969,8 +3968,8 @@ function packBoxHTML(t){ const s=packStats(t);
 }
 function renderPackingScreen(){
   const host=document.getElementById('packingScreen'); if(!host) return;
-  const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
-  host.innerHTML = planned.length ? planned.map(packBoxHTML).join('') : `<div class="empty">${poppiePic('calm','','Poppie')}<h3>Nothing to pack yet!</h3><p>Add an upcoming trip in your Journal and Poppie will help you pack. ✈️</p></div>`;
+  const t=nextPlanned();
+  host.innerHTML = t ? packBoxHTML(t) : `<div class="empty">${poppiePic('calm','','Poppie')}<h3>Nothing to pack yet!</h3><p>Add an upcoming trip in your Journal and Poppie will help you pack. ✈️</p></div>`;
 }
 function togglePack(id,i){ if(!packState[id])packState[id]={}; packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); renderPackingScreen(); }
 
