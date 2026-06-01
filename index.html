@@ -4816,7 +4816,7 @@ function showView(v){
   if(v==='packing') renderPackingScreen();
   if(v==='badges'){ renderStats(); renderAchievements(); }
   if(v==='world') renderWorld();
-  if(v==='map') setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90);
+  if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90); }
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
 }
@@ -5166,6 +5166,8 @@ function flyToNextTrip(){
   if(!np||np.lat==null){ if(map) map.flyTo([20,0],2,{duration:.8}); return; }
   if(map){ map.flyTo([np.lat,np.lng],4,{duration:1.1}); }
 }
+function updateFlyBtn(){ const b=document.getElementById('flyNextBtn'); if(!b) return; const np=nextPlanned();
+  if(np&&np.lat!=null){ b.hidden=false; b.innerHTML='✈️ Fly to '+esc(np.city); } else { b.hidden=true; } }
 function drawArc(line){ if(reduceMotion) return;
   try{const p=line._path; if(!p||!p.getTotalLength) return; const len=p.getTotalLength();
     p.style.transition='none';p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.getBoundingClientRect();
@@ -6001,14 +6003,20 @@ function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.
 function profileName(){ const p=PROFILES.find(x=>x.id===currentProfile); return p?p.name:''; }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
   showSplash(()=>{ setTimeout(maybeOnboard,180); }); }
+let _splashTimers=[], _splashCb=null;
 function showSplash(cb){
   const s=document.getElementById('splash'); if(!s){ cb&&cb(); return; }
   const nm=profileName(), sub=document.getElementById('splashSub'); if(sub) sub.textContent=nm?('Welcome back, '+nm+'! ✈️'):"Kids' Travel Adventure";
-  s.classList.remove('hidden','out');
+  s.classList.remove('hidden','out'); s.onclick=skipSplash; _splashCb=cb;
   const hold=reduceMotion?300:1550;
-  setTimeout(()=>{ s.classList.add('out'); }, hold);
-  setTimeout(()=>{ s.classList.add('hidden'); s.classList.remove('out'); cb&&cb(); }, hold+430);
+  _splashTimers=[ setTimeout(()=>{ s.classList.add('out'); }, hold),
+                  setTimeout(()=>finishSplash(), hold+430) ];
 }
+function finishSplash(){ const s=document.getElementById('splash'); if(!s) return;
+  _splashTimers.forEach(clearTimeout); _splashTimers=[];
+  s.classList.add('hidden'); s.classList.remove('out'); s.onclick=null;
+  const cb=_splashCb; _splashCb=null; cb&&cb(); }
+function skipSplash(){ const s=document.getElementById('splash'); if(s) s.classList.add('out'); finishSplash(); }
 function maybeOnboard(){
   if(!currentProfile) return;
   try{ if(localStorage.getItem('globie_onboard_'+currentProfile)) return; }catch(e){}
