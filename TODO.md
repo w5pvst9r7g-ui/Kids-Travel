@@ -46,6 +46,10 @@ Last updated: 2026-06-01
 
 ## 🔜 In progress
 - [x] **Hero photo upgrade** — 17 less-iconic heroes swapped for more "wow" shots (Whitehaven aerial, Flinders St at night, Avon punting, Düden Falls…)
+- [x] **UI refresh (soft modern pastel)** — warm-cream palette, muted sage/blush/butter/lavender accents; deepened solid CTAs for readable white text
+- [x] **Boarding-pass "Getting there" tile** + **passport-page "The country" tile** (replaced the plain meta tiles Grant disliked)
+- [x] **Photos in "What to see" + "Fun stuff to do"** — each spot now has a thumbnail; "Best for kids" renamed to **🎢 Fun stuff to do**
+- [x] **Photo captions back in step** — gallery + lightbox now use the curated caption that matches each image
 
 ---
 
