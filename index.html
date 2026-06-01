@@ -315,6 +315,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .stat .lbl{color:var(--ink-2);font-weight:800;font-size:.82rem;margin-top:6px}
 
 .pin svg{filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
+.plane-fly{font-size:1.4rem;line-height:1;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:var(--shadow);padding:4px}
 .leaflet-popup-content{margin:10px 12px;font-family:var(--sans)}
 .pop{width:200px}
@@ -560,6 +561,12 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .pack-item.on{background:#eafaf3;border-color:var(--green);color:var(--teal-d)}
 .pack-item.on span{text-decoration:line-through;opacity:.7}
 .pack-done{margin-top:14px;text-align:center;font-family:var(--display);font-weight:800;color:var(--green);font-size:1.1rem}
+.packbox+.packbox{margin-top:16px}
+.pack-progress{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-sm);cursor:pointer;margin-top:14px;transition:.15s}
+.pack-progress:hover{transform:translateY(-2px);border-color:var(--teal)}
+.pp-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.05rem;margin-bottom:9px}
+.pp-count{background:var(--surface-2);color:var(--coral-d);border-radius:999px;padding:3px 11px;font-size:.85rem}
+.pp-cta{margin-top:9px;font-weight:800;color:var(--teal-d);font-size:.88rem}
 .cd-today .cd-num{animation:cdpop 1s ease-in-out infinite}
 /* —— journal toolbar —— */
 .journal-main{min-width:0}
@@ -711,6 +718,17 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     <div id="packing"></div>
     <div id="upcomingGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Your booked adventures — tap one to explore it!</p>
+  </section>
+
+  <!-- ===================== PACKING ===================== -->
+  <section id="packing-view" class="view">
+    <button class="back" onclick="showView('upcoming')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Upcoming
+    </button>
+    <div class="section-head"><div><span class="eyebrow">Get ready</span><h2>Help Poppie Pack 🎒</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-stand.png"></div>
+    <div id="packingScreen"></div>
+    <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tick things off as you pack them — your progress saves automatically!</p>
   </section>
 
   <!-- ===================== DETAIL ===================== -->
@@ -3386,7 +3404,7 @@ let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
   catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
-let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null;
+let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null, planeTimer=null;
 /* —— photo lightbox —— */
 function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=d.photos.length; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex];
@@ -3430,11 +3448,12 @@ function confetti(){
    VIEW SWITCHING
    ===================================================================== */
 function showView(v){
-  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',detail:'detail'};
+  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail'};
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   (document.getElementById(ids[v])||document.getElementById('explore')).classList.add('active');
   document.querySelectorAll('nav.top button, .tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   if(v==='upcoming') renderUpcoming();
+  if(v==='packing') renderPackingScreen();
   if(v==='badges'){ renderStats(); renderAchievements(); }
   if(v==='map') setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90);
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
@@ -3537,20 +3556,33 @@ function loadPack(){ try{return JSON.parse(localStorage.getItem(dataKey('pack'))
 function savePack(o){ try{localStorage.setItem(dataKey('pack'),JSON.stringify(o));}catch(e){} }
 let packState=loadPack();
 function packList(t){ const d=DESTS.find(x=>x.id===t.destId); const reg=d&&PACK_REGION[d.region]||[]; return PACK_BASE.concat(reg); }
+function packStats(t){ const items=packList(t), st=packState[t.id]||{}, done=items.filter((_,i)=>st[i]).length; return {items,st,done,total:items.length,pct:Math.round(done/items.length*100)}; }
+/* compact progress cards on the Upcoming page */
 function renderPacking(){
   const host=document.getElementById('packing'); if(!host) return;
-  const t=nextPlanned(); if(!t){ host.innerHTML=''; return; }
-  const items=packList(t); const id=t.id; const st=packState[id]||{};
-  const done=items.filter((_,i)=>st[i]).length; const pct=Math.round(done/items.length*100);
-  host.innerHTML=`<div class="packbox">
-    <div class="pack-head"><h3>🎒 Help Poppie pack for ${esc(t.city)}!</h3>
-      <span class="pack-count">${done}/${items.length} packed</span></div>
-    <div class="pack-bar"><i style="width:${pct}%"></i></div>
-    <div class="pack-grid">${items.map((it,i)=>`<label class="pack-item ${st[i]?'on':''}"><input type="checkbox" ${st[i]?'checked':''} onchange="togglePack('${id}',${i})"> <span>${esc(it)}</span></label>`).join('')}</div>
-    ${done===items.length?`<div class="pack-done">🎉 All packed — you're ready for an adventure!</div>`:''}
+  const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
+  if(!planned.length){ host.innerHTML=''; return; }
+  host.innerHTML=planned.map(t=>{ const s=packStats(t);
+    return `<button class="pack-progress" onclick="showView('packing')">
+      <div class="pp-top"><span>🎒 Packing for ${esc(t.city)}</span><span class="pp-count">${s.done}/${s.total}</span></div>
+      <div class="pack-bar"><i style="width:${s.pct}%"></i></div>
+      <div class="pp-cta">${s.done===s.total?'🎉 All packed!':'Open packing list →'}</div></button>`; }).join('');
+}
+/* full checklist on the dedicated Packing screen */
+function packBoxHTML(t){ const s=packStats(t);
+  return `<div class="packbox">
+    <div class="pack-head"><h3>🎒 ${esc(t.city)}</h3><span class="pack-count">${s.done}/${s.total} packed</span></div>
+    <div class="pack-bar"><i style="width:${s.pct}%"></i></div>
+    <div class="pack-grid">${s.items.map((it,i)=>`<label class="pack-item ${s.st[i]?'on':''}"><input type="checkbox" ${s.st[i]?'checked':''} onchange="togglePack('${t.id}',${i})"> <span>${esc(it)}</span></label>`).join('')}</div>
+    ${s.done===s.total?`<div class="pack-done">🎉 All packed for ${esc(t.city)} — ready for an adventure!</div>`:''}
   </div>`;
 }
-function togglePack(id,i){ if(!packState[id])packState[id]={}; packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); }
+function renderPackingScreen(){
+  const host=document.getElementById('packingScreen'); if(!host) return;
+  const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
+  host.innerHTML = planned.length ? planned.map(packBoxHTML).join('') : `<div class="empty">${poppiePic('calm','','Poppie')}<h3>Nothing to pack yet!</h3><p>Add an upcoming trip in your Journal and Poppie will help you pack. ✈️</p></div>`;
+}
+function togglePack(id,i){ if(!packState[id])packState[id]={}; packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); renderPackingScreen(); }
 
 /* =====================================================================
    DETAIL
@@ -3720,8 +3752,16 @@ function buildMap(){
   });
   if(bounds.length>1) map.fitBounds(bounds,{padding:[60,60]});
   setTimeout(()=>map.invalidateSize(),60);
+  /* animate a little plane flying along the arc to the next trip */
+  if(planeTimer){ clearInterval(planeTimer); planeTimer=null; }
+  const np=nextPlanned();
+  if(np && np.lat!=null && !reduceMotion){
+    const pts=arc(originFor(np),{lat:np.lat,lng:np.lng});
+    const pm=L.marker(pts[0],{icon:L.divIcon({className:'plane-fly',html:'✈️',iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500,interactive:false}).addTo(layer);
+    let k=0; planeTimer=setInterval(()=>{ k=(k+2)%pts.length; pm.setLatLng(pts[k]); },90);
+  }
   const sum=document.getElementById('mapSummary');
-  if(sum) sum.textContent='Home bases: Sunshine Coast, Australia and Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
+  if(sum) sum.textContent='Home bases: Gold Coast, Australia and Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
   renderStats();
 }
 function renderStats(){

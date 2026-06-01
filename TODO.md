@@ -57,7 +57,7 @@ Last updated: 2026-06-01
 - [x] **Direct-to-Rabat** flight info update ✈️
 
 ### Medium
-- [ ] **Map polish** — cluster the dense Australian east-coast pins; animate a plane travelling along the next-trip arc
+- [x] **Map polish (part)** — animated plane flying along the next-trip arc ✈️  ·  [ ] still: cluster the dense Australian pins
 - [ ] Expand remaining popular guides (Brisbane, Auckland, Barcelona, Whitsundays, Gold Coast…) to the 8/8/10 depth
 - [ ] **Weather / best-time** mini-widget per destination
 - [ ] **Language mini-quiz** ("how do you say…?") using the phrases data
@@ -78,4 +78,6 @@ Last updated: 2026-06-01
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page
+- [x] Replace Poppie poses with transparent versions + use her bigger (hero + every destination hero)
 - [x] **Rabat is a DIRECT flight from Dublin** — Getting there now shows nonstop ~3h45 ✈️
