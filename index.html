@@ -371,6 +371,12 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 /* —— World / Countries page —— */
 .wc-h{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--ink);margin:26px 0 4px;display:flex;align-items:center;gap:9px}
 .wc-sub{color:var(--ink-2);font-weight:700;font-size:.95rem;margin:0 0 14px}
+.cont-strip{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 8px}
+.cont-chip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:78px;padding:11px 12px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface);opacity:.5;filter:grayscale(.7);transition:.15s}
+.cont-chip.on{opacity:1;filter:none;border-color:var(--teal);box-shadow:var(--shadow-sm)}
+.cont-chip .ce{font-size:1.5rem;line-height:1}
+.cont-chip .cn{font-weight:800;font-size:.66rem;color:var(--ink-2);text-align:center;letter-spacing:.02em}
+.cont-chip .ck{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--green-d);color:#fff;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.25)}
 .wc-flags{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
 .wc-flag{display:flex;align-items:center;gap:11px;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:11px 14px;box-shadow:var(--shadow-sm);text-align:left;width:100%;cursor:pointer;transition:.15s}
 .wc-flag:hover,.wc-flag:focus-visible{transform:translateY(-2px);border-color:var(--teal)}
@@ -5382,6 +5388,13 @@ function renderWorld(){
   const dim=WORLD_DIMS.find(d=>d.k===worldDim)||WORLD_DIMS[0];
   const suggestions=WORLD_COUNTRIES.filter(c=>!everNames.has(wcKey(c.name))).slice().sort((a,b)=>dim.val(b)-dim.val(a)).slice(0,5);
 
+  /* continents collection strip */
+  const CONTS=['Europe','Asia','Africa','North America','South America','Oceania','Antarctica'];
+  const CONT_EM={Europe:'🏰',Asia:'🏯',Africa:'🦁','North America':'🗽','South America':'🌎',Oceania:'🦘',Antarctica:'🐧'};
+  const visitedConts=new Set(visited.map(c=>c.continent));
+  const contStrip=`<div class="cont-strip">${CONTS.map(co=>`<div class="cont-chip ${visitedConts.has(co)?'on':''}" title="${esc(co)}">
+      <span class="ce" aria-hidden="true">${CONT_EM[co]}</span><span class="cn">${esc(co)}</span>${visitedConts.has(co)?'<span class="ck" aria-hidden="true">✓</span>':''}</div>`).join('')}</div>`;
+
   const visHTML = visited.length
     ? `<div class="wc-flags">${visited.map(c=>{const g=wcGuide(c.name);
         return `<button class="wc-flag${g?'':' plain'}" ${g?`onclick="openDest('${g}')"`:'disabled'} aria-label="${esc(c.name)}${g?', open guide':''}">
@@ -5404,7 +5417,9 @@ function renderWorld(){
     </div>`;}).join('');
 
   host.innerHTML=
-    `<h3 class="wc-h">🛂 Countries you've explored <span style="color:var(--teal-d)">(${visited.length})</span></h3>
+    `<h3 class="wc-h">🌐 Continents collected <span style="color:var(--teal-d)">(${visitedConts.size} / 7)</span></h3>
+     ${contStrip}
+     <h3 class="wc-h">🛂 Countries you've explored <span style="color:var(--teal-d)">(${visited.length})</span></h3>
      <p class="wc-sub">Tap a country with a guide to revisit it.</p>
      ${visHTML}
      <h3 class="wc-h">✨ Dream destinations to explore next</h3>
