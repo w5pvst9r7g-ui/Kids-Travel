@@ -1278,12 +1278,20 @@ const EXTRA_DESTS = [
 ];
 DESTS.push(...EXTRA_DESTS);
 
+/* Real family trips (2016 onward — after the kids were born). Years are best
+   estimates from the travel project; edit any in the Journal to fix them. */
 const SEED_TRIPS = [
-  {id:'t1', destId:'lapland',    city:'Rovaniemi', country:'Finland',   flag:'🇫🇮', emoji:'🎅', lat:66.5039, lng:25.7294, year:2014, planned:false, rating:5, note:'Met the real Santa and went husky sledding in the snow!'},
-  {id:'t2', destId:'madagascar', city:'Madagascar', country:'Madagascar', flag:'🇲🇬', emoji:'🦎', lat:-18.8792, lng:47.5079, year:2016, planned:false, rating:4, note:'So many lemurs and the giant baobab trees at sunset.'},
-  {id:'t3', destId:'antarctica', city:'Antarctica', country:'Antarctica', flag:'🇦🇶', emoji:'🐧', lat:-64.0, lng:-60.0, year:2016, planned:false, rating:5, note:'Penguins everywhere and icebergs bigger than houses.'},
-  {id:'t4', destId:'maldives',   city:'Maldives', country:'Maldives',   flag:'🇲🇻', emoji:'🏝️', lat:2.7167, lng:72.95, year:2017, planned:false, rating:5, note:'Overwater villa and snorkelling with turtles.'},
-  {id:'t5', destId:'maldives',   city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'}
+  {id:'t1', destId:null,       city:'Sydney', country:'Australia', flag:'🇦🇺', emoji:'🌉', lat:-33.8688, lng:151.2093, year:2017, planned:false, rating:5, note:'Sydney Harbour Bridge, the Opera House and the beaches!'},
+  {id:'t2', destId:null,       city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🏄', lat:-26.6500, lng:153.0667, year:2018, planned:false, rating:5, note:'Sandy beaches, the zoo and lots of sunshine in Queensland.'},
+  {id:'t3', destId:null,       city:'Cape Town', country:'South Africa', flag:'🇿🇦', emoji:'🏔️', lat:-33.9249, lng:18.4241, year:2018, planned:false, rating:5, note:'Table Mountain, penguins at Boulders Beach and family time.'},
+  {id:'t4', destId:null,       city:'Miami', country:'United States', flag:'🇺🇸', emoji:'🌴', lat:25.7617, lng:-80.1918, year:2018, planned:false, rating:4, note:'Palm trees, colourful South Beach and warm ocean.'},
+  {id:'t5', destId:null,       city:'Los Angeles', country:'United States', flag:'🇺🇸', emoji:'🎬', lat:34.0522, lng:-118.2437, year:2018, planned:false, rating:4, note:'Theme parks, Hollywood and the Pacific coast.'},
+  {id:'t6', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:3.2028, lng:73.2207, year:2019, planned:false, rating:5, note:'Overwater villa and snorkelling with turtles.'},
+  {id:'t7', destId:null,       city:'Paris', country:'France', flag:'🇫🇷', emoji:'🗼', lat:48.8566, lng:2.3522, year:2023, planned:false, rating:5, note:'The Eiffel Tower, Disneyland Paris and yummy pastries.'},
+  {id:'t8', destId:null,       city:'Barcelona', country:'Spain', flag:'🇪🇸', emoji:'🏛️', lat:41.3874, lng:2.1686, year:2024, planned:false, rating:5, note:'Gaudí’s wavy buildings, the park and tapas by the sea.'},
+  {id:'t9', destId:'algarve',  city:'Faro (Algarve)', country:'Portugal', flag:'🇵🇹', emoji:'🏖️', lat:37.0194, lng:-7.9304, year:2024, planned:false, rating:5, note:'Golden cliffs, warm beaches and boat trips to the caves.'},
+  {id:'t10',destId:null,       city:'Fuerteventura', country:'Spain', flag:'🇪🇸', emoji:'🏝️', lat:28.3587, lng:-14.0537, year:2025, planned:false, rating:4, note:'Endless sandy beaches and windsurfing in the Canaries.'},
+  {id:'t11',destId:'maldives', city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'}
 ];
 
 /* =====================================================================
@@ -1317,7 +1325,7 @@ const POPPIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Poppie the
 /* =====================================================================
    STATE + STORAGE
    ===================================================================== */
-const LS_KEY='globie_atlas_trips_v2';
+const LS_KEY='globie_atlas_trips_v3';
 function loadTrips(){ try{const s=localStorage.getItem(LS_KEY); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
@@ -1733,8 +1741,9 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
    ===================================================================== */
 const ACH_KEY='globie_atlas_achievements_v1';
 const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Europe',Portugal:'Europe',
-  Croatia:'Europe',Albania:'Europe',Iceland:'Europe','Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',
-  Morocco:'Africa',Madagascar:'Africa',Antarctica:'Antarctica'};
+  Croatia:'Europe',Albania:'Europe',Iceland:'Europe',France:'Europe','Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',
+  Morocco:'Africa',Madagascar:'Africa','South Africa':'Africa',Antarctica:'Antarctica',
+  Australia:'Oceania','United States':'North America'};
 const continentOf=t=>CONTINENT_OF[t.country]||null;
 const ACHIEVEMENTS=[
   {id:'first_flight',em:'🛫',nm:'First Flight',ds:'Save your first trip',ac:'#13B5AC',test:c=>c.visited.length>=1},
