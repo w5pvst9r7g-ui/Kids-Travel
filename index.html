@@ -483,6 +483,12 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .pop-explore:active{transform:translateY(2px);box-shadow:none}
 .entry-explore{width:100%;margin-top:9px;background:var(--surface-2);border:2px solid var(--line);border-radius:var(--r-sm);padding:9px;font-weight:800;color:var(--teal-d);cursor:pointer;font-size:.86rem;min-height:44px}
 .entry-explore:hover{border-color:var(--teal)}
+.dgroup{margin-top:34px}
+.dgroup:first-child{margin-top:18px}
+.dgroup-head{margin:0 2px 14px}
+.dgroup-head .eyebrow{display:block;margin-bottom:5px}
+.dgroup-head h3{font-size:clamp(1.3rem,3.6vw,1.75rem);display:flex;align-items:center;gap:10px}
+.dgroup-head h3 .cnt{font-size:.72rem;font-weight:800;color:var(--muted);background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:3px 11px}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
 </style>
@@ -551,10 +557,10 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     </svg>
 
     <div class="section-head" id="chooseHead">
-      <div><span class="eyebrow">Pick your adventure</span><h2>Where to next?</h2></div>
+      <div><span class="eyebrow">The whole atlas</span><h2>Explore places</h2></div>
       <div class="filters" id="filters"></div>
     </div>
-    <div class="deck" id="destGrid"></div>
+    <div id="destGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tap any place to explore it! ⭐ ratings &amp; map pins come from Google Maps.</p>
   </section>
 
@@ -2128,15 +2134,9 @@ function renderFilters(){
 }
 function visitedDestIds(){return new Set(trips.filter(t=>!t.planned).map(t=>t.destId));}
 function plannedDestIds(){return new Set(trips.filter(t=>t.planned).map(t=>t.destId));}
-function renderGrid(){
-  const g=document.getElementById('destGrid'),vis=visitedDestIds(),soon=plannedDestIds();
-  const list=DESTS.filter(d=>activeRegion==='All'||d.region===activeRegion);
-  g.innerHTML=list.map(d=>{
-    const th=themeFor(d);let tag;
-    if(vis.has(d.id))tag='<span class="t visited">✓ Visited</span>';
-    else if(soon.has(d.id))tag='<span class="t soon">Coming up</span>';
-    else tag=`<span class="t">${d.tag}</span>`;
-    return `<article class="dcard" role="button" tabindex="0" aria-label="Explore ${esc(d.name)}, ${esc(d.country)}" onclick="openDest('${d.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDest('${d.id}')}">
+function cardHTML(d,tag){
+  const th=themeFor(d);
+  return `<article class="dcard" role="button" tabindex="0" aria-label="Explore ${esc(d.name)}, ${esc(d.country)}" onclick="openDest('${d.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDest('${d.id}')}">
       <div class="frame" style="${frameStyle(th)}">
         <div class="tags">${tag}</div>${sticker(d.emoji)}
         ${dpic(d.id,'hero',d.photos[0][2],800,540,d.name,d.photos[0][0])}
@@ -2147,7 +2147,27 @@ function renderGrid(){
         <div class="foot">✈️ ${d.gettingThere.flightTime}<span class="arrow">→</span></div>
       </div>
     </article>`;
-  }).join('');
+}
+function groupHTML(eyebrow,emoji,title,cards){
+  if(!cards.length) return '';
+  return `<section class="dgroup"><div class="dgroup-head"><span class="eyebrow">${eyebrow}</span>
+    <h3>${emoji} ${title} <span class="cnt">${cards.length}</span></h3></div>
+    <div class="deck">${cards.join('')}</div></section>`;
+}
+function renderGrid(){
+  const host=document.getElementById('destGroups'),vis=visitedDestIds(),soon=plannedDestIds();
+  const list=DESTS.filter(d=>activeRegion==='All'||d.region===activeRegion);
+  const upcoming=[],explored=[],wishlist=[];
+  list.forEach(d=>{
+    if(soon.has(d.id)) upcoming.push(cardHTML(d,'<span class="t soon">🔜 Coming up</span>'));
+    else if(vis.has(d.id)) explored.push(cardHTML(d,'<span class="t visited">✓ Visited</span>'));
+    else wishlist.push(cardHTML(d,`<span class="t">${esc(d.tag)}</span>`));
+  });
+  host.innerHTML =
+      groupHTML('Get excited','🔜','Coming up next',upcoming)
+    + groupHTML('Where shall we go?','💭','Dream destinations',wishlist)
+    + groupHTML('Our adventures','🧭','Places we’ve explored',explored)
+    || `<div class="empty">No places match this filter — try “All”.</div>`;
 }
 
 /* =====================================================================
