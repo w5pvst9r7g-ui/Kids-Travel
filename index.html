@@ -349,6 +349,40 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .stat .big{font-family:var(--display);font-size:2.4rem;font-weight:800;color:var(--teal-d);line-height:1}
 .stat .big .u{font-size:1rem;color:var(--muted)}
 .stat .lbl{color:var(--ink-2);font-weight:800;font-size:.82rem;margin-top:6px}
+.stat.link{cursor:pointer;transition:.15s;position:relative}
+.stat.link:hover,.stat.link:focus-visible{transform:translateY(-3px);border-color:var(--teal);box-shadow:var(--shadow)}
+.stat.link .go{display:block;font-size:.7rem;font-weight:800;color:var(--teal-d);margin-top:6px}
+
+/* —— World / Countries page —— */
+.wc-h{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--ink);margin:26px 0 4px;display:flex;align-items:center;gap:9px}
+.wc-sub{color:var(--ink-2);font-weight:700;font-size:.95rem;margin:0 0 14px}
+.wc-flags{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+.wc-flag{display:flex;align-items:center;gap:11px;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:11px 14px;box-shadow:var(--shadow-sm);text-align:left;width:100%;cursor:pointer;transition:.15s}
+.wc-flag:hover,.wc-flag:focus-visible{transform:translateY(-2px);border-color:var(--teal)}
+.wc-flag.plain{cursor:default}
+.wc-flag.plain:hover{transform:none;border-color:var(--line)}
+.wc-flag .fl{font-size:1.9rem;line-height:1;flex:none}
+.wc-flag .nm{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.02rem;line-height:1.1}
+.wc-flag .ct{color:var(--muted);font-weight:700;font-size:.74rem}
+.wc-empty{background:var(--surface-2);border:2px dashed var(--line-2);border-radius:var(--r);padding:18px;color:var(--ink-2);font-weight:700}
+.dimnav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.dimnav::-webkit-scrollbar{display:none}
+.dimnav button{flex:none;white-space:nowrap;background:#fff;border:2px solid var(--line);border-radius:999px;padding:9px 15px;font-weight:800;font-size:.9rem;color:var(--ink-2);cursor:pointer;transition:.15s}
+.dimnav button:hover{color:var(--ink);transform:translateY(-2px)}
+.dimnav button.active{background:var(--grape-d);color:#fff;border-color:var(--grape-d)}
+.wc-list{display:grid;gap:12px}
+.wc-card{display:grid;grid-template-columns:auto auto 1fr;gap:15px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow-sm)}
+.wc-rank{font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--grape-d);width:30px;text-align:center}
+.wc-card .fl{font-size:2.5rem;line-height:1}
+.wc-card .nm{font-family:var(--display);font-weight:800;font-size:1.22rem;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wc-card .nm .em{font-size:1.05rem}
+.wc-card .bl{color:var(--ink-2);font-weight:600;font-size:.95rem;margin-top:2px}
+.wc-metric{margin-top:8px;display:inline-flex;align-items:baseline;gap:6px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:999px;padding:4px 12px}
+.wc-metric .mv{font-family:var(--display);font-weight:800;color:var(--grape-d);font-size:1rem}
+.wc-metric .mu{color:var(--muted);font-weight:700;font-size:.76rem}
+.wc-go{margin-top:9px}
+.wc-go .maplink{margin-top:0}
+@media(max-width:520px){.wc-card{grid-template-columns:auto 1fr;gap:10px}.wc-card .fl{grid-row:1;font-size:2rem}.wc-rank{font-size:1.2rem;width:auto}}
 
 .pin svg{filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
 .plane-fly .pe{display:block;font-size:1.55rem;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));transition:transform .12s linear}
@@ -875,7 +909,16 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     <div class="section-head"><div><span class="eyebrow">Collect them all</span><h2>Explorer Badges 🏅</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 16px">Earn badges as you explore the world. They update automatically from your travel journal!</p>
     <div id="explorerBadge"></div>
+    <button class="btn btn-teal" style="margin:4px 0 22px" onclick="showView('world')">🌍 See all your countries &amp; where to go next</button>
     <div id="achShelf" class="ach-shelf"></div>
+  </section>
+
+  <!-- ===================== WORLD / COUNTRIES ===================== -->
+  <section id="world-view" class="view">
+    <button class="back" onclick="showView('badges')">‹ Back to badges</button>
+    <div class="section-head"><div><span class="eyebrow teal">Your passport to the planet</span><h2>Countries of the World 🌍</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-stand.png"></div>
+    <p class="lead" style="max-width:700px;margin:-6px 0 18px">Here's every country your family has set foot in — plus some amazing ones to dream about next!</p>
+    <div id="worldBody"></div>
   </section>
 
   <!-- ===================== TRIPS ===================== -->
@@ -4494,13 +4537,14 @@ function confetti(){
    VIEW SWITCHING
    ===================================================================== */
 function showView(v){
-  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail'};
+  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail',world:'world-view'};
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   (document.getElementById(ids[v])||document.getElementById('explore')).classList.add('active');
   document.querySelectorAll('nav.top button, .tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   if(v==='upcoming') renderUpcoming();
   if(v==='packing') renderPackingScreen();
   if(v==='badges'){ renderStats(); renderAchievements(); }
+  if(v==='world') renderWorld();
   if(v==='map') setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90);
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
@@ -4856,9 +4900,11 @@ function renderStats(){
   let km=0;done.forEach(t=>{if(t.lat!=null)km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2;});
   const planned=trips.filter(t=>t.planned).length;
   document.getElementById('stats').innerHTML=[
-    [countries,'Countries visited',''],[done.length,'Adventures taken',''],
-    [km.toLocaleString(),'km flown',' km'],[planned,'Trips coming up','']
-  ].map(s=>`<div class="stat"><div class="big">${s[0]}<span class="u">${s[2]}</span></div><div class="lbl">${s[1]}</div></div>`).join('');
+    [countries,'Countries visited','',true],[done.length,'Adventures taken','',false],
+    [km.toLocaleString(),'km flown',' km',false],[planned,'Trips coming up','',false]
+  ].map(s=>s[3]
+    ?`<div class="stat link" role="button" tabindex="0" onclick="showView('world')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('world')}" aria-label="${s[0]} countries visited. Open the world countries page."><div class="big">${s[0]}<span class="u">${s[2]}</span></div><div class="lbl">${s[1]}</div><span class="go">🌍 See them all →</span></div>`
+    :`<div class="stat"><div class="big">${s[0]}<span class="u">${s[2]}</span></div><div class="lbl">${s[1]}</div></div>`).join('');
 
   /* explorer badge / level */
   const levels=[{n:0,e:'🐣',t:'Junior Explorer'},{n:1,e:'🧭',t:'Pathfinder'},{n:3,e:'🌍',t:'Globetrotter'},{n:5,e:'🏆',t:'World Explorer'},{n:8,e:'👑',t:'Legendary Voyager'}];
@@ -4870,6 +4916,140 @@ function renderStats(){
     <span class="em">${cur.e}</span>
     <div><div class="lbl">You're a ${cur.t}!</div><div class="sub">${msg}</div>
       <div class="bar"><i style="width:${prog}%"></i></div></div></div>`;
+}
+
+/* =====================================================================
+   WORLD / COUNTRIES page — visited list + top-5 "where to go next"
+   ===================================================================== */
+/* world reference dataset (77 countries) */
+const WORLD_COUNTRIES = [
+  { name: "Algeria", flag: "🇩🇿", continent: "Africa", capital: "Algiers", area: 2381741, population: 45000000, tourism: 2, beauty: 7.4, blurb: "Africa's biggest country, with endless golden Sahara sand!", emoji: "🏜️" },
+  { name: "Argentina", flag: "🇦🇷", continent: "South America", capital: "Buenos Aires", area: 2780400, population: 46000000, tourism: 7, beauty: 8.5, blurb: "See giant waterfalls, glaciers and penguins all in one big country!", emoji: "🐧" },
+  { name: "Australia", flag: "🇦🇺", continent: "Oceania", capital: "Canberra", area: 7692024, population: 26000000, tourism: 9, beauty: 8.8, blurb: "Cuddle koalas, snorkel the reef and spot bouncing kangaroos!", emoji: "🦘" },
+  { name: "Austria", flag: "🇦🇹", continent: "Europe", capital: "Vienna", area: 83879, population: 9100000, tourism: 31, beauty: 8.7, blurb: "Sing in snowy mountains and eat the yummiest chocolate cake!", emoji: "🏔️" },
+  { name: "Bahamas", flag: "🇧🇸", continent: "North America", capital: "Nassau", area: 13943, population: 410000, tourism: 2, beauty: 8.8, blurb: "Swim with friendly pigs in bright turquoise water!", emoji: "🐷" },
+  { name: "Belgium", flag: "🇧🇪", continent: "Europe", capital: "Brussels", area: 30528, population: 11700000, tourism: 9, beauty: 6.5, blurb: "Munch warm waffles and chocolate in pretty old town squares!", emoji: "🧇" },
+  { name: "Belize", flag: "🇧🇿", continent: "North America", capital: "Belmopan", area: 22966, population: 410000, tourism: 1, beauty: 8.7, blurb: "Snorkel a giant blue hole and explore jungle ruins!", emoji: "🐠" },
+  { name: "Bhutan", flag: "🇧🇹", continent: "Asia", capital: "Thimphu", area: 38394, population: 790000, tourism: 1, beauty: 9.1, blurb: "A happy mountain kingdom with a temple on a cliff!", emoji: "🐲" },
+  { name: "Botswana", flag: "🇧🇼", continent: "Africa", capital: "Gaborone", area: 581730, population: 2600000, tourism: 1, beauty: 8.8, blurb: "Glide in a canoe past elephants in a watery wonderland!", emoji: "🐘" },
+  { name: "Brazil", flag: "🇧🇷", continent: "South America", capital: "Brasília", area: 8515767, population: 216000000, tourism: 6, beauty: 8.4, blurb: "Dance at carnival and explore the giant green Amazon rainforest!", emoji: "🦜" },
+  { name: "Cambodia", flag: "🇰🇭", continent: "Asia", capital: "Phnom Penh", area: 181035, population: 17000000, tourism: 6, beauty: 7.6, blurb: "Discover huge ancient temples hidden in the jungle!", emoji: "🛕" },
+  { name: "Canada", flag: "🇨🇦", continent: "North America", capital: "Ottawa", area: 9984670, population: 40000000, tourism: 22, beauty: 9.2, blurb: "Watch moose and bears near sparkling lakes and giant mountains!", emoji: "🍁" },
+  { name: "Chile", flag: "🇨🇱", continent: "South America", capital: "Santiago", area: 756102, population: 19600000, tourism: 4, beauty: 8.6, blurb: "A super skinny country with deserts, volcanoes and penguins!", emoji: "🌋" },
+  { name: "China", flag: "🇨🇳", continent: "Asia", capital: "Beijing", area: 9596961, population: 1410000000, tourism: 32, beauty: 8.2, blurb: "Walk the Great Wall and meet fluffy giant pandas!", emoji: "🐼" },
+  { name: "Colombia", flag: "🇨🇴", continent: "South America", capital: "Bogotá", area: 1141748, population: 52000000, tourism: 4, beauty: 8, blurb: "Colourful towns, friendly dancing and tasty tropical fruit!", emoji: "☕" },
+  { name: "Costa Rica", flag: "🇨🇷", continent: "North America", capital: "San José", area: 51100, population: 5200000, tourism: 3, beauty: 8.9, blurb: "Spot sloths and toucans in steamy green rainforests!", emoji: "🦥" },
+  { name: "Croatia", flag: "🇭🇷", continent: "Europe", capital: "Zagreb", area: 56594, population: 3900000, tourism: 18, beauty: 8.8, blurb: "Swim in clear blue seas and explore stone castle towns!", emoji: "🏖️" },
+  { name: "Cuba", flag: "🇨🇺", continent: "North America", capital: "Havana", area: 109884, population: 11000000, tourism: 2, beauty: 7.8, blurb: "Ride in bright old cars past colourful seaside houses!", emoji: "🚗" },
+  { name: "Czechia", flag: "🇨🇿", continent: "Europe", capital: "Prague", area: 78867, population: 10500000, tourism: 13, beauty: 7.8, blurb: "Walk over old bridges to a fairytale castle on a hill!", emoji: "🏰" },
+  { name: "Denmark", flag: "🇩🇰", continent: "Europe", capital: "Copenhagen", area: 42933, population: 5900000, tourism: 13, beauty: 7, blurb: "Ride bikes and visit the land of Lego and little mermaids!", emoji: "🧱" },
+  { name: "Ecuador", flag: "🇪🇨", continent: "South America", capital: "Quito", area: 283561, population: 18000000, tourism: 2, beauty: 8.7, blurb: "Meet giant tortoises on the wild Galápagos islands!", emoji: "🐢" },
+  { name: "Egypt", flag: "🇪🇬", continent: "Africa", capital: "Cairo", area: 1010408, population: 110000000, tourism: 15, beauty: 7.8, blurb: "Stand beside the giant pyramids and the great stone Sphinx!", emoji: "🐪" },
+  { name: "Fiji", flag: "🇫🇯", continent: "Oceania", capital: "Suva", area: 18274, population: 930000, tourism: 1, beauty: 9.3, blurb: "Splash in warm turquoise water on tiny palm-tree islands!", emoji: "🌴" },
+  { name: "Finland", flag: "🇫🇮", continent: "Europe", capital: "Helsinki", area: 338145, population: 5600000, tourism: 3, beauty: 8.6, blurb: "Visit Santa, spot reindeer and watch the dancing northern lights!", emoji: "🦌" },
+  { name: "France", flag: "🇫🇷", continent: "Europe", capital: "Paris", area: 551695, population: 68000000, tourism: 89, beauty: 8.5, blurb: "Climb the Eiffel Tower and taste buttery croissants!", emoji: "🗼" },
+  { name: "Germany", flag: "🇩🇪", continent: "Europe", capital: "Berlin", area: 357592, population: 84000000, tourism: 39, beauty: 7.6, blurb: "Ride roller coasters and see castles straight from a storybook!", emoji: "🥨" },
+  { name: "Greece", flag: "🇬🇷", continent: "Europe", capital: "Athens", area: 131957, population: 10400000, tourism: 33, beauty: 8.9, blurb: "Explore ancient temples and hop between sunny white islands!", emoji: "🏛️" },
+  { name: "Hungary", flag: "🇭🇺", continent: "Europe", capital: "Budapest", area: 93028, population: 9600000, tourism: 16, beauty: 7.6, blurb: "Splash in warm bath pools in a beautiful river city!", emoji: "♨️" },
+  { name: "Iceland", flag: "🇮🇸", continent: "Europe", capital: "Reykjavík", area: 103000, population: 380000, tourism: 2, beauty: 9.7, blurb: "Watch waterfalls, bubbling geysers and erupting volcanoes!", emoji: "💦" },
+  { name: "India", flag: "🇮🇳", continent: "Asia", capital: "New Delhi", area: 3287263, population: 1430000000, tourism: 18, beauty: 8.1, blurb: "See the gleaming Taj Mahal and ride a colourful painted elephant!", emoji: "🐘" },
+  { name: "Indonesia", flag: "🇮🇩", continent: "Asia", capital: "Jakarta", area: 1904569, population: 277000000, tourism: 12, beauty: 8.7, blurb: "Thousands of islands with volcanoes, monkeys and dragons!", emoji: "🐉" },
+  { name: "Iran", flag: "🇮🇷", continent: "Asia", capital: "Tehran", area: 1648195, population: 89000000, tourism: 4, beauty: 7.8, blurb: "See sparkly tiled palaces and bustling old bazaars!", emoji: "🕌" },
+  { name: "Ireland", flag: "🇮🇪", continent: "Europe", capital: "Dublin", area: 70273, population: 5100000, tourism: 11, beauty: 8.4, blurb: "Roll down super green hills and hunt for leprechaun rainbows!", emoji: "🍀" },
+  { name: "Israel", flag: "🇮🇱", continent: "Asia", capital: "Jerusalem", area: 22072, population: 9700000, tourism: 4, beauty: 7.5, blurb: "Float on top of the super salty Dead Sea!", emoji: "🕊️" },
+  { name: "Italy", flag: "🇮🇹", continent: "Europe", capital: "Rome", area: 301340, population: 59000000, tourism: 57, beauty: 8.8, blurb: "Eat pizza and gelato then float through canals in Venice!", emoji: "🍕" },
+  { name: "Jamaica", flag: "🇯🇲", continent: "North America", capital: "Kingston", area: 10991, population: 2800000, tourism: 4, beauty: 8.4, blurb: "Bounce to reggae music on sunny tropical beaches!", emoji: "🥁" },
+  { name: "Japan", flag: "🇯🇵", continent: "Asia", capital: "Tokyo", area: 377975, population: 124000000, tourism: 25, beauty: 8.8, blurb: "See cherry blossoms, bullet trains and snowy Mount Fuji!", emoji: "🗻" },
+  { name: "Jordan", flag: "🇯🇴", continent: "Asia", capital: "Amman", area: 89342, population: 11300000, tourism: 5, beauty: 8.3, blurb: "Discover a secret pink city carved into the desert rocks!", emoji: "🏜️" },
+  { name: "Kazakhstan", flag: "🇰🇿", continent: "Asia", capital: "Astana", area: 2724900, population: 19000000, tourism: 8, beauty: 7.6, blurb: "A huge land of wide open plains and snowy mountains!", emoji: "🦅" },
+  { name: "Kenya", flag: "🇰🇪", continent: "Africa", capital: "Nairobi", area: 580367, population: 55000000, tourism: 2, beauty: 8.8, blurb: "Go on safari to see lions, zebras and tall giraffes!", emoji: "🦁" },
+  { name: "Madagascar", flag: "🇲🇬", continent: "Africa", capital: "Antananarivo", area: 587041, population: 30000000, tourism: 1, beauty: 8.7, blurb: "Meet bouncing lemurs found nowhere else on Earth!", emoji: "🐒" },
+  { name: "Malaysia", flag: "🇲🇾", continent: "Asia", capital: "Kuala Lumpur", area: 330803, population: 34000000, tourism: 26, beauty: 8, blurb: "Climb to twin towers and meet orangutans in the jungle!", emoji: "🦧" },
+  { name: "Maldives", flag: "🇲🇻", continent: "Asia", capital: "Malé", area: 300, population: 520000, tourism: 2, beauty: 9.8, blurb: "Sleep in huts over the sea and swim with friendly fish!", emoji: "🐠" },
+  { name: "Mauritius", flag: "🇲🇺", continent: "Africa", capital: "Port Louis", area: 2040, population: 1300000, tourism: 1, beauty: 9.2, blurb: "A tropical island with rainbow beaches and waterfalls!", emoji: "🌺" },
+  { name: "Mexico", flag: "🇲🇽", continent: "North America", capital: "Mexico City", area: 1964375, population: 129000000, tourism: 42, beauty: 8.3, blurb: "Climb ancient pyramids and snorkel in sea-blue swimming holes!", emoji: "🌮" },
+  { name: "Mongolia", flag: "🇲🇳", continent: "Asia", capital: "Ulaanbaatar", area: 1564110, population: 3400000, tourism: 1, beauty: 8.4, blurb: "Ride horses across huge grasslands and sleep in round tents!", emoji: "🐎" },
+  { name: "Morocco", flag: "🇲🇦", continent: "Africa", capital: "Rabat", area: 446550, population: 37000000, tourism: 14, beauty: 8.2, blurb: "Ride camels over golden sand dunes in the great desert!", emoji: "🐫" },
+  { name: "Namibia", flag: "🇳🇦", continent: "Africa", capital: "Windhoek", area: 825615, population: 2600000, tourism: 1, beauty: 9, blurb: "Climb the tallest orange sand dunes in the whole world!", emoji: "🦓" },
+  { name: "Nepal", flag: "🇳🇵", continent: "Asia", capital: "Kathmandu", area: 147181, population: 30000000, tourism: 1, beauty: 9.3, blurb: "Look up at Mount Everest, the tallest mountain on Earth!", emoji: "⛰️" },
+  { name: "Netherlands", flag: "🇳🇱", continent: "Europe", capital: "Amsterdam", area: 41850, population: 17900000, tourism: 20, beauty: 7.4, blurb: "Ride bikes past spinning windmills and bright tulip fields!", emoji: "🌷" },
+  { name: "New Zealand", flag: "🇳🇿", continent: "Oceania", capital: "Wellington", area: 268838, population: 5200000, tourism: 3, beauty: 9.6, blurb: "Explore green hobbit hills, geysers and giant snowy peaks!", emoji: "🥝" },
+  { name: "Nigeria", flag: "🇳🇬", continent: "Africa", capital: "Abuja", area: 923768, population: 223000000, tourism: 1, beauty: 7, blurb: "Africa's most crowded country, full of music and fun markets!", emoji: "🥁" },
+  { name: "Norway", flag: "🇳🇴", continent: "Europe", capital: "Oslo", area: 385207, population: 5500000, tourism: 6, beauty: 9.5, blurb: "Sail past steep cliffs and see the magical northern lights!", emoji: "🛶" },
+  { name: "Panama", flag: "🇵🇦", continent: "North America", capital: "Panama City", area: 75417, population: 4500000, tourism: 2, beauty: 8, blurb: "Watch huge ships sail through a famous water shortcut!", emoji: "🚢" },
+  { name: "Peru", flag: "🇵🇪", continent: "South America", capital: "Lima", area: 1285216, population: 34000000, tourism: 3, beauty: 8.9, blurb: "Hike to a lost mountain city and meet fluffy llamas!", emoji: "🦙" },
+  { name: "Philippines", flag: "🇵🇭", continent: "Asia", capital: "Manila", area: 300000, population: 117000000, tourism: 5, beauty: 8.6, blurb: "Thousands of islands with white beaches and hidden lagoons!", emoji: "🏝️" },
+  { name: "Poland", flag: "🇵🇱", continent: "Europe", capital: "Warsaw", area: 312696, population: 38000000, tourism: 20, beauty: 7.5, blurb: "Explore old market squares and a town full of dragons!", emoji: "🐉" },
+  { name: "Portugal", flag: "🇵🇹", continent: "Europe", capital: "Lisbon", area: 92090, population: 10300000, tourism: 27, beauty: 8.3, blurb: "Ride yellow trams and eat warm custard tarts by the sea!", emoji: "🚋" },
+  { name: "Russia", flag: "🇷🇺", continent: "Europe", capital: "Moscow", area: 17098242, population: 144000000, tourism: 5, beauty: 7.9, blurb: "The biggest country with colourful onion-shaped domes!", emoji: "🧅" },
+  { name: "Saudi Arabia", flag: "🇸🇦", continent: "Asia", capital: "Riyadh", area: 2149690, population: 37000000, tourism: 27, beauty: 7.4, blurb: "Discover huge deserts and rock cities under starry skies!", emoji: "🌟" },
+  { name: "Seychelles", flag: "🇸🇨", continent: "Africa", capital: "Victoria", area: 452, population: 100000, tourism: 1, beauty: 9.6, blurb: "Tiny dreamy islands with giant tortoises and big round rocks!", emoji: "🐢" },
+  { name: "Singapore", flag: "🇸🇬", continent: "Asia", capital: "Singapore", area: 728, population: 5900000, tourism: 14, beauty: 7.8, blurb: "See glowing super-trees and a famous lion-fish statue!", emoji: "🦁" },
+  { name: "South Africa", flag: "🇿🇦", continent: "Africa", capital: "Pretoria", area: 1221037, population: 60000000, tourism: 10, beauty: 8.7, blurb: "Go on safari and look for the big five amazing animals!", emoji: "🦏" },
+  { name: "South Korea", flag: "🇰🇷", continent: "Asia", capital: "Seoul", area: 100210, population: 52000000, tourism: 11, beauty: 7.7, blurb: "Try K-pop dances, busy night markets and old palaces!", emoji: "🏯" },
+  { name: "Spain", flag: "🇪🇸", continent: "Europe", capital: "Madrid", area: 505992, population: 48000000, tourism: 85, beauty: 8.4, blurb: "See wobbly fun buildings and dance to clapping flamenco!", emoji: "💃" },
+  { name: "Sri Lanka", flag: "🇱🇰", continent: "Asia", capital: "Colombo", area: 65610, population: 22000000, tourism: 1, beauty: 8.5, blurb: "Ride trains past tea hills and watch elephants splash!", emoji: "🐘" },
+  { name: "Sweden", flag: "🇸🇪", continent: "Europe", capital: "Stockholm", area: 450295, population: 10500000, tourism: 7, beauty: 8.4, blurb: "Explore islands, deep forests and cosy red wooden houses!", emoji: "🌲" },
+  { name: "Switzerland", flag: "🇨🇭", continent: "Europe", capital: "Bern", area: 41285, population: 8800000, tourism: 12, beauty: 9.5, blurb: "Ride mountain trains past cows, cheese and snowy peaks!", emoji: "🏔️" },
+  { name: "Tanzania", flag: "🇹🇿", continent: "Africa", capital: "Dodoma", area: 945087, population: 67000000, tourism: 2, beauty: 9, blurb: "Climb Africa's tallest mountain and watch wildebeest run!", emoji: "🦒" },
+  { name: "Thailand", flag: "🇹🇭", continent: "Asia", capital: "Bangkok", area: 513120, population: 72000000, tourism: 35, beauty: 8.5, blurb: "Float past golden temples and pet gentle giant elephants!", emoji: "🐘" },
+  { name: "Tunisia", flag: "🇹🇳", continent: "Africa", capital: "Tunis", area: 163610, population: 12000000, tourism: 9, beauty: 7.5, blurb: "Explore desert towns used in famous space movies!", emoji: "🌅" },
+  { name: "Türkiye", flag: "🇹🇷", continent: "Asia", capital: "Ankara", area: 783562, population: 85000000, tourism: 50, beauty: 8.4, blurb: "Float in a hot air balloon over funny cone-shaped rocks!", emoji: "🎈" },
+  { name: "United Arab Emirates", flag: "🇦🇪", continent: "Asia", capital: "Abu Dhabi", area: 83600, population: 9500000, tourism: 17, beauty: 7.5, blurb: "Ride to the top of the tallest tower in the world!", emoji: "🏙️" },
+  { name: "United Kingdom", flag: "🇬🇧", continent: "Europe", capital: "London", area: 243610, population: 67000000, tourism: 30, beauty: 7.8, blurb: "Ride a giant wheel and wave at the royal palace guards!", emoji: "🎡" },
+  { name: "United States", flag: "🇺🇸", continent: "North America", capital: "Washington", area: 9833517, population: 335000000, tourism: 51, beauty: 8.6, blurb: "Visit theme parks, giant canyons and bright city lights!", emoji: "🗽" },
+  { name: "Vanuatu", flag: "🇻🇺", continent: "Oceania", capital: "Port Vila", area: 12189, population: 320000, tourism: 1, beauty: 8.8, blurb: "Tropical islands where you can peek into a bubbling volcano!", emoji: "🌋" },
+  { name: "Vietnam", flag: "🇻🇳", continent: "Asia", capital: "Hanoi", area: 331212, population: 99000000, tourism: 13, beauty: 8.6, blurb: "Sail among magical green rocks rising out of the sea!", emoji: "⛵" }
+];
+let worldDim='tourism';
+const WORLD_DIMS=[
+  {k:'tourism',   tab:'🧳 Most popular', heading:'Most popular holiday countries', unit:'million visitors a year', fmt:v=>v+'M', val:c=>c.tourism||0},
+  {k:'beauty',    tab:'🏞️ Most beautiful', heading:'Most beautiful countries', unit:'beauty score', fmt:v=>v.toFixed(1)+' / 10', val:c=>c.beauty||0},
+  {k:'area',      tab:'🗺️ Biggest', heading:'Biggest countries', unit:'square kilometres', fmt:v=>Number(v).toLocaleString(), val:c=>c.area||0},
+  {k:'population',tab:'👥 Most people', heading:'Most crowded countries', unit:'people', fmt:v=>Number(v).toLocaleString(), val:c=>c.population||0}
+];
+/* normalise names so trip countries match WORLD_COUNTRIES entries */
+function wcKey(n){ n=String(n||'').trim(); return n==='Turkey'?'Türkiye':n; }
+function wcGuide(name){ const d=DESTS.find(x=>wcKey(x.country)===wcKey(name)); return d?d.id:null; }
+function setWorldDim(k){ worldDim=k; renderWorld(); }
+function renderWorld(){
+  const host=document.getElementById('worldBody'); if(!host) return;
+  if(typeof WORLD_COUNTRIES==='undefined'){ host.innerHTML='<div class="wc-empty">Country data is still loading…</div>'; return; }
+  const doneNames=new Set(trips.filter(t=>!t.planned).map(t=>wcKey(t.country)).filter(Boolean));
+  const everNames=new Set(trips.map(t=>wcKey(t.country)).filter(Boolean)); /* visited or booked — excluded from suggestions */
+  const visited=WORLD_COUNTRIES.filter(c=>doneNames.has(wcKey(c.name))).sort((a,b)=>a.name.localeCompare(b.name));
+  const dim=WORLD_DIMS.find(d=>d.k===worldDim)||WORLD_DIMS[0];
+  const suggestions=WORLD_COUNTRIES.filter(c=>!everNames.has(wcKey(c.name))).slice().sort((a,b)=>dim.val(b)-dim.val(a)).slice(0,5);
+
+  const visHTML = visited.length
+    ? `<div class="wc-flags">${visited.map(c=>{const g=wcGuide(c.name);
+        return `<button class="wc-flag${g?'':' plain'}" ${g?`onclick="openDest('${g}')"`:'disabled'} aria-label="${esc(c.name)}${g?', open guide':''}">
+          <span class="fl" aria-hidden="true">${c.flag}</span><span><span class="nm">${esc(c.name)}</span><span class="ct">${esc(c.continent)} ✓</span></span></button>`;}).join('')}</div>`
+    : `<div class="wc-empty">No countries logged yet — add a trip in your Journal and watch your passport fill up! ✈️</div>`;
+
+  const tabs=`<div class="dimnav" role="tablist" aria-label="Sort countries by">${WORLD_DIMS.map(d=>
+    `<button role="tab" aria-selected="${d.k===worldDim}" class="${d.k===worldDim?'active':''}" onclick="setWorldDim('${d.k}')">${d.tab}</button>`).join('')}</div>`;
+
+  const sugHTML = suggestions.map((c,i)=>{const g=wcGuide(c.name);
+    return `<div class="wc-card">
+      <div class="wc-rank">${i+1}</div>
+      <div class="fl" aria-hidden="true">${c.flag}</div>
+      <div>
+        <div class="nm">${esc(c.name)} <span class="em" aria-hidden="true">${c.emoji||'🌍'}</span></div>
+        <div class="bl">${esc(c.blurb)}</div>
+        <span class="wc-metric"><span class="mv">${dim.fmt(dim.val(c))}</span><span class="mu">${dim.unit}</span></span>
+        ${g?`<div class="wc-go"><button class="maplink" type="button" onclick="openDest('${g}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Explore ${esc(c.name)}</button></div>`:''}
+      </div>
+    </div>`;}).join('');
+
+  host.innerHTML=
+    `<h3 class="wc-h">🛂 Countries you've explored <span style="color:var(--teal-d)">(${visited.length})</span></h3>
+     <p class="wc-sub">Tap a country with a guide to revisit it.</p>
+     ${visHTML}
+     <h3 class="wc-h">✨ Dream destinations to explore next</h3>
+     <p class="wc-sub">The top 5 countries you haven't been to yet — ${esc(dim.heading.toLowerCase())}.</p>
+     ${tabs}
+     <div class="wc-list">${sugHTML}</div>`;
 }
 
 /* =====================================================================
