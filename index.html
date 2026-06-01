@@ -308,7 +308,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
   border-radius:var(--r);padding:14px;box-shadow:var(--shadow-sm);margin-bottom:13px;transition:.15s}
 .spot:hover{transform:translateX(4px);border-color:var(--line-2)}
 .spot:hover .spot-pic img{transform:scale(1.06)}
-.spot-pic{position:relative;width:108px;align-self:stretch;min-height:104px;border-radius:15px;flex:none}
+.spot-pic{margin:0;position:relative;width:108px;align-self:stretch;min-height:104px;border-radius:15px;flex:none;overflow:hidden}
 .spot-pic .spot-num{position:absolute;top:7px;left:7px;z-index:5;min-width:27px;height:27px;padding:0 7px;border-radius:9px;
   background:rgba(255,255,255,.94);color:var(--coral-d);font-family:var(--display);font-weight:800;font-size:1rem;
   display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px rgba(0,0,0,.22)}
@@ -685,9 +685,11 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0}
 .phrase .ph-say{font-weight:700;color:var(--ink-2);font-size:.92rem}
 /* —— local cat story: cover card —— */
+.catcover-list{display:grid;gap:14px}
 .catcover{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;width:100%;text-align:left;
   background:var(--surface);border:2px solid var(--line);border-radius:var(--r-xl);padding:18px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .18s,box-shadow .18s}
 .catcover:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.catcover-badge{position:absolute;top:8px;left:8px;z-index:5;background:var(--coral-d);color:#fff;font-family:var(--display);font-weight:800;font-size:.72rem;letter-spacing:.04em;padding:4px 10px;border-radius:999px;box-shadow:0 2px 7px rgba(0,0,0,.25)}
 @media(max-width:560px){.catcover{grid-template-columns:1fr}}
 .catcover-pic{margin:0;position:relative;aspect-ratio:1;border-radius:var(--r-lg);overflow:hidden;border:3px solid #fff;outline:1px solid var(--line)}
 .catcover-pic img{object-position:50% 35%}
@@ -4464,10 +4466,19 @@ function normalizeCatPages(c){ if(!c) return [];
   if(c.stories&&c.stories.length) return c.stories.map(s=>typeof s==='string'?s:((s.title?'**'+s.title+'**\n\n':'')+(s.text||'')));
   return c.story?[c.story]:[];
 }
-function openStory(id){
+/* a cat can have a whole series: the main story plus any in c.more[] */
+function catStories(c){ if(!c) return [];
+  var out=[]; var main=normalizeCatPages(c);
+  if(main.length) out.push({title:c.title||(c.name+'’s Tale'), pages:main});
+  if(c.more&&c.more.length) c.more.forEach(function(s){ if(s&&s.pages&&s.pages.length) out.push({title:s.title||(c.name+'’s Tale'), pages:s.pages.slice()}); });
+  return out;
+}
+function openStory(id,si){
   const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[id]; if(!c) return;
-  storyCat=c; storyPages=normalizeCatPages(c); storyPage=0;
-  const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=c.title||(c.name+'’s Tale');
+  const stories=catStories(c); if(!stories.length) return;
+  const story=stories[Math.max(0,Math.min(si||0,stories.length-1))];
+  storyCat=c; storyPages=story.pages.slice(); storyPage=0;
+  const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=story.title;
   const img=document.getElementById('storyCatImg');
   if(img){
     /* lead with the "cat" tag and keep it to 2 tags — loremflickr requires ALL tags to match,
@@ -4713,17 +4724,25 @@ function openDest(id){
     const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[d.id];
     if(!c) return `<h3 class="blockhead">🐾 The local cat's tale</h3><p class="sub">${esc(d.name)}'s local cat is still snoozing — story coming soon!</p>`;
     const kw=c.photoKw||('cat,'+d.name);
-    const n=normalizeCatPages(c).length;
-    return `<h3 class="blockhead">🐾 ${esc(d.name)}'s local cat</h3><p class="sub">Meet ${esc(c.name)} — tap the storybook to read their adventure 🐈</p>
-      <button class="catcover" onclick="openStory('${d.id}')">
-        <figure class="catcover-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${pimg(kw,(d.id.length*13+7),700,560,c.name)}</figure>
+    const stories=catStories(c);
+    const multi=stories.length>1;
+    const intro=multi
+      ? `Meet ${esc(c.name)} — there are ${stories.length} tales to read 🐈 Pick a storybook!`
+      : `Meet ${esc(c.name)} — tap the storybook to read their adventure 🐈`;
+    const covers=stories.map((s,si)=>{
+      const n=s.pages.length;
+      return `<button class="catcover" onclick="openStory('${d.id}',${si})">
+        <figure class="catcover-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${multi?`<span class="catcover-badge">Tale ${si+1}</span>`:''}${pimg(kw,(d.id.length*13+7+si*5),700,560,c.name)}</figure>
         <div class="catcover-info">
           <div class="catcover-name">${esc(c.name)}</div>
-          <div class="catcover-title">“${esc(c.title||(c.name+'’s Adventure'))}”</div>
+          <div class="catcover-title">“${esc(s.title)}”</div>
           <div class="catcover-meta">📖 ${n} page${n>1?'s':''} · a ${esc(d.name)} tale</div>
-          <span class="catcover-cta">📖 Read the story →</span>
+          <span class="catcover-cta">📖 Read this story →</span>
         </div>
       </button>`;
+    }).join('');
+    return `<h3 class="blockhead">🐾 ${esc(d.name)}'s local cat</h3><p class="sub">${intro}</p>
+      <div class="catcover-list">${covers}</div>`;
   })();
 
   const panels={
