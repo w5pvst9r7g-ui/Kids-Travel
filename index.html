@@ -9,6 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Poppie's Atlas" />
+<meta name="description" content="Poppie's Atlas — a fun travel app for kids: trip countdowns, photos, fun facts, quizzes, local-cat stories and a passport of every adventure." />
+<link rel="icon" type="image/jpeg" href="poppie.jpg" />
 <link id="appicon" rel="apple-touch-icon" href="" />
 <link id="manifest" rel="manifest" href="" />
 
@@ -536,6 +538,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .ach .nm{font-family:var(--display);font-weight:800;font-size:.92rem;color:var(--ink);margin-top:7px;line-height:1.15}
 .ach .ds{font-size:.74rem;color:var(--ink-2);font-weight:700;margin-top:3px;line-height:1.3}
 .ach.locked .nm,.ach.locked .ds{color:var(--muted)}
+.badge-actions{display:flex;gap:12px;flex-wrap:wrap;margin:4px 0 22px}
 .next-badge{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#fff,var(--surface-2));border:2px solid var(--ac,var(--teal));border-radius:var(--r-lg);padding:16px 20px;margin:14px 0 22px;box-shadow:var(--shadow-sm)}
 .next-badge .nb-em{font-size:2.6rem;line-height:1;flex:none}
 .next-badge .nb-k{font-family:var(--display);font-weight:800;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ac,var(--teal-d))}
@@ -1071,7 +1074,10 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     <div class="section-head"><div><span class="eyebrow">Collect them all</span><h2>Explorer Badges 🏅</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 16px">Earn badges as you explore the world. They update automatically from your travel journal!</p>
     <div id="explorerBadge"></div>
-    <button class="btn btn-teal" style="margin:4px 0 22px" onclick="showView('world')">🌍 See all your countries &amp; where to go next</button>
+    <div class="badge-actions">
+      <button class="btn btn-teal" onclick="showView('world')">🌍 See all your countries &amp; where to go next</button>
+      <button class="btn btn-ghost" onclick="shareApp()">📤 Share Poppie's Atlas</button>
+    </div>
     <div id="achShelf" class="ach-shelf"></div>
   </section>
 
@@ -5624,6 +5630,14 @@ function setHeroSpotlight(){
   const chip=document.getElementById('heroSpot'); if(chip){ chip.hidden=false; chip.innerHTML='✨ Spotlight: '+esc(d.name)+' '+esc(d.flag||''); }
 }
 function openHeroSpot(){ if(heroSpotId) openDest(heroSpotId); }
+/* share the app (Web Share API, with a copy-link fallback) */
+function shareApp(){
+  const url=(location.href.split('#')[0])||'https://w5pvst9r7g-ui.github.io/kids-travel/';
+  const data={title:"Poppie's Atlas",text:"Come explore the world with Poppie the cat! 🐱✈️",url:url};
+  if(navigator.share){ navigator.share(data).catch(()=>{}); return; }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(()=>toast('🔗 Link copied — share it with friends!')).catch(()=>toast('🔗 '+url)); return; }
+  toast('🔗 '+url);
+}
 
 /* =====================================================================
    PWA polish
