@@ -489,6 +489,27 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .dgroup-head .eyebrow{display:block;margin-bottom:5px}
 .dgroup-head h3{font-size:clamp(1.3rem,3.6vw,1.75rem);display:flex;align-items:center;gap:10px}
 .dgroup-head h3 .cnt{font-size:.72rem;font-weight:800;color:var(--muted);background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:3px 11px}
+/* ===== login / profiles ===== */
+.login{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;
+  background:radial-gradient(120% 80% at 50% -10%, #FFD86B 0, transparent 45%), linear-gradient(155deg,#13B5AC,#46B3F0 55%,#7C6CF4)}
+.login.hidden{display:none}
+.login-card{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:30px 26px;text-align:center}
+.login-card .mark{width:78px;height:78px;margin:0 auto;display:block}
+.login-card h1{font-size:1.8rem;margin:12px 0 2px}
+.login-card .who{color:var(--ink-2);font-weight:700;margin-bottom:20px}
+.profiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.profile-btn{background:var(--surface-2);border:3px solid var(--line);border-radius:20px;padding:22px 12px;cursor:pointer;transition:transform .15s,border-color .15s;font-family:var(--display);min-height:120px}
+.profile-btn:hover{transform:translateY(-4px)}
+.profile-btn .av{font-size:3.2rem;display:block;line-height:1}
+.profile-btn .nm{font-weight:800;font-size:1.12rem;margin-top:10px;color:var(--ink);display:block}
+.pinpad .greet{font-weight:800;font-family:var(--display);font-size:1.1rem;margin:4px 0 14px}
+.pin-input{font-size:1.7rem;text-align:center;letter-spacing:.45em;font-family:var(--display);font-weight:800}
+.pin-err{color:var(--coral-d);font-weight:800;min-height:1.3em;margin:10px 0 4px}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(6px)}50%{transform:translateX(-9px)}}
+.shake{animation:shake .4s}
+#profileChip{display:none;align-items:center;gap:7px;background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:800;color:var(--ink);font-size:.9rem;cursor:pointer}
+#profileChip:hover{border-color:var(--teal)}
+@media(prefers-reduced-motion:reduce){.profile-btn:hover{transform:none}.shake{animation:none}}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
 </style>
@@ -519,8 +540,28 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <button data-view="map">Atlas Map</button>
       <button data-view="trips">Travel Journal</button>
     </nav>
+    <button id="profileChip" onclick="showLogin()" title="Switch explorer" aria-label="Switch explorer"></button>
   </div>
 </header>
+
+<div id="loginScreen" class="login">
+  <div class="login-card">
+    <svg class="mark" id="loginMark" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    <h1>Poppie's Atlas</h1>
+    <div class="who">Who's exploring today?</div>
+    <div class="profiles" id="profilePick">
+      <button class="profile-btn" data-p="jeanluc"><span class="av">🦖</span><span class="nm">Jean-Luc</span></button>
+      <button class="profile-btn" data-p="hailey"><span class="av">🦄</span><span class="nm">Hailey</span></button>
+    </div>
+    <div class="pinpad" id="pinPad" hidden>
+      <div class="greet" id="pinGreet"></div>
+      <input class="pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="••••" aria-label="Secret code" />
+      <div class="pin-err" id="pinErr" role="alert"></div>
+      <button class="btn btn-primary" id="pinGo" style="width:100%;justify-content:center">Let's go! →</button>
+      <button class="btn-text" id="pinBack" style="width:100%;justify-content:center;margin-top:6px">← Choose someone else</button>
+    </div>
+  </div>
+</div>
 
 <main>
   <!-- ===================== EXPLORE ===================== -->
@@ -2303,11 +2344,18 @@ const POPPIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Poppie the
 /* =====================================================================
    STATE + STORAGE
    ===================================================================== */
-const LS_KEY='globie_atlas_trips_v7';
-function loadTrips(){ try{const s=localStorage.getItem(LS_KEY); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
+/* —— Profiles: each explorer has their own journal, badges & quiz scores —— */
+const PROFILES=[
+  {id:'jeanluc', name:'Jean-Luc', emoji:'🦖', color:'#46B3F0'},
+  {id:'hailey',  name:'Hailey',   emoji:'🦄', color:'#FF7FB0'}
+];
+const PROFILE_PIN='1985';            // simple family gate (not real security)
+let currentProfile=null;             // chosen at the login screen each visit
+const dataKey=base=>'globie_atlas_'+base+'_v7_'+(currentProfile||'guest');
+function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
-function saveTrips(){ try{localStorage.setItem(LS_KEY,JSON.stringify(trips));}
+function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
   catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
 let editingId=null, formRating=0, currentDest=null, map=null, layer=null;
@@ -2743,7 +2791,7 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
 /* =====================================================================
    GAMIFICATION (stream 3): achievements, surprise-me, passport stamp, Poppie speaks
    ===================================================================== */
-const ACH_KEY='globie_atlas_achievements_v1';
+/* achievement storage is profile-namespaced via dataKey('ach') */
 const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Europe',Portugal:'Europe',
   Croatia:'Europe',Albania:'Europe',Iceland:'Europe',France:'Europe',Italy:'Europe','United Kingdom':'Europe',
   'Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',Singapore:'Asia',
@@ -2766,8 +2814,8 @@ const ACHIEVEMENTS=[
   {id:'planner',em:'🗓️',nm:'Trip Planner',ds:'Plan an upcoming trip',ac:'#7C6CF4',test:c=>c.planned.length>=1},
   {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 10 trips in all',ac:'#FF8366',test:c=>c.visited.length>=10}
 ];
-function loadAch(){ try{const s=localStorage.getItem(ACH_KEY); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
-function saveAch(set){ try{localStorage.setItem(ACH_KEY,JSON.stringify([...set]));}catch(e){} }
+function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
+function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
 let unlockedAch=loadAch();
 function achContext(){
   const visited=trips.filter(t=>!t.planned), planned=trips.filter(t=>t.planned);
@@ -2846,9 +2894,8 @@ function poppieSpeak(){ const el=document.getElementById('globieSay'); if(!el) r
 /* =====================================================================
    QUIZ — three questions auto-built from each destination's facts
    ===================================================================== */
-const QUIZ_KEY='globie_atlas_quiz_v1';
-function loadQuizBest(){ try{return JSON.parse(localStorage.getItem(QUIZ_KEY))||{};}catch(e){return {};} }
-function saveQuizBest(o){ try{localStorage.setItem(QUIZ_KEY,JSON.stringify(o));}catch(e){} }
+function loadQuizBest(){ try{return JSON.parse(localStorage.getItem(dataKey('quiz')))||{};}catch(e){return {};} }
+function saveQuizBest(o){ try{localStorage.setItem(dataKey('quiz'),JSON.stringify(o));}catch(e){} }
 let quizBest=loadQuizBest();
 let quizState=null;
 function qshuffle(arr,seed){ const a=[...arr]; let s=seed||1;
@@ -2911,6 +2958,37 @@ function finishQuiz(){
   const rr=body.querySelector('.quiz-result'); if(rr) rr.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'nearest'});
 }
 
+/* ===== login / profile gate ===== */
+let pendingProfile=null;
+function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) return;
+  s.classList.remove('hidden');
+  document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false;
+  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; }
+function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
+function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
+  if(p){ c.style.display='inline-flex'; c.innerHTML='<span aria-hidden="true">'+p.emoji+'</span> '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
+function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest();
+  renderFeatured(); renderFilters(); renderGrid(); renderPassport(); checkAchievements({silent:true}); if(map) initMap(); }
+function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('explore'); }
+function setupLogin(){
+  const mk=document.getElementById('loginMark'); if(mk) mk.innerHTML=POPPIE_FACE;
+  document.querySelectorAll('#profilePick .profile-btn').forEach(b=>b.addEventListener('click',()=>{
+    pendingProfile=b.dataset.p; const p=PROFILES.find(x=>x.id===pendingProfile);
+    document.getElementById('profilePick').hidden=true; document.getElementById('pinPad').hidden=false;
+    document.getElementById('pinGreet').textContent='Hi '+p.name+'! Enter your secret code 🔑';
+    document.getElementById('pinErr').textContent='';
+    const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60);
+  }));
+  document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
+  const submit=()=>{ const v=document.getElementById('pinInput').value.trim();
+    if(v===PROFILE_PIN){ signIn(pendingProfile); }
+    else{ document.getElementById('pinErr').textContent="Oops, that code isn't right — try again!";
+      const c=document.querySelector('.login-card'); if(c){ c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
+      const pi=document.getElementById('pinInput'); pi.value=''; pi.focus(); } };
+  document.getElementById('pinGo').addEventListener('click',submit);
+  document.getElementById('pinInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();submit();} });
+}
+
 document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"','class="globie bob"');
 renderFeatured();renderFilters();renderGrid();buildDestSelect();buildRatePick();renderPassport();
 checkAchievements({silent:true});
@@ -2920,6 +2998,7 @@ document.getElementById('fYear').value=new Date().getFullYear();
 rotateFact();setInterval(rotateFact,6000);observeReveals();
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
 addEventListener('resize',syncHeader); syncHeader();
+setupLogin(); showLogin();
 </script>
 </body>
 </html>
