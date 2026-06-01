@@ -58,7 +58,7 @@ Last updated: 2026-06-01
 
 ### Medium
 - [x] **Map polish (part)** — animated plane flying along the next-trip arc ✈️  ·  [ ] still: cluster the dense Australian pins
-- [ ] Expand remaining popular guides (Brisbane, Auckland, Barcelona, Whitsundays, Gold Coast…) to the 8/8/10 depth
+- [x] Expanded Brisbane, Auckland, Barcelona, Whitsundays, Gold Coast, Melbourne, Miami, Fuerteventura to 8/8/10
 - [ ] **Weather / best-time** mini-widget per destination
 - [ ] **Language mini-quiz** ("how do you say…?") using the phrases data
 - [ ] Compress the Poppie PNGs (~20 MB → ~1.5 MB) for faster loads *(needs an image tool / external compressor)*
