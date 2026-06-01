@@ -542,6 +542,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .egg.hidden{display:none}
 .egg-card{text-align:center;max-width:480px}
 .egg-cat{width:min(72vw,360px);height:auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
+.egg-cat.photo{width:min(72vw,320px);aspect-ratio:1;object-fit:cover;border-radius:24px;border:4px solid #fff}
 .egg-cat.pop{animation:eggpop .6s cubic-bezier(.2,1.35,.4,1) both}
 @keyframes eggpop{0%{transform:scale(.2) rotate(-14deg);opacity:0}55%{transform:scale(1.14) rotate(5deg)}72%{transform:scale(.95) rotate(-3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 .egg-bubble{margin-top:18px;background:#fff;color:var(--ink);border-radius:20px;padding:16px 22px;font-family:var(--display);font-weight:800;font-size:clamp(1.1rem,3.8vw,1.55rem);line-height:1.3;box-shadow:var(--shadow);position:relative;animation:eggrise .4s .15s both}
@@ -4103,10 +4104,35 @@ const EGG_LINES=[
   "Wow. A whole click. Truly the height of your talents.",
   "Silence! The royal whiskers require quiet. 😼"
 ];
+function localInsults(name,place,thing){return [
+  `I'm ${name}, royal cat of ${place}. You couldn't find ${thing} with a map AND a torch. 😼`,
+  `A wild tourist appeared at ${place}! It used "Poke". It was not very effective. 😹`,
+  `Pfft. I've guarded ${thing} for nine lives, and YOU can't even click straight.`,
+  `${place} is MY turf, hooman. Bring snacks next time — fish, ideally. 🐟`,
+  `You + ${thing} = a disaster waiting to happen. I'll be over here. Napping.`,
+  `Shoo! Before I set the guards of ${thing} on you. 👑`,
+  `You came ALL the way to ${place} just to bother a cat? Bold. Silly, but bold.`
+];}
 function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) return;
-  document.getElementById('eggLine').textContent=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
+  const img=o.querySelector('.egg-cat'); if(!img) return;
+  const onDetail=document.getElementById('detail').classList.contains('active');
+  const c=(onDetail&&currentDest&&typeof LOCAL_CATS!=='undefined')?LOCAL_CATS[currentDest.id]:null;
+  let line;
+  if(c){
+    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; this.classList.remove('photo'); };
+    img.classList.add('photo');
+    img.src=flick(c.photoKw||('cat,'+currentDest.name), 99, 640, 640);
+    const things=(currentDest.attractions&&currentDest.attractions.map(a=>a[1]))||[];
+    const thing=things.length?things[Math.floor(Math.random()*things.length)]:currentDest.name;
+    const T=localInsults(c.name, currentDest.name, thing);
+    line=T[Math.floor(Math.random()*T.length)];
+  } else {
+    img.onerror=null; img.classList.remove('photo'); img.src='poppie-hi.png';
+    line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
+  }
+  document.getElementById('eggLine').textContent=line;
   o.classList.remove('hidden');
-  const cat=o.querySelector('.egg-cat'); if(cat){ cat.classList.remove('pop'); void cat.offsetWidth; cat.classList.add('pop'); } }
+  img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
