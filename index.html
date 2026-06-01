@@ -556,6 +556,12 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .pack-item.on span{text-decoration:line-through;opacity:.7}
 .pack-done{margin-top:14px;text-align:center;font-family:var(--display);font-weight:800;color:var(--green);font-size:1.1rem}
 .cd-today .cd-num{animation:cdpop 1s ease-in-out infinite}
+/* —— journal toolbar —— */
+.journal-main{min-width:0}
+.journal-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.journal-tools{display:flex;gap:6px;flex-wrap:wrap}
+.jtool{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:7px 12px;font-weight:700;font-size:.82rem;color:var(--ink-2);cursor:pointer;min-height:40px}
+.jtool:hover{border-color:var(--teal);color:var(--teal-d)}
 /* photo lightbox */
 .lightbox{position:fixed;inset:0;z-index:5600;display:flex;align-items:center;justify-content:center;gap:8px;
   padding:16px;background:rgba(15,17,30,.92);backdrop-filter:blur(4px)}
@@ -771,7 +777,18 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
         <button class="btn btn-primary" id="saveTrip">💾 Save trip</button>
         <button class="btn-text" id="cancelEdit" style="display:none">Cancel edit</button>
       </div>
-      <div id="passport" class="passport"></div>
+      <div class="journal-main">
+        <div class="journal-bar">
+          <div class="filters" id="journalFilters"></div>
+          <div class="journal-tools">
+            <button class="jtool" onclick="exportTrips()" title="Save a backup file">📤 Backup</button>
+            <button class="jtool" onclick="document.getElementById('importFile').click()" title="Load a backup file">📥 Restore</button>
+            <button class="jtool" onclick="resetTrips()" title="Restore the sample family trips">↺ Sample trips</button>
+            <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="importTrips(this)">
+          </div>
+        </div>
+        <div id="passport" class="passport"></div>
+      </div>
     </div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Your journal is saved privately in this browser — it'll be here when you come back!</p>
   </section>
@@ -3750,13 +3767,28 @@ function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').f
   s.setAttribute('aria-checked',v===n?'true':'false');
   s.tabIndex=(v===n||(n===0&&v===1))?0:-1;
 });}
+let journalFilter='all';
+function renderJournalFilters(){
+  const f=document.getElementById('journalFilters'); if(!f) return;
+  const opts=[['all','📋 All'],['upcoming','🔜 Upcoming'],['past','✅ Visited']];
+  f.innerHTML=opts.map(o=>`<button class="chip ${o[0]===journalFilter?'active':''}" onclick="journalFilter='${o[0]}';renderJournalFilters();renderPassport()">${o[1]}</button>`).join('');
+}
+function exportTrips(){ try{const blob=new Blob([JSON.stringify(trips,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='poppie-atlas-'+(currentProfile||'trips')+'.json'; a.click(); }catch(e){alert('Could not export.');} }
+function importTrips(input){ const file=input.files&&input.files[0]; if(!file) return;
+  const r=new FileReader(); r.onload=()=>{ try{const v=JSON.parse(r.result); if(Array.isArray(v)){ trips=v; saveTrips(); applyProfileData(); alert('Journal restored! ✈️'); } else alert('That file does not look like a trips backup.'); }catch(e){alert('Could not read that file.');} input.value=''; };
+  r.readAsText(file); }
+function resetTrips(){ if(!confirm('Restore the original sample family trips? This replaces the current journal for this explorer.')) return;
+  trips=JSON.parse(JSON.stringify(SEED_TRIPS)); saveTrips(); applyProfileData(); }
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
     p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppie waiting')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
     return;
   }
-  const sorted=[...trips].sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
+  let list=trips.filter(t=>journalFilter==='all'||(journalFilter==='upcoming'?t.planned:!t.planned));
+  if(!list.length){ p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppie')}<h3>Nothing here yet!</h3><p>No ${journalFilter==='upcoming'?'upcoming':'visited'} trips — try another filter.</p></div>`; return; }
+  const sorted=list.sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
   p.innerHTML=sorted.map(t=>{
     const d=DESTS.find(x=>x.id===t.destId),th=themeFor(d),kw=d?d.photos[0][0]:(t.city||'travel'),lk=d?d.photos[0][2]:(t.year||1);
     return `<article class="entry">
@@ -4077,7 +4109,7 @@ function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.cl
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); celebratedTrip=null;
-  renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
+  renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); }
 function renderProfilePick(){
   const wrap=document.getElementById('profilePick'); if(!wrap) return;
