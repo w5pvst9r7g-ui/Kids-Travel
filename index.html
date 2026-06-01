@@ -403,6 +403,49 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   .frame img{transition:none}
   *{scroll-behavior:auto!important}
 }
+
+/* ===== gamification (stream 3) ===== */
+.ach-shelf{margin-top:24px}
+.ach-shelf .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ach-shelf .head h3{font-size:1.4rem}
+.ach-shelf .head .count{font-weight:800;color:var(--coral-d);font-family:var(--display)}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px}
+.ach{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);padding:18px 12px 14px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .18s, box-shadow .18s}
+.ach.unlocked{border-color:transparent;box-shadow:0 10px 22px -12px var(--ac,#13B5AC), inset 0 0 0 2px var(--ac,#13B5AC)}
+.ach.unlocked:hover{transform:translateY(-4px) rotate(-1deg)}
+.ach .em{font-size:2.5rem;line-height:1;filter:grayscale(1);opacity:.34;transition:.3s}
+.ach.unlocked .em{filter:none;opacity:1}
+.ach .nm{font-family:var(--display);font-weight:800;font-size:.92rem;color:var(--ink);margin-top:7px;line-height:1.15}
+.ach .ds{font-size:.74rem;color:var(--ink-2);font-weight:700;margin-top:3px;line-height:1.3}
+.ach.locked .nm,.ach.locked .ds{color:var(--muted)}
+.ach .lock{position:absolute;top:9px;right:10px;font-size:.86rem;opacity:.5}
+@keyframes achPop{0%{transform:scale(.4);opacity:0}55%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.ach.justpop{animation:achPop .5s cubic-bezier(.2,.8,.3,1.2)}
+.ach-toast-wrap{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4000;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;width:min(360px,92vw)}
+.ach-toast{pointer-events:auto;display:flex;align-items:center;gap:13px;background:var(--surface);border:2px solid var(--ac,#13B5AC);border-radius:var(--r-lg);padding:13px 18px 13px 14px;box-shadow:var(--shadow);transform:translateY(24px);opacity:0;transition:transform .35s cubic-bezier(.2,.8,.3,1.1),opacity .35s}
+.ach-toast.in{transform:none;opacity:1}
+.ach-toast .em{font-size:2.2rem;line-height:1;flex:none}
+.ach-toast .tx b{display:block;font-family:var(--display);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ac,#13B5AC)}
+.ach-toast .tx .nm{font-family:var(--display);font-weight:800;font-size:1.06rem;color:var(--ink);line-height:1.15}
+.ach-toast .tx .ds{font-size:.8rem;color:var(--ink-2);font-weight:700}
+.btn-surprise{background:var(--grape);color:#fff;box-shadow:0 5px 0 0 #5b49d6}
+.btn-surprise:hover{transform:translateY(-2px);background:#8a7bf6}
+.btn-surprise .reel{display:inline-block;min-width:1.3em;text-align:center}
+.btn-surprise.spinning{pointer-events:none}
+.btn-surprise.spinning .reel{animation:reelpop .12s linear infinite}
+@keyframes reelpop{0%{transform:translateY(-3px) scale(1.15)}100%{transform:translateY(2px) scale(.95)}}
+.entry .stamp-mark{position:absolute;z-index:5;top:9px;left:9px;width:84px;height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--sc,#0E9890);border:2.5px solid currentColor;border-radius:50%;font-family:var(--display);font-weight:800;line-height:1;transform:rotate(-13deg);opacity:.86;mix-blend-mode:multiply;box-shadow:inset 0 0 0 2px currentColor;pointer-events:none}
+.entry .stamp-mark:before{content:"";position:absolute;inset:6px;border:1.5px dashed currentColor;border-radius:50%;opacity:.8}
+.entry .stamp-mark .sc{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:1px}
+.entry .stamp-mark .sf{font-size:1.5rem;line-height:1;margin:1px 0}
+.entry .stamp-mark .sy{font-size:.82rem;margin-top:1px}
+.entry .stamp-mark.planned{--sc:#F0A91E}
+.hero .who{position:relative}
+.globie-say{position:relative;background:#fff;color:var(--ink);border-radius:14px;padding:7px 13px;font-weight:700;font-size:.86rem;box-shadow:var(--shadow-sm);max-width:240px;line-height:1.35;animation:sayIn .4s ease}
+.globie-say:after{content:"";position:absolute;left:-7px;top:16px;width:0;height:0;border:7px solid transparent;border-right-color:#fff;border-left:0}
+@keyframes sayIn{from{opacity:0;transform:translateX(-6px) scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:520px){.globie-say{display:none}}
+@media(prefers-reduced-motion:reduce){.ach.justpop{animation:none}.ach.unlocked:hover{transform:none}.btn-surprise.spinning .reel{animation:none}.globie-say{animation:none}}
 </style>
 </head>
 <body>
@@ -444,12 +487,13 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       </div>
       <div class="factnote"><span>💡</span><span><b>Did you know?</b><span id="heroFact">Loading a fun fact…</span></span></div>
       <div class="inner">
-        <div class="who"><span class="globie" id="heroGlobie"></span><span>Hi, I'm Poppie! 🐱</span></div>
+        <div class="who"><span class="globie" id="heroGlobie"></span><span class="globie-say" id="globieSay" role="status" aria-live="polite">Hi, I'm Poppie! 🐱</span></div>
         <h1>Where shall we <em>explore</em> next?</h1>
         <p>Pick a place to see how to get there, awesome facts, and the most fun things to do for kids — then collect every adventure on your own map!</p>
         <div class="cta">
           <button class="btn btn-yellow" onclick="document.getElementById('chooseHead').scrollIntoView({behavior:'smooth'})">🌍 Choose a place</button>
           <button class="btn btn-teal" onclick="showView('map')">🗺️ My map</button>
+          <button class="btn btn-surprise" id="surpriseBtn" type="button"><span class="reel" aria-hidden="true">🎲</span> Surprise me!</button>
         </div>
       </div>
     </div>
@@ -492,6 +536,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <span><span class="leg-dot" style="background:#13B5AC"></span> Home · Dublin</span>
     </div>
     <div id="explorerBadge"></div>
+    <div id="achShelf" class="ach-shelf"></div>
     <div class="stats" id="stats"></div>
   </section>
 
@@ -1591,6 +1636,7 @@ function renderPassport(){
     const d=DESTS.find(x=>x.id===t.destId),th=themeFor(d),kw=d?d.photos[0][0]:(t.city||'travel'),lk=d?d.photos[0][2]:(t.year||1);
     return `<article class="entry">
       <div class="pic frame" style="${frameStyle(th)}">
+        ${stampMark(t)}
         ${t.planned?'<span class="soon">Upcoming</span>':''}<span class="yr">${t.year||''}</span>
         ${sticker(t.emoji||(d&&d.emoji))}${d?dpic(d.id,'hero',lk,520,330,t.city,kw):pimg(kw,lk,520,330,t.city)}<div class="scrim"></div>
         <div class="where"><div class="c">${esc(t.flag)} ${esc(t.country)}</div><h4>${esc(t.city)}</h4></div>
@@ -1629,6 +1675,7 @@ document.getElementById('saveTrip').addEventListener('click',()=>{
   else{data.id='t'+Date.now();trips.push(data);}
   saveTrips();resetForm();renderPassport();renderGrid();renderFeatured();if(map)initMap();
   if(isNew) confetti();
+  checkAchievements();
 });
 function editTrip(id){
   const t=trips.find(x=>x.id===id);if(!t)return;editingId=id;
@@ -1644,7 +1691,7 @@ function editTrip(id){
 }
 function delTrip(id){
   if(!confirm('Remove this adventure from your journal?'))return;
-  trips=trips.filter(t=>t.id!==id);saveTrips();renderPassport();renderGrid();renderFeatured();if(map)initMap();
+  trips=trips.filter(t=>t.id!==id);saveTrips();renderPassport();renderGrid();renderFeatured();if(map)initMap();renderAchievements();
 }
 function resetForm(){
   editingId=null;formRating=0;
@@ -1681,8 +1728,109 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
 /* =====================================================================
    INIT
    ===================================================================== */
+/* =====================================================================
+   GAMIFICATION (stream 3): achievements, surprise-me, passport stamp, Poppie speaks
+   ===================================================================== */
+const ACH_KEY='globie_atlas_achievements_v1';
+const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Europe',Portugal:'Europe',
+  Croatia:'Europe',Albania:'Europe',Iceland:'Europe','Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',
+  Morocco:'Africa',Madagascar:'Africa',Antarctica:'Antarctica'};
+const continentOf=t=>CONTINENT_OF[t.country]||null;
+const ACHIEVEMENTS=[
+  {id:'first_flight',em:'🛫',nm:'First Flight',ds:'Save your first trip',ac:'#13B5AC',test:c=>c.visited.length>=1},
+  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy place',ac:'#46B3F0',test:c=>c.regions.has('Snow')},
+  {id:'reef_explorer',em:'🐠',nm:'Reef Explorer',ds:'Visit a beach or island',ac:'#0FA7AF',test:c=>c.regions.has('Beach')},
+  {id:'city_slicker',em:'🏙️',nm:'City Slicker',ds:'Visit a big city',ac:'#F46A4B',test:c=>c.regions.has('City')},
+  {id:'wild_one',em:'🦎',nm:'Wild One',ds:'Visit a wildlife spot',ac:'#43C28A',test:c=>c.regions.has('Wildlife')},
+  {id:'five_countries',em:'🖐️',nm:'5 Countries',ds:'Visit 5 different countries',ac:'#FFC23C',test:c=>c.countries.size>=5},
+  {id:'continent_hop',em:'🌐',nm:'Continent Hopper',ds:'Reach 3 continents',ac:'#7C6CF4',test:c=>c.continents.size>=3},
+  {id:'polar',em:'🐧',nm:'Polar Pioneer',ds:'Reach Antarctica',ac:'#48cae4',test:c=>c.continents.has('Antarctica')},
+  {id:'around_world',em:'🌍',nm:'Around the World',ds:'Fly 40,000 km in total',ac:'#FF7FB0',test:c=>c.km>=40000},
+  {id:'super_fan',em:'⭐',nm:'Super Fan',ds:'Give a trip 5 fun stars',ac:'#F0A91E',test:c=>c.visited.some(t=>t.rating>=5)},
+  {id:'planner',em:'🗓️',nm:'Trip Planner',ds:'Plan an upcoming trip',ac:'#7C6CF4',test:c=>c.planned.length>=1},
+  {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 8 trips in all',ac:'#FF8366',test:c=>c.visited.length>=8}
+];
+function loadAch(){ try{const s=localStorage.getItem(ACH_KEY); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
+function saveAch(set){ try{localStorage.setItem(ACH_KEY,JSON.stringify([...set]));}catch(e){} }
+let unlockedAch=loadAch();
+function achContext(){
+  const visited=trips.filter(t=>!t.planned), planned=trips.filter(t=>t.planned);
+  const countries=new Set(visited.map(t=>t.country).filter(Boolean));
+  const continents=new Set(visited.map(continentOf).filter(Boolean));
+  const regions=new Set(visited.map(t=>{const d=DESTS.find(x=>x.id===t.destId);return d&&d.region;}).filter(Boolean));
+  let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(HOME,{lat:t.lat,lng:t.lng})*2; });
+  return {visited,planned,countries,continents,regions,km};
+}
+function renderAchievements(){
+  const host=document.getElementById('achShelf'); if(!host) return;
+  const got=ACHIEVEMENTS.filter(a=>unlockedAch.has(a.id)).length;
+  host.innerHTML=`<div class="head"><h3>🏅 Explorer Badges</h3><span class="count">${got} / ${ACHIEVEMENTS.length} collected</span></div>
+    <div class="ach-grid">${ACHIEVEMENTS.map(a=>{const on=unlockedAch.has(a.id);
+      return `<div class="ach ${on?'unlocked':'locked'}" style="--ac:${a.ac}" tabindex="0" role="group" aria-label="${esc(a.nm)}. ${on?'Unlocked':'Locked'}. ${esc(a.ds)}.">
+        ${on?'':'<span class="lock" aria-hidden="true">🔒</span>'}<div class="em" aria-hidden="true">${a.em}</div>
+        <div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div>`;}).join('')}</div>`;
+}
+function checkAchievements(opts){
+  const ctx=achContext(); const fresh=[];
+  ACHIEVEMENTS.forEach(a=>{ if(!unlockedAch.has(a.id) && a.test(ctx)){ unlockedAch.add(a.id); fresh.push(a); } });
+  if(fresh.length) saveAch(unlockedAch);
+  renderAchievements();
+  if(fresh.length && !(opts&&opts.silent)){
+    fresh.forEach((a,i)=>setTimeout(()=>showAchToast(a), i*900));
+    if(!reduceMotion) confetti();
+  }
+  return fresh;
+}
+function showAchToast(a){
+  let wrap=document.getElementById('achToastWrap');
+  if(!wrap){ wrap=document.createElement('div'); wrap.id='achToastWrap'; wrap.className='ach-toast-wrap'; wrap.setAttribute('aria-live','polite'); document.body.appendChild(wrap); }
+  const t=document.createElement('div'); t.className='ach-toast'; t.style.setProperty('--ac',a.ac); t.setAttribute('role','status');
+  t.innerHTML=`<div class="em" aria-hidden="true">${a.em}</div><div class="tx"><b>Badge unlocked!</b><div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div>`;
+  wrap.appendChild(t); requestAnimationFrame(()=>t.classList.add('in'));
+  setTimeout(()=>{ t.classList.remove('in'); setTimeout(()=>t.remove(),400); }, 3600);
+}
+
+/* ---- Surprise me ---- */
+function surpriseMe(){
+  const btn=document.getElementById('surpriseBtn'); if(!btn) return;
+  const reel=btn.querySelector('.reel'); const pick=DESTS[Math.floor(Math.random()*DESTS.length)];
+  if(reduceMotion){ openDest(pick.id); return; }
+  if(btn.classList.contains('spinning')) return;
+  btn.classList.add('spinning'); const faces=DESTS.map(d=>d.emoji);
+  let ticks=0; const total=16+Math.floor(Math.random()*6);
+  const iv=setInterval(()=>{ reel.textContent=faces[Math.floor(Math.random()*faces.length)];
+    if(++ticks>=total){ clearInterval(iv); reel.textContent=pick.emoji;
+      setTimeout(()=>{ btn.classList.remove('spinning'); reel.textContent='🎲'; openDest(pick.id); }, 320); } }, 70);
+}
+
+/* ---- Passport stamp markup ---- */
+function stampMark(t){
+  return `<div class="stamp-mark ${t.planned?'planned':''}" aria-hidden="true">
+      <span class="sc">${t.planned?'Booked':'Visited'}</span>
+      <span class="sf">${esc(t.flag||t.emoji||'🌍')}</span>
+      <span class="sy">${esc(t.year||'')}</span></div>`;
+}
+
+/* ---- Poppie speaks ---- */
+function poppieLines(){
+  const visited=trips.filter(t=>!t.planned);
+  const countries=new Set(visited.map(t=>t.country).filter(Boolean)).size;
+  const nextUp=trips.find(t=>t.planned);
+  const lines=["Hi, I'm Poppie! 🐱  Where shall we go?","Tap any place to explore it with me! 🌍",
+    "Try the 🎲 Surprise me button for a random adventure!"];
+  if(countries>0) lines.push(`You've explored ${countries} ${countries===1?'country':'countries'} so far! 🧭`);
+  if(nextUp) lines.push(`Counting down to ${esc(nextUp.city)}! ✈️`);
+  lines.push("Don't forget to collect your explorer badges! 🏅");
+  return lines;
+}
+let poppieI=0;
+function poppieSpeak(){ const el=document.getElementById('globieSay'); if(!el) return; const l=poppieLines(); el.textContent=l[poppieI%l.length]; poppieI++; }
+
 document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"','class="globie bob"');
 renderFeatured();renderFilters();renderGrid();buildDestSelect();buildRatePick();renderPassport();
+checkAchievements({silent:true});
+const _sb=document.getElementById('surpriseBtn'); if(_sb) _sb.addEventListener('click',surpriseMe);
+poppieSpeak(); setInterval(poppieSpeak,7000);
 document.getElementById('fYear').value=new Date().getFullYear();
 rotateFact();setInterval(rotateFact,6000);observeReveals();
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
