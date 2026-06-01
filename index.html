@@ -678,6 +678,20 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .amodal-card{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:24px;text-align:center;max-height:86vh;overflow:auto}
 .amodal-card h3{font-size:1.35rem;margin-bottom:16px}
 .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:10px}
+.cloud-card{position:relative;text-align:left;max-width:480px}
+.cloud-lead{color:var(--ink-2);font-weight:600;font-size:.92rem;margin:0 0 14px;line-height:1.5}
+.cloud-status{font-weight:800;font-size:.85rem;padding:9px 12px;border-radius:10px;background:var(--surface-2);color:var(--ink-2);margin-bottom:12px}
+.cloud-status.ok{background:#E9F8F1;color:var(--green-d)}
+.cloud-status.err{background:#FDECE7;color:var(--coral-d)}
+.cloud-l{display:block;font-weight:800;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:10px 0 4px}
+.cloud-in{width:100%;border:2px solid var(--line);border-radius:12px;padding:11px 13px;font-family:var(--sans);font-weight:700;font-size:.95rem;color:var(--ink)}
+.cloud-in:focus{outline:none;border-color:var(--teal)}
+.cloud-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.cloud-row .btn{padding:11px 16px;font-size:.92rem}
+.cloud-help{margin-top:16px;font-size:.86rem;color:var(--ink-2)}
+.cloud-help summary{cursor:pointer;font-weight:800;color:var(--teal-d)}
+.cloud-help ol{margin:10px 0;padding-left:20px;line-height:1.6;font-weight:600}
+.cloud-sql{background:var(--ink);color:#E8FBF7;border-radius:12px;padding:13px;font-size:.74rem;overflow:auto;white-space:pre;line-height:1.45}
 .av-choice{aspect-ratio:1;border:2px solid var(--line);border-radius:16px;background:var(--surface-2);cursor:pointer;font-size:2rem;display:flex;align-items:center;justify-content:center;transition:.12s;padding:6px}
 .av-choice:hover{transform:translateY(-3px) scale(1.05);border-color:var(--teal)}
 .av-choice.sel{border-color:var(--teal);background:#e7faf8;box-shadow:0 0 0 3px rgba(19,181,172,.18)}
@@ -985,6 +999,42 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   </div>
 </div>
 
+<div id="cloudModal" class="amodal hidden" role="dialog" aria-modal="true" aria-label="Cloud sync" onclick="if(event.target.id==='cloudModal')closeCloud()">
+  <div class="amodal-card cloud-card">
+    <button class="story-close" onclick="closeCloud()" aria-label="Close">✕</button>
+    <h3>☁️ Cloud sync</h3>
+    <p class="cloud-lead">Back up every explorer's trips, badges &amp; stories to your own free <b>Supabase</b> project, and restore them on any device. Your data stays in <i>your</i> account.</p>
+    <div id="cloudStatus" class="cloud-status" role="status"></div>
+    <label class="cloud-l" for="cbUrl">Supabase project URL</label>
+    <input id="cbUrl" class="cloud-in" type="url" placeholder="https://xxxx.supabase.co" autocomplete="off" />
+    <label class="cloud-l" for="cbKey">Anon public key</label>
+    <input id="cbKey" class="cloud-in" type="password" placeholder="eyJ… (anon key)" autocomplete="off" />
+    <label class="cloud-l" for="cbCode">Family code (a shared secret word)</label>
+    <input id="cbCode" class="cloud-in" type="text" placeholder="e.g. peacock-family-2026" autocomplete="off" />
+    <div class="cloud-row">
+      <button class="btn btn-teal" onclick="saveCloud()">💾 Save settings</button>
+      <button class="btn btn-primary" onclick="cloudBackup()">⬆️ Back up now</button>
+      <button class="btn btn-ghost" onclick="cloudRestore()">⬇️ Restore</button>
+    </div>
+    <details class="cloud-help"><summary>First-time setup (one minute)</summary>
+      <ol>
+        <li>Make a free project at <b>supabase.com</b>.</li>
+        <li>In the SQL editor, run the snippet below to create the table.</li>
+        <li>Copy your <b>Project URL</b> and <b>anon public</b> key (Settings → API) into the boxes above.</li>
+        <li>Pick a <b>family code</b> and use the same one on every device.</li>
+      </ol>
+      <pre class="cloud-sql">create table if not exists atlas_sync (
+  code text primary key,
+  payload jsonb,
+  updated_at timestamptz default now()
+);
+alter table atlas_sync enable row level security;
+create policy "atlas all" on atlas_sync
+  for all using (true) with check (true);</pre>
+    </details>
+  </div>
+</div>
+
 <main>
   <!-- ===================== EXPLORE ===================== -->
   <section id="explore" class="view active">
@@ -1138,6 +1188,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
             <button class="jtool" onclick="exportTrips()" title="Save a backup file">📤 Backup</button>
             <button class="jtool" onclick="document.getElementById('importFile').click()" title="Load a backup file">📥 Restore</button>
             <button class="jtool" onclick="printPassport()" title="Print or save your passport page">🖨️ Passport</button>
+            <button class="jtool" onclick="openCloud()" title="Sync across devices with a free Supabase account">☁️ Cloud sync</button>
             <button class="jtool" onclick="resetTrips()" title="Restore the sample family trips">↺ Sample trips</button>
             <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="importTrips(this)">
           </div>
@@ -4708,7 +4759,7 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); closeCloud(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 
 /* =====================================================================
@@ -5487,6 +5538,57 @@ function renderJournalFilters(){
   const f=document.getElementById('journalFilters'); if(!f) return;
   const opts=[['all','📋 All'],['upcoming','🔜 Upcoming'],['past','✅ Visited']];
   f.innerHTML=opts.map(o=>`<button class="chip ${o[0]===journalFilter?'active':''}" onclick="journalFilter='${o[0]}';renderJournalFilters();renderPassport()">${o[1]}</button>`).join('');
+}
+/* =====================================================================
+   CLOUD SYNC (optional) — back up / restore all explorers' data to the
+   family's own free Supabase project. Fully dormant until configured.
+   ===================================================================== */
+function loadCloudCfg(){ try{return JSON.parse(localStorage.getItem('globie_cloud'))||{};}catch(e){return {};} }
+function saveCloudCfg(c){ try{localStorage.setItem('globie_cloud',JSON.stringify(c));}catch(e){} }
+function cloudStatus(msg,kind){ const el=document.getElementById('cloudStatus'); if(!el) return;
+  el.textContent=msg||''; el.className='cloud-status'+(kind?(' '+kind):''); }
+function openCloud(){ const c=loadCloudCfg();
+  const u=document.getElementById('cbUrl'), k=document.getElementById('cbKey'), code=document.getElementById('cbCode');
+  if(u) u.value=c.url||''; if(k) k.value=c.key||''; if(code) code.value=c.code||'';
+  cloudStatus(c.url&&c.key&&c.code?'✓ Configured. Back up or restore any time.':'Not set up yet — add your Supabase details below.', c.url?'ok':'');
+  document.getElementById('cloudModal').classList.remove('hidden'); }
+function closeCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
+function saveCloud(){
+  const url=(document.getElementById('cbUrl').value||'').trim().replace(/\/+$/,'');
+  const key=(document.getElementById('cbKey').value||'').trim();
+  const code=(document.getElementById('cbCode').value||'').trim();
+  if(!url||!key||!code){ cloudStatus('Please fill in all three boxes.','err'); return; }
+  saveCloudCfg({url,key,code}); cloudStatus('✓ Saved! Now tap “Back up now”.','ok');
+}
+function cloudReady(){ const c=loadCloudCfg(); return (c.url&&c.key&&c.code)?c:null; }
+function cloudHeaders(c){ return {'apikey':c.key,'Authorization':'Bearer '+c.key,'Content-Type':'application/json'}; }
+/* gather every Poppie key from localStorage into one payload */
+function cloudGather(){ const out={}; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i);
+  if(k && k.indexOf('globie')===0 && k!=='globie_cloud'){ out[k]=localStorage.getItem(k); } } }catch(e){} return out; }
+function cloudApply(payload){ if(!payload||typeof payload!=='object') return 0; let n=0;
+  Object.keys(payload).forEach(k=>{ if(k.indexOf('globie')===0 && k!=='globie_cloud'){ try{localStorage.setItem(k,payload[k]); n++;}catch(e){} } });
+  return n; }
+function cloudBackup(){ const c=cloudReady(); if(!c){ cloudStatus('Add your Supabase details and Save first.','err'); return; }
+  cloudStatus('⬆️ Backing up…');
+  const body=[{code:c.code,payload:cloudGather(),updated_at:new Date().toISOString()}];
+  fetch(c.url+'/rest/v1/atlas_sync',{method:'POST',headers:Object.assign(cloudHeaders(c),{'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(body)})
+    .then(r=>{ if(r.ok){ cloudStatus('✓ Backed up to the cloud! 🎉','ok'); }
+      else r.text().then(t=>cloudStatus('Backup failed ('+r.status+'). '+(t||'Check the table & policy.'),'err')); })
+    .catch(()=>cloudStatus('Backup failed — check the URL and your connection.','err'));
+}
+function cloudRestore(){ const c=cloudReady(); if(!c){ cloudStatus('Add your Supabase details and Save first.','err'); return; }
+  if(!confirm('Restore from the cloud? This replaces the trips, badges and stories on THIS device with the cloud copy.')) return;
+  cloudStatus('⬇️ Restoring…');
+  fetch(c.url+'/rest/v1/atlas_sync?select=payload&code=eq.'+encodeURIComponent(c.code),{headers:cloudHeaders(c)})
+    .then(r=>r.ok?r.json():r.text().then(t=>Promise.reject(r.status+' '+t)))
+    .then(rows=>{ const row=rows&&rows[0];
+      if(!row||!row.payload){ cloudStatus('Nothing in the cloud yet for that family code.','err'); return; }
+      const n=cloudApply(row.payload);
+      if(typeof currentProfile!=='undefined'&&currentProfile){ try{applyProfileData();}catch(e){} }
+      cloudStatus('✓ Restored '+n+' items! Reloading…','ok');
+      setTimeout(()=>location.reload(),900);
+    })
+    .catch(err=>cloudStatus('Restore failed ('+err+').','err'));
 }
 function exportTrips(){ try{const blob=new Blob([JSON.stringify(trips,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='poppie-atlas-'+(currentProfile||'trips')+'.json'; a.click(); }catch(e){alert('Could not export.');} }
