@@ -541,6 +541,21 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .quiz-result .poppie-pic{width:104px;height:104px;margin:0 auto 6px;display:block}
 .ach-toast .poppie-pic{width:42px;height:42px;flex:none}
 @media(prefers-reduced-motion:reduce){.poppie-peek,.cd-poppie,.empty .poppie-pic{animation:none}}
+/* —— packing checklist —— */
+.packbox{background:var(--surface);border:2px solid var(--line);border-radius:var(--r-xl);padding:20px 22px;box-shadow:var(--shadow-sm);margin-top:18px}
+.pack-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pack-head h3{font-size:1.3rem}
+.pack-count{font-family:var(--display);font-weight:800;color:var(--coral-d);background:var(--surface-2);border-radius:999px;padding:4px 12px;font-size:.85rem}
+.pack-bar{height:10px;background:var(--line);border-radius:10px;margin:12px 0 16px;overflow:hidden}
+.pack-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--coral));border-radius:10px;transition:width .4s ease}
+.pack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.pack-item{display:flex;align-items:center;gap:9px;background:var(--surface-2);border:2px solid var(--line);border-radius:var(--r-sm);padding:10px 13px;font-weight:700;color:var(--ink);cursor:pointer;min-height:44px;transition:.12s}
+.pack-item:hover{border-color:var(--teal)}
+.pack-item input{width:20px;height:20px;flex:none;accent-color:var(--teal)}
+.pack-item.on{background:#eafaf3;border-color:var(--green);color:var(--teal-d)}
+.pack-item.on span{text-decoration:line-through;opacity:.7}
+.pack-done{margin-top:14px;text-align:center;font-family:var(--display);font-weight:800;color:var(--green);font-size:1.1rem}
+.cd-today .cd-num{animation:cdpop 1s ease-in-out infinite}
 /* photo lightbox */
 .lightbox{position:fixed;inset:0;z-index:5600;display:flex;align-items:center;justify-content:center;gap:8px;
   padding:16px;background:rgba(15,17,30,.92);backdrop-filter:blur(4px)}
@@ -682,6 +697,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   <section id="upcoming" class="view">
     <div class="section-head"><div><span class="eyebrow">Get excited</span><h2>Coming up next 🔜</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-play.png"></div>
     <div id="featured" class="reveal"></div>
+    <div id="packing"></div>
     <div id="upcomingGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Your booked adventures — tap one to explore it!</p>
   </section>
@@ -3347,7 +3363,7 @@ let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
   catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
-let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0;
+let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null;
 /* —— photo lightbox —— */
 function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=d.photos.length; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex];
@@ -3417,17 +3433,19 @@ function renderFeatured(){
   const d=DESTS.find(x=>x.id===t.destId), th=themeFor(d), days=daysUntil(t), dt=tripDate(t);
   const dstr=dt?dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
   const wks=days!=null?Math.floor(days/7):null;
-  host.innerHTML=`<div class="cd-hero" style="${frameStyle(th)}">
+  const today=days===0;
+  host.innerHTML=`<div class="cd-hero ${today?'cd-today':''}" style="${frameStyle(th)}">
     <div class="cd-bg">${d?dpic(d.id,'hero',d.photos[0][2],1200,640,t.city,d.photos[0][0]):''}</div>
     <div class="cd-scrim"></div>
     <div class="cd-inner">
-      <span class="cd-eyebrow">✈️ Next adventure</span>
-      <div class="cd-count"><span class="cd-num">${days==null?'—':days}</span><span class="cd-lab">${days===1?'sleep':'sleeps'}<br>to go!</span></div>
+      <span class="cd-eyebrow">${today?'🎉 Adventure time!':'✈️ Next adventure'}</span>
+      <div class="cd-count">${today?`<span class="cd-num">🎉</span><span class="cd-lab">It's<br>today!</span>`:`<span class="cd-num">${days==null?'—':days}</span><span class="cd-lab">${days===1?'sleep':'sleeps'}<br>to go!</span>`}</div>
       <h2 class="cd-place">${esc(t.flag||'')} ${esc(t.city)}</h2>
-      <div class="cd-date">📅 ${esc(dstr)}${wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:''}</div>
+      <div class="cd-date">${today?'Have the BEST time! ✨':'📅 '+esc(dstr)+(wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:'')}</div>
       ${d?`<button class="btn btn-yellow" onclick="openDest('${d.id}')">Explore ${esc(d.name)} →</button>`:''}
     </div>
     <img class="cd-poppie" loading="lazy" alt="Poppie can't wait!" src="poppie-fish.png"></div>`;
+  if(today && !reduceMotion && celebratedTrip!==t.id){ celebratedTrip=t.id; confetti(); }
 }
 
 /* =====================================================================
@@ -3486,7 +3504,30 @@ function renderUpcoming(){
     cards.push(cardHTML(d,`<span class="t soon">🔜 ${lab}</span>`)); });
   host.innerHTML = cards.length ? `<div class="section-head" style="margin-top:8px"><div><span class="eyebrow">Every booked adventure</span><h3 style="font-size:1.4rem">All our upcoming trips</h3></div></div><div class="deck">${cards.join('')}</div>`
     : `<div class="empty">No upcoming trips yet — add one with a future date in your Journal! ✈️</div>`;
+  renderPacking();
 }
+
+/* —— packing checklist for the next trip —— */
+const PACK_BASE=['👕 Clothes for each day','🩲 Undies & socks','🪥 Toothbrush & toothpaste','🧸 Teddy / comfort toy','📱 Tablet & headphones','🔌 Chargers','🍫 Plane snacks','📸 Camera','🧴 Sunscreen','💧 Water bottle'];
+const PACK_REGION={Beach:['🩳 Swimmers','🥽 Goggles','🩴 Flip-flops','🏖️ Beach towel','🧢 Sun hat'],Snow:['🧥 Warm jacket','🧤 Gloves','🧣 Scarf & beanie','🥾 Snow boots'],City:['👟 Comfy walking shoes','🎒 Day backpack','☂️ Small umbrella'],Wildlife:['🔭 Binoculars','🪲 Bug spray','👖 Long trousers','🧢 Hat']};
+function loadPack(){ try{return JSON.parse(localStorage.getItem(dataKey('pack')))||{};}catch(e){return {};} }
+function savePack(o){ try{localStorage.setItem(dataKey('pack'),JSON.stringify(o));}catch(e){} }
+let packState=loadPack();
+function packList(t){ const d=DESTS.find(x=>x.id===t.destId); const reg=d&&PACK_REGION[d.region]||[]; return PACK_BASE.concat(reg); }
+function renderPacking(){
+  const host=document.getElementById('packing'); if(!host) return;
+  const t=nextPlanned(); if(!t){ host.innerHTML=''; return; }
+  const items=packList(t); const id=t.id; const st=packState[id]||{};
+  const done=items.filter((_,i)=>st[i]).length; const pct=Math.round(done/items.length*100);
+  host.innerHTML=`<div class="packbox">
+    <div class="pack-head"><h3>🎒 Help Poppie pack for ${esc(t.city)}!</h3>
+      <span class="pack-count">${done}/${items.length} packed</span></div>
+    <div class="pack-bar"><i style="width:${pct}%"></i></div>
+    <div class="pack-grid">${items.map((it,i)=>`<label class="pack-item ${st[i]?'on':''}"><input type="checkbox" ${st[i]?'checked':''} onchange="togglePack('${id}',${i})"> <span>${esc(it)}</span></label>`).join('')}</div>
+    ${done===items.length?`<div class="pack-done">🎉 All packed — you're ready for an adventure!</div>`:''}
+  </div>`;
+}
+function togglePack(id,i){ if(!packState[id])packState[id]={}; packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); }
 
 /* =====================================================================
    DETAIL
@@ -4035,7 +4076,7 @@ function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) ret
 function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
-function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest();
+function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); }
 function renderProfilePick(){
