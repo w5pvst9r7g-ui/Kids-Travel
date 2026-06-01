@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Globie's Atlas — A Kids' Travel Adventure</title>
+<title>Poppie's Atlas — A Kids' Travel Adventure</title>
 <meta name="theme-color" content="#10B5AE" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Globie's Atlas" />
+<meta name="apple-mobile-web-app-title" content="Poppie's Atlas" />
 <link id="appicon" rel="apple-touch-icon" href="" />
 <link id="manifest" rel="manifest" href="" />
 
-<!-- Leaflet (no SRI integrity, so the script always loads) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet is loaded lazily on first map view, with multi-CDN fallback (see initMap) -->
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+<link rel="dns-prefetch" href="https://unpkg.com" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -379,18 +379,19 @@ textarea{resize:vertical}
     <a class="brand" href="#" onclick="showView('explore');return false;">
       <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
         <circle cx="50" cy="50" r="48" fill="#13B5AC"/>
-        <g transform="translate(0,4)">
-          <path d="M24 34 L33 10 L50 30 Z" fill="#F58220"/><path d="M76 34 L67 10 L50 30 Z" fill="#F58220"/>
-          <path d="M30 30 L34 16 L43 28 Z" fill="#9A4912"/><path d="M70 30 L66 16 L57 28 Z" fill="#9A4912"/>
-          <path d="M50 26 C72 26 84 42 84 57 C84 76 69 88 50 88 C31 88 16 76 16 57 C16 42 28 26 50 26 Z" fill="#F58220"/>
-          <path d="M50 52 C63 52 73 61 73 70 C73 81 62 88 50 88 C38 88 27 81 27 70 C27 61 37 52 50 52 Z" fill="#FFF3E6"/>
-          <circle cx="39" cy="55" r="5" fill="#2A2433"/><circle cx="61" cy="55" r="5" fill="#2A2433"/>
-          <circle cx="40.6" cy="53.4" r="1.7" fill="#fff"/><circle cx="62.6" cy="53.4" r="1.7" fill="#fff"/>
-          <path d="M50 67 l-6 -6 h12 z" fill="#2A2433"/>
-          <path d="M44 73 Q50 79 56 73" fill="none" stroke="#2A2433" stroke-width="2.6" stroke-linecap="round"/>
-        </g>
+        <path d="M21 33 L25 7 L46 27 Z" fill="#26262B"/><path d="M79 33 L75 7 L54 27 Z" fill="#26262B"/>
+        <path d="M28 28 L30 15 L40 26 Z" fill="#FF9DB0"/><path d="M72 28 L70 15 L60 26 Z" fill="#FF9DB0"/>
+        <path d="M50 24 C71 24 84 39 84 57 C84 76 69 89 50 89 C31 89 16 76 16 57 C16 39 29 24 50 24 Z" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+        <path d="M17 56 C18 38 31 24 50 24 C69 24 82 38 83 56 C74 47 64 46 57 49 L50 62 L43 49 C36 46 26 47 17 56 Z" fill="#26262B"/>
+        <ellipse cx="38" cy="62" rx="6" ry="7" fill="#FFFFFF" stroke="#26262B" stroke-width="1.3"/>
+        <ellipse cx="62" cy="62" rx="6" ry="7" fill="#FFFFFF" stroke="#26262B" stroke-width="1.3"/>
+        <ellipse cx="38" cy="63" rx="3.2" ry="5" fill="#7CC36B"/><ellipse cx="62" cy="63" rx="3.2" ry="5" fill="#7CC36B"/>
+        <ellipse cx="38" cy="64" rx="1.5" ry="3.4" fill="#26262B"/><ellipse cx="62" cy="64" rx="1.5" ry="3.4" fill="#26262B"/>
+        <path d="M50 71 l-4 -3.5 h8 z" fill="#FF8FA3"/>
+        <path d="M50 71 v3.6 M50 74.6 Q45 78 41 75 M50 74.6 Q55 78 59 75" fill="none" stroke="#26262B" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z" fill="#FF8A1E" stroke="#E0760E" stroke-width="1"/>
       </svg>
-      <span><span class="name">Globie's Atlas</span><span class="tag">Kids' Travel Adventure</span></span>
+      <span><span class="name">Poppie's Atlas</span><span class="tag">Kids' Travel Adventure</span></span>
     </a>
     <nav class="top">
       <button class="active" data-view="explore">Explore</button>
@@ -410,7 +411,7 @@ textarea{resize:vertical}
       </div>
       <div class="factnote"><span>💡</span><span><b>Did you know?</b><span id="heroFact">Loading a fun fact…</span></span></div>
       <div class="inner">
-        <div class="who"><span class="globie" id="heroGlobie"></span><span>Hi, I'm Globie! 🦊</span></div>
+        <div class="who"><span class="globie" id="heroGlobie"></span><span>Hi, I'm Poppie! 🐱</span></div>
         <h1>Where shall we <em>explore</em> next?</h1>
         <p>Pick a place to see how to get there, awesome facts, and the most fun things to do for kids — then collect every adventure on your own map!</p>
         <div class="cta">
@@ -953,16 +954,22 @@ const THEMES={
 };
 const themeFor = d => (d && THEMES[d.region]) || THEMES.Beach;
 
-/* Globie the Fox — reusable SVG mascot */
-const GLOBIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Globie the fox">
-  <path d="M24 34 L33 10 L50 30 Z" fill="#F58220"/><path d="M76 34 L67 10 L50 30 Z" fill="#F58220"/>
-  <path d="M30 30 L34 16 L43 28 Z" fill="#9A4912"/><path d="M70 30 L66 16 L57 28 Z" fill="#9A4912"/>
-  <path d="M50 26 C72 26 84 42 84 57 C84 76 69 88 50 88 C31 88 16 76 16 57 C16 42 28 26 50 26 Z" fill="#F58220"/>
-  <path d="M50 52 C63 52 73 61 73 70 C73 81 62 88 50 88 C38 88 27 81 27 70 C27 61 37 52 50 52 Z" fill="#FFF3E6"/>
-  <circle cx="39" cy="55" r="5" fill="#2A2433"/><circle cx="61" cy="55" r="5" fill="#2A2433"/>
-  <circle cx="40.6" cy="53.4" r="1.7" fill="#fff"/><circle cx="62.6" cy="53.4" r="1.7" fill="#fff"/>
-  <path d="M50 67 l-6 -6 h12 z" fill="#2A2433"/>
-  <path d="M44 73 Q50 79 56 73" fill="none" stroke="#2A2433" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+/* Poppie the Cat — reusable SVG mascot (black & white tuxedo cat w/ crown) */
+const POPPIE_FACE = `
+  <path d="M21 33 L25 7 L46 27 Z" fill="#26262B"/><path d="M79 33 L75 7 L54 27 Z" fill="#26262B"/>
+  <path d="M28 28 L30 15 L40 26 Z" fill="#FF9DB0"/><path d="M72 28 L70 15 L60 26 Z" fill="#FF9DB0"/>
+  <path d="M50 24 C71 24 84 39 84 57 C84 76 69 89 50 89 C31 89 16 76 16 57 C16 39 29 24 50 24 Z" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+  <path d="M17 56 C18 38 31 24 50 24 C69 24 82 38 83 56 C74 47 64 46 57 49 L50 62 L43 49 C36 46 26 47 17 56 Z" fill="#26262B"/>
+  <ellipse cx="38" cy="62" rx="6" ry="7" fill="#FFFFFF" stroke="#26262B" stroke-width="1.3"/>
+  <ellipse cx="62" cy="62" rx="6" ry="7" fill="#FFFFFF" stroke="#26262B" stroke-width="1.3"/>
+  <ellipse cx="38" cy="63" rx="3.2" ry="5" fill="#7CC36B"/><ellipse cx="62" cy="63" rx="3.2" ry="5" fill="#7CC36B"/>
+  <ellipse cx="38" cy="64" rx="1.5" ry="3.4" fill="#26262B"/><ellipse cx="62" cy="64" rx="1.5" ry="3.4" fill="#26262B"/>
+  <circle cx="36.4" cy="60.3" r="1.1" fill="#fff"/><circle cx="60.4" cy="60.3" r="1.1" fill="#fff"/>
+  <path d="M50 71 l-4 -3.5 h8 z" fill="#FF8FA3"/>
+  <path d="M50 71 v3.6 M50 74.6 Q45 78 41 75 M50 74.6 Q55 78 59 75" fill="none" stroke="#26262B" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="M31 68 L13 64 M31 71.5 L13 73 M69 68 L87 64 M69 71.5 L87 73" stroke="#26262B" stroke-width="1.3" stroke-linecap="round" opacity=".75"/>
+  <path d="M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z" fill="#FF8A1E" stroke="#E0760E" stroke-width="1"/>`;
+const POPPIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Poppie the cat">${POPPIE_FACE}</svg>`;
 
 /* =====================================================================
    STATE + STORAGE
@@ -1149,9 +1156,37 @@ function drawArc(line){ if(reduceMotion) return;
     p.style.transition='none';p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.getBoundingClientRect();
     requestAnimationFrame(()=>{p.style.transition='stroke-dashoffset 1.7s ease';p.style.strokeDashoffset=0;});
   }catch(e){}}
+/* Leaflet can be blocked on some networks (unpkg filtered on school/work/iOS
+   content blockers), so load it lazily from several CDNs with a retry. */
+const LEAFLET_JS=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'];
+const LEAFLET_CSS=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'];
+let leafletLoading=false;
+function loadFrom(list,i,make,done){
+  if(i>=list.length){ done(false); return; }
+  const node=make(list[i]);
+  node.onload=()=>done(true);
+  node.onerror=()=>{ try{node.remove();}catch(e){} loadFrom(list,i+1,make,done); };
+  document.head.appendChild(node);
+}
+function ensureLeafletCss(){
+  if(document.querySelector('link[data-leaflet]')) return;
+  loadFrom(LEAFLET_CSS,0,u=>{const l=document.createElement('link');l.rel='stylesheet';l.href=u;l.setAttribute('data-leaflet','1');return l;},()=>{});
+}
 function initMap(){
   const el=document.getElementById('map');
-  if(typeof L==='undefined'){ el.className='maperr'; el.innerHTML='🗺️ The map needs an internet connection to load. Please reconnect and reopen this tab.'; return; }
+  if(typeof L!=='undefined'){ buildMap(); return; }
+  if(leafletLoading) return;
+  leafletLoading=true;
+  el.className='maperr'; el.innerHTML='🗺️ Loading your map…';
+  ensureLeafletCss();
+  loadFrom(LEAFLET_JS,0,u=>{const s=document.createElement('script');s.src=u;return s;},ok=>{
+    leafletLoading=false;
+    if(ok && typeof L!=='undefined'){ el.className=''; el.innerHTML=''; buildMap(); }
+    else{ el.className='maperr'; el.innerHTML='🗺️ Couldn’t load the map library. Your network may be blocking unpkg, jsDelivr <em>and</em> cdnjs (some school / work / iOS content filters do this). Try a different Wi‑Fi or turn off any content blocker, then <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; }
+  });
+}
+function buildMap(){
+  const el=document.getElementById('map'); if(el.className==='maperr'){ el.className=''; el.innerHTML=''; }
   if(!map){
     map=L.map('map',{worldCopyJump:true,minZoom:1,scrollWheelZoom:false}).setView([32,8],2);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -1220,7 +1255,7 @@ function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').f
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
-    p.innerHTML=`<div class="empty">${GLOBIE.replace('class="globie"','class="globie bob"')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
+    p.innerHTML=`<div class="empty">${POPPIE.replace('class="globie"','class="globie bob"')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
     return;
   }
   const sorted=[...trips].sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
@@ -1305,17 +1340,17 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
    PWA polish
    ===================================================================== */
 (function(){
-  const svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2313B5AC'/><g transform='translate(0,6)'><path d='M24 34 L33 10 L50 30 Z' fill='%23F58220'/><path d='M76 34 L67 10 L50 30 Z' fill='%23F58220'/><path d='M50 26 C72 26 84 42 84 57 C84 76 69 88 50 88 C31 88 16 76 16 57 C16 42 28 26 50 26 Z' fill='%23F58220'/><path d='M50 52 C63 52 73 61 73 70 C73 81 62 88 50 88 C38 88 27 81 27 70 C27 61 37 52 50 52 Z' fill='%23FFF3E6'/><circle cx='39' cy='55' r='5' fill='%232A2433'/><circle cx='61' cy='55' r='5' fill='%232A2433'/><path d='M50 67 l-6 -6 h12 z' fill='%232A2433'/></g></svg>";
+  const svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2313B5AC'/><path d='M21 33 L25 7 L46 27 Z' fill='%2326262B'/><path d='M79 33 L75 7 L54 27 Z' fill='%2326262B'/><path d='M28 28 L30 15 L40 26 Z' fill='%23FF9DB0'/><path d='M72 28 L70 15 L60 26 Z' fill='%23FF9DB0'/><path d='M50 24 C71 24 84 39 84 57 C84 76 69 89 50 89 C31 89 16 76 16 57 C16 39 29 24 50 24 Z' fill='%23FFFFFF' stroke='%2326262B' stroke-width='2'/><path d='M17 56 C18 38 31 24 50 24 C69 24 82 38 83 56 C74 47 64 46 57 49 L50 62 L43 49 C36 46 26 47 17 56 Z' fill='%2326262B'/><ellipse cx='38' cy='62' rx='6' ry='7' fill='%23FFFFFF'/><ellipse cx='62' cy='62' rx='6' ry='7' fill='%23FFFFFF'/><ellipse cx='38' cy='63' rx='3.2' ry='5' fill='%237CC36B'/><ellipse cx='62' cy='63' rx='3.2' ry='5' fill='%237CC36B'/><ellipse cx='38' cy='64' rx='1.5' ry='3.4' fill='%2326262B'/><ellipse cx='62' cy='64' rx='1.5' ry='3.4' fill='%2326262B'/><path d='M50 71 l-4 -3.5 h8 z' fill='%23FF8FA3'/><path d='M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z' fill='%23FF8A1E'/></svg>";
   const uri='data:image/svg+xml,'+svg;
   document.getElementById('appicon').href=uri;
-  try{const m={name:"Globie's Atlas",short_name:"Globie",start_url:".",display:"standalone",background_color:"#FFFCF5",theme_color:"#13B5AC",icons:[{src:uri,sizes:"any",type:"image/svg+xml"}]};
+  try{const m={name:"Poppie's Atlas",short_name:"Poppie",start_url:".",display:"standalone",background_color:"#FFFCF5",theme_color:"#13B5AC",icons:[{src:uri,sizes:"any",type:"image/svg+xml"}]};
     document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));}catch(e){}
 })();
 
 /* =====================================================================
    INIT
    ===================================================================== */
-document.getElementById('heroGlobie').innerHTML=GLOBIE.replace('class="globie"','class="globie bob"');
+document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"','class="globie bob"');
 renderFeatured();renderFilters();renderGrid();buildDestSelect();buildRatePick();renderPassport();
 document.getElementById('fYear').value=new Date().getFullYear();
 rotateFact();setInterval(rotateFact,6000);observeReveals();

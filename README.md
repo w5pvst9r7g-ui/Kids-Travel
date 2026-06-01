@@ -1,4 +1,4 @@
-# 🧭 Globie's Atlas — A Kids' Travel Journal
+# 🧭 Poppie's Atlas — A Kids' Travel Journal
 
 A single, standalone `index.html` travel app for kids. **No build step, no server** — just
 open the file in any modern browser (or double-click it).
