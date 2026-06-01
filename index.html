@@ -538,6 +538,10 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .qopt.wrong{border-color:var(--coral);background:#FFF1EC;color:var(--coral-d)}
 .qopt.wrong .mk{border-color:var(--coral-d);background:var(--coral-d);color:#fff}
 .qopt:disabled{cursor:default}
+.qsay{margin-top:10px;background:var(--surface-2);border:1px dashed var(--line-2);border-radius:var(--r-sm);padding:8px 12px;font-weight:700;color:var(--ink-2);font-size:.9rem}
+.qsay b{color:var(--teal-d)}
+.langgame{margin-top:24px;padding-top:20px;border-top:2px dashed var(--line)}
+.langgame-h{font-family:var(--display);font-weight:800;font-size:1.25rem;color:var(--ink);margin-bottom:2px}
 .quiz-result{text-align:center;background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-radius:var(--r-lg);padding:26px 22px;box-shadow:var(--shadow-sm)}
 .quiz-result .globie{width:76px;height:76px;margin:0 auto 8px}
 .quiz-result h4{font-size:1.5rem;margin-bottom:4px}
@@ -4807,8 +4811,12 @@ function openDest(id){
     const lk=(typeof DEST_LANG!=='undefined'&&DEST_LANG[d.id])||null;
     const L=(lk&&typeof LANG_PHRASES!=='undefined')?LANG_PHRASES[lk]:null;
     if(!L||!L.phrases) return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">Handy phrases for ${esc(d.country)} are coming soon!</p>`;
+    const canQuiz=L.phrases.length>=4;
     return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">${L.flag||'🗣️'} A few handy words in ${esc(L.native||lk)}</p>
-      <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>`;
+      <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>
+      ${canQuiz?`<div class="langgame"><h4 class="langgame-h">🎮 Phrase game</h4><p class="sub">Match the English to the ${esc(L.native||lk)} word!</p>
+        <button class="btn btn-teal" id="langQuizStart" type="button" onclick="startLangQuiz()">▶️ Start the phrase game</button>
+        <div id="langQuizBody"></div></div>`:''}`;
   })();
   const catPanel=(function(){
     const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[d.id];
@@ -5511,6 +5519,59 @@ function finishQuiz(){
   if(rb) rb.addEventListener('click',()=>{ const host=document.getElementById('panel-quiz'); host.innerHTML=quizPanelHTML(d);
     const qs=document.getElementById('quizStart'); if(qs) qs.addEventListener('click',startQuiz); });
   if(score===3 && !reduceMotion) confetti();
+  const rr=body.querySelector('.quiz-result'); if(rr) rr.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'nearest'});
+}
+
+/* =====================================================================
+   LANGUAGE MINI-QUIZ — "how do you say…?" built from the phrases data
+   ===================================================================== */
+let langQuiz=null;
+function currentLang(){ const d=currentDest; if(!d||typeof DEST_LANG==='undefined') return null;
+  const lk=DEST_LANG[d.id]; const L=(lk&&typeof LANG_PHRASES!=='undefined')?LANG_PHRASES[lk]:null;
+  return (L&&L.phrases&&L.phrases.length>=4)?{lk:lk,L:L}:null; }
+function buildLangQuiz(L,seed){
+  const pool=L.phrases.filter(p=>p.local&&p.en);
+  return qshuffle(pool,seed).slice(0,5).map((p,i)=>{
+    const others=pool.filter(x=>x.local!==p.local);
+    const wrong=qshuffle(others,seed+i*7+1).slice(0,3).map(x=>x.local);
+    const opts=qshuffle([p.local].concat(wrong),seed+i+3);
+    return {q:'How do you say “'+p.en+'”?', say:p.say||'', opts:opts, correct:p.local};
+  });
+}
+function startLangQuiz(){
+  const c=currentLang(); if(!c) return;
+  const seed=currentDest.id.length*7+c.lk.length+1;
+  langQuiz={qs:buildLangQuiz(c.L,seed), answered:[]};
+  const b=document.getElementById('langQuizStart'); if(b) b.style.display='none';
+  renderLangQuiz();
+}
+function renderLangQuiz(){
+  const body=document.getElementById('langQuizBody'), st=langQuiz; if(!body||!st) return;
+  body.innerHTML='<div class="quiz" style="margin-top:14px">'+st.qs.map((q,qi)=>{ const done=st.answered[qi]!=null;
+    return `<div class="qcard"><div class="qn"><span class="qi">${qi+1}</span><span>${esc(q.q)}</span></div>
+      <div class="qopts">${q.opts.map((o,oi)=>{ let cls=''; if(done){ if(o===q.correct)cls='correct'; else if(st.answered[qi]===oi)cls='wrong'; }
+        return `<button class="qopt ${cls}" type="button" ${done?'disabled':''} data-q="${qi}" data-o="${oi}"><span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div>
+      ${done&&q.say?`<div class="qsay">🗣️ say it like: <b>${esc(q.say)}</b></div>`:''}</div>`;
+  }).join('')+'</div>';
+  body.querySelectorAll('.qopt:not(:disabled)').forEach(btn=>btn.addEventListener('click',()=>{
+    const qi=+btn.dataset.q; if(langQuiz.answered[qi]!=null) return;
+    langQuiz.answered[qi]=+btn.dataset.o; renderLangQuiz();
+    if(langQuiz.answered.filter(a=>a!=null).length===langQuiz.qs.length) setTimeout(finishLangQuiz,450);
+  }));
+}
+function finishLangQuiz(){
+  const st=langQuiz, n=st.qs.length; let score=0;
+  st.qs.forEach((q,qi)=>{ if(q.opts[st.answered[qi]]===q.correct) score++; });
+  const lines=['Keep practising — you’ll get it next time! 🐱','Nice try, little linguist! 🌍',
+    'Great job — you’re picking it up fast! ⭐','WOW! Perfect — you can talk like a local! 🏆'];
+  const li=Math.min(3,Math.round(score/n*3));
+  const body=document.getElementById('langQuizBody');
+  body.insertAdjacentHTML('beforeend',`<div class="quiz-result">
+    ${poppiePic(score===n?'yay':'hi','','Poppie')}
+    <h4>${score===n?'Perfect!':'All done!'}</h4><div class="score">You got ${score} / ${n}</div>
+    ${stars(score/n*5)}<p class="sub" style="margin:10px 0 16px">${lines[li]}</p>
+    <button class="btn btn-yellow" type="button" onclick="startLangQuiz()">🔁 Play again</button></div>`);
+  if(score===n && !reduceMotion) confetti();
   const rr=body.querySelector('.quiz-result'); if(rr) rr.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'nearest'});
 }
 
