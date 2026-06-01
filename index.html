@@ -192,6 +192,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
   font-weight:800;font-size:.92rem;color:var(--ink-2);transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .chip:hover{transform:translateY(-2px);color:var(--ink)}
 .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .chip-n{font-size:.74rem;background:var(--surface-2);color:var(--muted);border-radius:999px;padding:1px 7px;font-weight:800}
+.chip.active .chip-n{background:rgba(255,255,255,.22);color:#fff}
 
 /* ============ deck ============ */
 .deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;margin-top:4px}
@@ -4859,7 +4861,8 @@ const regionEmoji={All:'🌍',Beach:'🏖️',City:'🏙️',Snow:'❄️',Wildl
 let activeRegion='All';
 function renderFilters(){
   const f=document.getElementById('filters');
-  f.innerHTML=regions.map(r=>`<button class="chip ${r===activeRegion?'active':''}" data-r="${r}">${regionEmoji[r]||''} ${r}</button>`).join('');
+  const count=r=>r==='All'?DESTS.length:DESTS.filter(d=>d.region===r).length;
+  f.innerHTML=regions.map(r=>`<button class="chip ${r===activeRegion?'active':''}" data-r="${r}">${regionEmoji[r]||''} ${r} <span class="chip-n">${count(r)}</span></button>`).join('');
   f.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{activeRegion=c.dataset.r;renderFilters();renderGrid();}));
 }
 function visitedDestIds(){return new Set(trips.filter(t=>!t.planned).map(t=>t.destId));}
