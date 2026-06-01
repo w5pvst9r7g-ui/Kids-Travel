@@ -533,7 +533,8 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
     <div class="legend">
       <span><span class="leg-dot" style="background:#FF8366"></span> Places visited</span>
       <span><span class="leg-dot" style="background:#FFC23C"></span> Coming up next</span>
-      <span><span class="leg-dot" style="background:#13B5AC"></span> Home · Dublin</span>
+      <span><span class="leg-dot" style="background:#43C28A"></span> Home · Gold Coast 🇦🇺</span>
+      <span><span class="leg-dot" style="background:#13B5AC"></span> Home · Dublin 🇮🇪</span>
     </div>
     <div id="explorerBadge"></div>
     <div id="achShelf" class="ach-shelf"></div>
@@ -586,6 +587,12 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
    DATA — from Grant's "Travel - International" project artefacts.
    ===================================================================== */
 const HOME = {code:'DUB', name:'Dublin', country:'Ireland', flag:'🇮🇪', lat:53.4264, lng:-6.2499};
+/* two home bases over the years — each trip flies from the home of its era */
+const HOMES = {
+  australia:{name:'Gold Coast', country:'Australia', flag:'🇦🇺', lat:-27.4698, lng:153.0251, color:'#43C28A'},
+  ireland:{name:'Dublin', country:'Ireland', flag:'🇮🇪', lat:53.4264, lng:-6.2499, color:'#13B5AC'}
+};
+const originFor = t => (t && t.era && HOMES[t.era]) || HOME;
 const gmap  = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 const flick = (kw, lock, w=800, h=600) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
 const esc   = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -1278,20 +1285,40 @@ const EXTRA_DESTS = [
 ];
 DESTS.push(...EXTRA_DESTS);
 
-/* Real family trips (2016 onward — after the kids were born). Years are best
-   estimates from the travel project; edit any in the Journal to fix them. */
+/* Real family travel history (2016+), de-duplicated by place, from the TripIt
+   export. era drives the home base each trip flew from (Australia → Dublin). */
 const SEED_TRIPS = [
-  {id:'t1', destId:null,       city:'Sydney', country:'Australia', flag:'🇦🇺', emoji:'🌉', lat:-33.8688, lng:151.2093, year:2017, planned:false, rating:5, note:'Sydney Harbour Bridge, the Opera House and the beaches!'},
-  {id:'t2', destId:null,       city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🏄', lat:-26.6500, lng:153.0667, year:2018, planned:false, rating:5, note:'Sandy beaches, the zoo and lots of sunshine in Queensland.'},
-  {id:'t3', destId:null,       city:'Cape Town', country:'South Africa', flag:'🇿🇦', emoji:'🏔️', lat:-33.9249, lng:18.4241, year:2018, planned:false, rating:5, note:'Table Mountain, penguins at Boulders Beach and family time.'},
-  {id:'t4', destId:null,       city:'Miami', country:'United States', flag:'🇺🇸', emoji:'🌴', lat:25.7617, lng:-80.1918, year:2018, planned:false, rating:4, note:'Palm trees, colourful South Beach and warm ocean.'},
-  {id:'t5', destId:null,       city:'Los Angeles', country:'United States', flag:'🇺🇸', emoji:'🎬', lat:34.0522, lng:-118.2437, year:2018, planned:false, rating:4, note:'Theme parks, Hollywood and the Pacific coast.'},
-  {id:'t6', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:3.2028, lng:73.2207, year:2019, planned:false, rating:5, note:'Overwater villa and snorkelling with turtles.'},
-  {id:'t7', destId:null,       city:'Paris', country:'France', flag:'🇫🇷', emoji:'🗼', lat:48.8566, lng:2.3522, year:2023, planned:false, rating:5, note:'The Eiffel Tower, Disneyland Paris and yummy pastries.'},
-  {id:'t8', destId:null,       city:'Barcelona', country:'Spain', flag:'🇪🇸', emoji:'🏛️', lat:41.3874, lng:2.1686, year:2024, planned:false, rating:5, note:'Gaudí’s wavy buildings, the park and tapas by the sea.'},
-  {id:'t9', destId:'algarve',  city:'Faro (Algarve)', country:'Portugal', flag:'🇵🇹', emoji:'🏖️', lat:37.0194, lng:-7.9304, year:2024, planned:false, rating:5, note:'Golden cliffs, warm beaches and boat trips to the caves.'},
-  {id:'t10',destId:null,       city:'Fuerteventura', country:'Spain', flag:'🇪🇸', emoji:'🏝️', lat:28.3587, lng:-14.0537, year:2025, planned:false, rating:4, note:'Endless sandy beaches and windsurfing in the Canaries.'},
-  {id:'t11',destId:'maldives', city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'}
+  // —— Australia era (home: Gold Coast / Brisbane) ——
+  {id:'t01', era:'australia', destId:null, city:'Sydney', country:'Australia', flag:'🇦🇺', emoji:'🌉', lat:-33.8688, lng:151.2093, year:2019, planned:false, rating:5, note:'Our most-visited city (2016–2019) — Harbour Bridge & the Opera House!'},
+  {id:'t02', era:'australia', destId:null, city:'Melbourne', country:'Australia', flag:'🇦🇺', emoji:'🏙️', lat:-37.8136, lng:144.9631, year:2016, planned:false, rating:4, note:'Trams, laneways and yummy food.'},
+  {id:'t03', era:'australia', destId:null, city:'Adelaide', country:'Australia', flag:'🇦🇺', emoji:'🍇', lat:-34.9285, lng:138.6007, year:2016, planned:false, rating:4, note:'South Australia adventures.'},
+  {id:'t04', era:'australia', destId:null, city:'Darwin', country:'Australia', flag:'🇦🇺', emoji:'🐊', lat:-12.4634, lng:130.8456, year:2017, planned:false, rating:4, note:'Top End heat and crocodiles!'},
+  {id:'t05', era:'australia', destId:null, city:'Agnes Water', country:'Australia', flag:'🇦🇺', emoji:'🏖️', lat:-24.2096, lng:151.9036, year:2018, planned:false, rating:4, note:'The most easterly beach town in Queensland.'},
+  {id:'t06', era:'australia', destId:null, city:'Surfers Paradise', country:'Australia', flag:'🇦🇺', emoji:'🏄', lat:-28.0023, lng:153.4145, year:2019, planned:false, rating:5, note:'Gold Coast beaches and theme parks.'},
+  {id:'t07', era:'australia', destId:null, city:'Hervey Bay', country:'Australia', flag:'🇦🇺', emoji:'🐋', lat:-25.2986, lng:152.8535, year:2019, planned:false, rating:5, note:'Whale-watching capital of Australia.'},
+  {id:'t08', era:'australia', destId:null, city:'The Whitsundays', country:'Australia', flag:'🇦🇺', emoji:'⛵', lat:-20.2687, lng:148.7176, year:2022, planned:false, rating:5, note:'Sailing the 74 islands and Whitehaven Beach (2021 & 2022).'},
+  {id:'t09', era:'australia', destId:null, city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🌅', lat:-26.6500, lng:153.0667, year:2022, planned:false, rating:5, note:'Maleny hinterland, beaches and the big pineapple.'},
+  {id:'t10', era:'australia', destId:null, city:'Auckland', country:'New Zealand', flag:'🇳🇿', emoji:'🌋', lat:-36.8485, lng:174.7633, year:2017, planned:false, rating:5, note:'The City of Sails (2016 & 2017).'},
+  {id:'t11', era:'australia', destId:null, city:'Christchurch', country:'New Zealand', flag:'🇳🇿', emoji:'🏔️', lat:-43.5321, lng:172.6362, year:2017, planned:false, rating:4, note:'Gateway to the South Island.'},
+  {id:'t12', era:'australia', destId:null, city:'Port Vila', country:'Vanuatu', flag:'🇻🇺', emoji:'🏝️', lat:-17.7334, lng:168.3220, year:2018, planned:false, rating:5, note:'Tropical island in the South Pacific.'},
+  {id:'t13', era:'australia', destId:null, city:'Singapore', country:'Singapore', flag:'🇸🇬', emoji:'🦁', lat:1.3521, lng:103.8198, year:2019, planned:false, rating:5, note:'Gardens by the Bay and the world’s best airport.'},
+  // —— Ireland era (home: Dublin) ——
+  {id:'t14', era:'ireland', destId:null, city:'Johannesburg', country:'South Africa', flag:'🇿🇦', emoji:'🦁', lat:-26.2041, lng:28.0473, year:2022, planned:false, rating:4, note:'Visiting family — and safari! (2019 & 2022)'},
+  {id:'t15', era:'ireland', destId:null, city:'Cape Town', country:'South Africa', flag:'🇿🇦', emoji:'🏔️', lat:-33.9249, lng:18.4241, year:2023, planned:false, rating:5, note:'Table Mountain and the penguins at Boulders (2017 & 2023).'},
+  {id:'t16', era:'ireland', destId:null, city:'Paris', country:'France', flag:'🇫🇷', emoji:'🗼', lat:48.8566, lng:2.3522, year:2023, planned:false, rating:5, note:'The Eiffel Tower and tasty pastries.'},
+  {id:'t17', era:'ireland', destId:null, city:'London', country:'United Kingdom', flag:'🇬🇧', emoji:'🎡', lat:51.5074, lng:-0.1278, year:2026, planned:false, rating:5, note:'Big Ben and the London Eye (2023 & 2026).'},
+  {id:'t18', era:'ireland', destId:null, city:'Barcelona', country:'Spain', flag:'🇪🇸', emoji:'🏛️', lat:41.3851, lng:2.1734, year:2024, planned:false, rating:5, note:'Gaudí’s wavy buildings and tapas by the sea.'},
+  {id:'t19', era:'ireland', destId:null, city:'Los Angeles', country:'United States', flag:'🇺🇸', emoji:'🎢', lat:34.0522, lng:-118.2437, year:2024, planned:false, rating:5, note:'Universal Studios — the whole family together! 🎬'},
+  {id:'t20', era:'ireland', destId:'split', city:'Split', country:'Croatia', flag:'🇭🇷', emoji:'🏰', lat:43.5081, lng:16.4402, year:2024, planned:false, rating:5, note:'Diocletian’s Palace and the sparkling Adriatic.'},
+  {id:'t21', era:'ireland', destId:null, city:'Fuerteventura', country:'Spain', flag:'🇪🇸', emoji:'🏝️', lat:28.3587, lng:-14.0537, year:2024, planned:false, rating:4, note:'Endless golden beaches in the Canary Islands.'},
+  {id:'t22', era:'ireland', destId:null, city:'Miami & Key Largo', country:'United States', flag:'🇺🇸', emoji:'🐬', lat:25.7617, lng:-80.1918, year:2025, planned:false, rating:5, note:'Fishing charter in Miami and a dolphin encounter in Key Largo!'},
+  {id:'t23', era:'ireland', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🐠', lat:4.1755, lng:73.5093, year:2025, planned:false, rating:5, note:'Turquoise lagoons and snorkelling with the fish.'},
+  {id:'t24', era:'ireland', destId:null, city:'Tuscany (Fiesole & Pisa)', country:'Italy', flag:'🇮🇹', emoji:'🍕', lat:43.7711, lng:11.2486, year:2025, planned:false, rating:5, note:'Hailey’s solo trip — the Leaning Tower of Pisa!'},
+  {id:'t25', era:'ireland', destId:null, city:'Kentroma', country:'Greece', flag:'🇬🇷', emoji:'🏖️', lat:39.4000, lng:20.2500, year:2025, planned:false, rating:5, note:'Quiet Greek beaches and crystal-clear water.'},
+  {id:'t26', era:'ireland', destId:null, city:'Brisbane', country:'Australia', flag:'🇦🇺', emoji:'🏠', lat:-27.4698, lng:153.0251, year:2025, planned:false, rating:5, note:'Going back to visit our old home in Queensland.'},
+  // —— Coming up ——
+  {id:'t27', era:'ireland', destId:'maldives', city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'},
+  {id:'t28', era:'ireland', destId:null, city:'Australia (Christmas)', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-27.4698, lng:153.0251, year:2026, planned:true, rating:0, note:'Three weeks back home in Australia for Christmas!'}
 ];
 
 /* =====================================================================
@@ -1325,7 +1352,7 @@ const POPPIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Poppie the
 /* =====================================================================
    STATE + STORAGE
    ===================================================================== */
-const LS_KEY='globie_atlas_trips_v3';
+const LS_KEY='globie_atlas_trips_v4';
 function loadTrips(){ try{const s=localStorage.getItem(LS_KEY); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
@@ -1559,13 +1586,18 @@ function buildMap(){
   }
   if(layer) layer.remove();
   layer=L.layerGroup().addTo(map);
-  L.marker([HOME.lat,HOME.lng],{icon:pinIcon('#13B5AC'),zIndexOffset:600}).addTo(layer)
-    .bindPopup(`<div class="pop"><div class="ttl">🏠 Home Base</div><div class="sub">${HOME.flag} ${HOME.name}, ${HOME.country}</div><div class="nt">Where every adventure begins!</div></div>`);
-  const bounds=[[HOME.lat,HOME.lng]];
+  const usedEras=new Set(trips.map(t=>t.era).filter(e=>HOMES[e]));
+  if(!usedEras.size) usedEras.add('ireland');
+  const bounds=[];
+  usedEras.forEach(eid=>{ const H=HOMES[eid];
+    L.marker([H.lat,H.lng],{icon:pinIcon(H.color),zIndexOffset:600}).addTo(layer)
+      .bindPopup(`<div class="pop"><div class="ttl">🏠 Home Base</div><div class="sub">${H.flag} ${H.name}, ${H.country}</div><div class="nt">${eid==='australia'?'Where the early adventures began!':'Where every adventure begins now!'}</div></div>`);
+    bounds.push([H.lat,H.lng]);
+  });
   trips.forEach(t=>{
     if(t.lat==null||t.lng==null) return;
-    const dest={lat:t.lat,lng:t.lng},col=t.planned?'#FFC23C':'#FF8366';
-    const line=L.polyline(arc(HOME,dest),{color:col,weight:3,opacity:.92,dashArray:t.planned?'1 8':null,lineCap:'round'}).addTo(layer);
+    const origin=originFor(t), dest={lat:t.lat,lng:t.lng}, col=t.planned?'#FFC23C':'#FF8366';
+    const line=L.polyline(arc(origin,dest),{color:col,weight:3,opacity:.92,dashArray:t.planned?'1 8':null,lineCap:'round'}).addTo(layer);
     drawArc(line);
     const d=DESTS.find(x=>x.id===t.destId),kw=d?d.photos[0][0]:(t.city||'travel'),lk=d?d.photos[0][2]:(t.year||1),th=themeFor(d);
     L.marker([t.lat,t.lng],{icon:pinIcon(col)}).addTo(layer).bindPopup(
@@ -1574,19 +1606,19 @@ function buildMap(){
       +`<div class="ttl">${esc(t.city)}</div><div class="sub">${esc(t.flag)} ${esc(t.country)} · ${esc(t.year)}</div>`
       +(t.rating?`<div>${stars(t.rating)}</div>`:'')
       +(t.note?`<div class="nt">“${esc(t.note)}”</div>`:'')
-      +`<div class="km">✈️ ${haversine(HOME,dest).toLocaleString()} km from home</div></div>`);
+      +`<div class="km">✈️ ${haversine(origin,dest).toLocaleString()} km from ${esc(origin.name)}</div></div>`);
     bounds.push([t.lat,t.lng]);
   });
   if(bounds.length>1) map.fitBounds(bounds,{padding:[60,60]});
   setTimeout(()=>map.invalidateSize(),60);
   const sum=document.getElementById('mapSummary');
-  if(sum) sum.textContent='Home base Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
+  if(sum) sum.textContent='Home bases: Gold Coast, Australia and Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
   renderStats();
 }
 function renderStats(){
   const done=trips.filter(t=>!t.planned);
   const countries=new Set(done.map(t=>t.country)).size;
-  let km=0;done.forEach(t=>{if(t.lat!=null)km+=haversine(HOME,{lat:t.lat,lng:t.lng})*2;});
+  let km=0;done.forEach(t=>{if(t.lat!=null)km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2;});
   const planned=trips.filter(t=>t.planned).length;
   document.getElementById('stats').innerHTML=[
     [countries,'Countries visited',''],[done.length,'Adventures taken',''],
@@ -1741,9 +1773,10 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
    ===================================================================== */
 const ACH_KEY='globie_atlas_achievements_v1';
 const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Europe',Portugal:'Europe',
-  Croatia:'Europe',Albania:'Europe',Iceland:'Europe',France:'Europe','Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',
+  Croatia:'Europe',Albania:'Europe',Iceland:'Europe',France:'Europe',Italy:'Europe','United Kingdom':'Europe',
+  'Türkiye':'Asia',Turkey:'Asia',Maldives:'Asia',Singapore:'Asia',
   Morocco:'Africa',Madagascar:'Africa','South Africa':'Africa',Antarctica:'Antarctica',
-  Australia:'Oceania','United States':'North America'};
+  Australia:'Oceania','New Zealand':'Oceania',Vanuatu:'Oceania','United States':'North America'};
 const continentOf=t=>CONTINENT_OF[t.country]||null;
 const ACHIEVEMENTS=[
   {id:'first_flight',em:'🛫',nm:'First Flight',ds:'Save your first trip',ac:'#13B5AC',test:c=>c.visited.length>=1},
@@ -1767,7 +1800,7 @@ function achContext(){
   const countries=new Set(visited.map(t=>t.country).filter(Boolean));
   const continents=new Set(visited.map(continentOf).filter(Boolean));
   const regions=new Set(visited.map(t=>{const d=DESTS.find(x=>x.id===t.destId);return d&&d.region;}).filter(Boolean));
-  let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(HOME,{lat:t.lat,lng:t.lng})*2; });
+  let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
   return {visited,planned,countries,continents,regions,km};
 }
 function renderAchievements(){
