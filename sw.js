@@ -1,7 +1,10 @@
-/* Poppie's Atlas service worker — offline app shell.
-   Registers only when the app is served over http(s) (e.g. GitHub Pages),
-   so the family can open it on the plane / abroad with no data. */
-const CACHE = 'poppie-atlas-v2';
+/* Poppie's Atlas service worker — offline support that still updates cleanly.
+   Strategy:
+   - HTML navigations: NETWORK-FIRST (always get the latest app when online,
+     fall back to the cached page only when offline). This avoids the classic
+     "stale single-page app" trap where users never see new deploys.
+   - Static assets (images, etc.): CACHE-FIRST (fast, and fine offline). */
+const CACHE = 'poppie-atlas-v3';
 const ASSETS = [
   './', './index.html',
   './poppie.jpg', './poppie-hi.png', './poppie-yay.png', './poppie-walk.png',
@@ -25,17 +28,34 @@ self.addEventListener('activate', e => {
   );
 });
 
+/* allow the page to tell a waiting SW to take over immediately */
+self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
+
+function isHTML(req) {
+  return req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').indexOf('text/html') >= 0;
+}
+
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const sameOrigin = new URL(req.url).origin === self.location.origin;
-  /* cache-first for our own files; network-first-ish (with cache fill) otherwise */
+
+  if (isHTML(req)) {
+    /* network-first: fresh page when online, cached shell when offline */
+    e.respondWith(
+      fetch(req).then(res => {
+        if (res && res.ok && sameOrigin) { const copy = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); }
+        return res;
+      }).catch(() => caches.match(req).then(hit => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  /* static assets: cache-first, fill cache on first network fetch */
   e.respondWith(
     caches.match(req).then(hit => hit || fetch(req).then(res => {
-      if (res && res.ok && sameOrigin) {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(req, copy));
-      }
+      if (res && res.ok && sameOrigin) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
       return res;
     }).catch(() => sameOrigin ? caches.match('./index.html') : Response.error()))
   );
