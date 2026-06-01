@@ -263,9 +263,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .bp-stub .bp-journey{font-weight:600;color:var(--ink-2)}
 
 /* —— Passport-page "Country" tile —— */
-.passport{position:relative;background:linear-gradient(160deg,#F2F5FB,#E7EDF7);border:2px solid #D7E0F0;
+.ppage{position:relative;background:linear-gradient(160deg,#F2F5FB,#E7EDF7);border:2px solid #D7E0F0;
   border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--shadow-sm);overflow:hidden}
-.passport:before{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
+.ppage:before{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
   border:14px solid rgba(62,132,190,.07);pointer-events:none}
 .pp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:14px;border-bottom:2px dashed #C6D2E8}
 .pp-title{display:flex;align-items:center;gap:13px}
@@ -4700,7 +4700,7 @@ function openDest(id){
         <div class="bp-stub"><div class="k">✈️ The journey</div><div class="bp-journey">${esc(gt.route)}</div></div>
       </div>`,
     info:`<h3 class="blockhead">🌍 All about ${d.country}</h3><p class="sub">The facts that make it special</p>
-      <div class="passport">
+      <div class="ppage">
         <div class="pp-head"><div class="pp-title"><span class="pp-crest">${d.flag}</span><div><div class="pp-kicker">Passport</div><div class="pp-country">${esc(d.country)}</div></div></div><div class="pp-stamp">${d.emoji}</div></div>
         <div class="pp-fields">${ppf('Capital',ci.capital)}${ppf('Language',ci.language)}${ppf('Currency',ci.currency)}${ppf('Population',ci.population)}</div>
       </div>
