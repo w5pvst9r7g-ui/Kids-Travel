@@ -1,4 +1,4 @@
-/* Poppie's Atlas service worker — offline support that still updates cleanly.
+/* Poppy's Atlas service worker — offline support that still updates cleanly.
    Strategy:
    - HTML navigations: NETWORK-FIRST (always get the latest app when online,
      fall back to the cached page only when offline). This avoids the classic

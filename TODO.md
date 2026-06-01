@@ -1,4 +1,4 @@
-# 🐱 Poppie's Atlas — Ideas & Improvements Tracker
+# 🐱 Poppy's Atlas — Ideas & Improvements Tracker
 
 A living checklist so nothing gets lost. **When we get sidetracked by a new request, add it here and tick things off as they ship.**
 
@@ -17,14 +17,14 @@ Last updated: 2026-06-01
 - [x] Real family itinerary (TripIt, 2016+); Maldives/Kandima combined
 
 ### Identity & people
-- [x] Poppie the cat mascot (real photo `poppie.jpg` + 11 pose PNGs used throughout)
+- [x] Poppy the cat mascot (real photo `poppie.jpg` + 11 pose PNGs used throughout)
 - [x] Profile login (Jean-Luc / Hailey, PIN 1985) with per-profile data
 - [x] Kids pick their own avatar icon
 - [x] **Per-user DOB filtering** (Jean-Luc 2016, Hailey 2019 — hide trips before they were born)
 
 ### Engagement
 - [x] 40 Explorer Badges (reconcile with live itinerary; 15 still to earn)
-- [x] Surprise-me 🎲, per-destination quiz, Poppie speech bubble
+- [x] Surprise-me 🎲, per-destination quiz, Poppy speech bubble
 - [x] Dramatic countdown to next trip + **"It's today!" celebration**
 - [x] **Packing checklist** per upcoming trip (region-aware, progress bar)
 
@@ -85,11 +85,11 @@ Last updated: 2026-06-01
 - [x] **Map polish** — animated plane along the next-trip arc ✈️ · **dense pins now cluster** (e.g. the Australian east coast collapses to one badge at world zoom and splits apart as you zoom in; tap a cluster to list/zoom)
 - [x] Expanded Brisbane, Auckland, Barcelona, Whitsundays, Gold Coast, Melbourne, Miami, Fuerteventura to 8/8/10
 - [x] **Language mini-quiz** ("how do you say…?") — phrase-matching game on the Talk-like-a-local tab ✅
-- [ ] Compress the Poppie PNGs (~20 MB → ~1.5 MB) for faster loads *(needs an image tool / external compressor)*
+- [ ] Compress the Poppy PNGs (~20 MB → ~1.5 MB) for faster loads *(needs an image tool / external compressor)*
 - [ ] ~~Weather / best-time mini-widget~~ — **deprioritised**: real weather needs a network API, and each guide's boarding pass already shows the "Best time" to go
 
 ### Polish / delight
-- [x] **First-run onboarding** — friendly Poppie welcome (once per explorer, personalised, Esc/tap to close) explaining Upcoming / Explore / Map / Badges
+- [x] **First-run onboarding** — friendly Poppy welcome (once per explorer, personalised, Esc/tap to close) explaining Upcoming / Explore / Map / Badges
 - [x] **Printable passport page** — 🖨️ button in the Journal opens a clean one-page passport (name, rank, stats + a stamp grid) you can print or save as PDF
 - [x] ~~Fun fact of the day~~ — already covered by the rotating "Did you know?" facts on the Explore hero
 - [ ] Map: tap a country to filter guides to it *(needs country polygons / GeoJSON — heavier)*
@@ -106,7 +106,7 @@ Last updated: 2026-06-01
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
-- [x] Easter egg: poke any Poppie → full-screen grumpy Poppie with a funny insult (pops in)
+- [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page
-- [x] Replace Poppie poses with transparent versions + use her bigger (hero + every destination hero)
+- [x] Replace Poppy poses with transparent versions + use her bigger (hero + every destination hero)
 - [x] **Rabat is a DIRECT flight from Dublin** — Getting there now shows nonstop ~3h45 ✈️
