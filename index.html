@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🌍 Globie's Big Adventure — Kids Travel Explorer</title>
+
+<!-- Leaflet for the interactive adventure map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --sky:#4cc9f0; --sky2:#4895ef; --grape:#7209b7; --pink:#f72585;
+    --sun:#ffba08; --mint:#80ed99; --coral:#ff6b6b; --deep:#1d3557;
+    --cream:#fff9f0; --ink:#22223b; --card:#ffffff;
+    --shadow:0 10px 30px rgba(29,53,87,.15);
+    --shadow-sm:0 4px 14px rgba(29,53,87,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Fredoka',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 10%, #cdeeff 0, transparent 40%),
+      radial-gradient(circle at 88% 8%, #ffe7f3 0, transparent 38%),
+      linear-gradient(160deg,#eaf7ff 0%, #fff9f0 55%, #f3fff6 100%);
+    min-height:100vh;
+  }
+  h1,h2,h3,.fancy{font-family:'Baloo 2',cursive}
+  button{font-family:inherit;cursor:pointer}
+  a{color:var(--sky2)}
+
+  /* ---------- Top bar ---------- */
+  header{
+    position:sticky;top:0;z-index:1000;
+    background:linear-gradient(120deg,var(--sky2),var(--grape));
+    color:#fff;box-shadow:var(--shadow);
+  }
+  .bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;
+       padding:12px 18px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Baloo 2';font-weight:800;
+        font-size:1.5rem;letter-spacing:.3px}
+  .logo .globe{font-size:1.9rem;animation:spin 9s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  nav{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+  .navbtn{
+    background:rgba(255,255,255,.16);color:#fff;border:none;border-radius:999px;
+    padding:9px 16px;font-size:1rem;font-weight:600;transition:.18s;backdrop-filter:blur(4px)}
+  .navbtn:hover{background:rgba(255,255,255,.32);transform:translateY(-2px)}
+  .navbtn.active{background:#fff;color:var(--grape)}
+
+  /* ---------- Layout ---------- */
+  main{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
+  .view{display:none;animation:fade .35s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(120deg,#fff,#fffdf7);
+    border-radius:28px;padding:26px 28px;box-shadow:var(--shadow);
+    display:flex;gap:22px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;
+    background:radial-gradient(circle,var(--sun),transparent 70%);opacity:.5}
+  .hero .mascot{font-size:4.4rem;animation:bob 3s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-12px) rotate(-6deg)}}
+  .hero h1{margin:.1em 0;font-size:2.2rem;color:var(--grape)}
+  .hero p{margin:.2em 0;font-size:1.12rem;max-width:560px}
+  .pill{display:inline-block;background:var(--mint);color:#0a5d2a;border-radius:999px;
+        padding:5px 13px;font-weight:600;font-size:.92rem;margin:4px 6px 0 0}
+  .pill.sun{background:#ffe7a8;color:#8a5a00}
+  .pill.pink{background:#ffd6e7;color:#a01457}
+
+  /* ---------- Section titles ---------- */
+  .section-title{display:flex;align-items:center;gap:10px;margin:30px 4px 14px;font-size:1.6rem}
+  .section-title .dot{font-size:1.7rem}
+
+  /* ---------- Destination grid ---------- */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 6px}
+  .chip{background:#fff;border:2px solid #e6eef7;border-radius:999px;padding:7px 14px;
+        font-weight:600;color:var(--deep);transition:.15s}
+  .chip:hover{border-color:var(--sky)}
+  .chip.active{background:var(--sky2);color:#fff;border-color:var(--sky2)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;margin-top:10px}
+  .card{
+    background:var(--card);border-radius:22px;overflow:hidden;box-shadow:var(--shadow-sm);
+    transition:.2s;cursor:pointer;position:relative;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .card .thumb{height:150px;position:relative;display:flex;align-items:center;justify-content:center;
+    font-size:3.6rem;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,.25)}
+  .card .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .card .thumb .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.35))}
+  .card .thumb .emj{position:relative;z-index:2}
+  .badge-tag{position:absolute;top:10px;left:10px;z-index:3;background:#fff;color:var(--grape);
+    border-radius:999px;padding:4px 11px;font-weight:700;font-size:.8rem;box-shadow:var(--shadow-sm)}
+  .badge-visited{position:absolute;top:10px;right:10px;z-index:3;background:var(--mint);color:#0a5d2a;
+    border-radius:999px;padding:4px 11px;font-weight:700;font-size:.8rem}
+  .card .body{padding:14px 16px 18px}
+  .card .body h3{margin:.1em 0;font-size:1.32rem;color:var(--deep)}
+  .card .flag{font-size:1.05rem}
+  .card .tagline{color:#5a6b82;font-size:.96rem;margin:.35em 0 0;min-height:2.4em}
+  .card .meta{display:flex;gap:12px;margin-top:10px;font-size:.86rem;color:#41576f;font-weight:600}
+
+  /* ---------- Detail view ---------- */
+  .back{background:#fff;border:2px solid #e6eef7;border-radius:999px;padding:8px 16px;
+    font-weight:700;color:var(--deep);margin-bottom:14px}
+  .back:hover{border-color:var(--sky)}
+  .dhero{border-radius:28px;overflow:hidden;position:relative;box-shadow:var(--shadow);min-height:240px;
+    display:flex;align-items:flex-end;color:#fff}
+  .dhero .bg{position:absolute;inset:0}
+  .dhero .bg img{width:100%;height:100%;object-fit:cover}
+  .dhero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.62))}
+  .dhero .content{position:relative;z-index:2;padding:26px 28px}
+  .dhero h1{margin:0;font-size:2.6rem;text-shadow:0 3px 12px rgba(0,0,0,.4)}
+  .dhero .sub{font-size:1.15rem;font-weight:500;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+  .tab{background:#fff;border:2px solid #e6eef7;border-radius:999px;padding:9px 16px;font-weight:600;
+       color:var(--deep);transition:.15s;font-size:1rem}
+  .tab:hover{border-color:var(--sky)}
+  .tab.active{background:var(--grape);color:#fff;border-color:var(--grape)}
+
+  .panel{display:none;animation:fade .3s ease}
+  .panel.active{display:block}
+
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .info-box{background:#fff;border-radius:18px;padding:16px 18px;box-shadow:var(--shadow-sm)}
+  .info-box .k{font-size:.82rem;color:#7186a0;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .info-box .v{font-size:1.22rem;font-weight:700;color:var(--deep);margin-top:3px}
+
+  .funbox{background:linear-gradient(120deg,#fff,#fff7fb);border-radius:20px;padding:18px 20px;
+    box-shadow:var(--shadow-sm);margin-top:16px;border-left:8px solid var(--pink)}
+  .funbox h3{margin:.1em 0 .5em;color:var(--pink)}
+  .funbox ul{margin:0;padding-left:22px}
+  .funbox li{margin:7px 0;font-size:1.04rem}
+  .kidfacts{border-left-color:var(--sun)}
+  .kidfacts h3{color:#c98700}
+
+  /* getting there */
+  .route{display:flex;align-items:center;gap:14px;background:#fff;border-radius:20px;padding:20px;
+    box-shadow:var(--shadow-sm);flex-wrap:wrap}
+  .airport{text-align:center;min-width:90px}
+  .airport .code{font-family:'Baloo 2';font-size:1.9rem;font-weight:800;color:var(--grape)}
+  .airport .nm{font-size:.85rem;color:#5a6b82}
+  .planeline{flex:1;min-width:120px;position:relative;height:40px;display:flex;align-items:center}
+  .planeline .ln{height:4px;background:repeating-linear-gradient(90deg,var(--sky) 0 10px,transparent 10px 18px);
+    flex:1;border-radius:4px}
+  .planeline .pl{font-size:1.7rem;animation:fly 4s ease-in-out infinite}
+  @keyframes fly{0%{transform:translateX(-6px)}50%{transform:translateX(6px) translateY(-4px)}100%{transform:translateX(-6px)}}
+
+  /* photos */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .gallery .ph{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;
+    box-shadow:var(--shadow-sm);background:linear-gradient(135deg,var(--sky),var(--grape));
+    display:flex;align-items:center;justify-content:center;font-size:2.6rem}
+  .gallery .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .gallery .ph .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;color:#fff;font-weight:600;
+    font-size:.85rem;padding:14px 10px 7px;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+
+  /* attraction / kid spot lists */
+  .spot{display:flex;gap:14px;background:#fff;border-radius:18px;padding:15px 16px;box-shadow:var(--shadow-sm);
+    margin-bottom:12px;align-items:flex-start}
+  .spot .ic{font-size:2rem;flex-shrink:0}
+  .spot h3{margin:0 0 3px;font-size:1.18rem;color:var(--deep)}
+  .spot p{margin:0;color:#52647d;font-size:.98rem}
+  .stars{color:var(--sun);font-weight:700;font-size:.95rem;margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .stars .rev{color:#7186a0;font-weight:600;font-size:.85rem}
+  .maplink{display:inline-flex;align-items:center;gap:5px;background:#eaf4ff;color:#1a73e8;
+    border-radius:999px;padding:4px 11px;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:6px}
+  .maplink:hover{background:#d7eaff}
+
+  /* ---------- Map view ---------- */
+  #map{height:540px;border-radius:24px;box-shadow:var(--shadow);margin-top:6px;z-index:1}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:14px 0 0}
+  .stat{background:linear-gradient(135deg,#fff,#f3faff);border-radius:20px;padding:16px;text-align:center;
+    box-shadow:var(--shadow-sm)}
+  .stat .big{font-family:'Baloo 2';font-size:2.2rem;font-weight:800;color:var(--grape);line-height:1}
+  .stat .lbl{color:#5a6b82;font-weight:600;margin-top:5px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-weight:600;color:#41576f}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .leg-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+
+  /* ---------- Trips view ---------- */
+  .trip-wrap{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:840px){.trip-wrap{grid-template-columns:340px 1fr}}
+  .form-card{background:#fff;border-radius:22px;padding:20px;box-shadow:var(--shadow-sm);align-self:start;
+    position:sticky;top:90px}
+  .form-card h3{margin-top:0;color:var(--grape)}
+  label{display:block;font-weight:600;color:var(--deep);margin:12px 0 5px;font-size:.95rem}
+  input,select,textarea{width:100%;padding:10px 12px;border:2px solid #e6eef7;border-radius:12px;
+    font-family:inherit;font-size:1rem;color:var(--ink);background:#fbfdff}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sky)}
+  .ratepick{display:flex;gap:4px;font-size:1.7rem;cursor:pointer;margin-top:4px}
+  .ratepick .s{filter:grayscale(1);opacity:.4;transition:.1s}
+  .ratepick .s.on{filter:none;opacity:1;transform:scale(1.08)}
+  .btn{background:linear-gradient(120deg,var(--pink),var(--grape));color:#fff;border:none;border-radius:14px;
+    padding:13px;font-weight:700;font-size:1.05rem;width:100%;margin-top:16px;box-shadow:var(--shadow-sm)}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:#fff;color:var(--grape);border:2px solid #eadcff;box-shadow:none;margin-top:8px}
+
+  .passport{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .stamp{background:#fff;border-radius:20px;box-shadow:var(--shadow-sm);overflow:hidden;position:relative}
+  .stamp .top{height:90px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;color:#fff;position:relative}
+  .stamp .top img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .stamp .top .ov{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+  .stamp .top .emj{position:relative;z-index:2;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .stamp .b{padding:13px 15px 16px}
+  .stamp h3{margin:0;font-size:1.2rem;color:var(--deep)}
+  .stamp .loc{color:#5a6b82;font-size:.92rem;margin:2px 0 0}
+  .stamp .yr{position:absolute;top:8px;right:10px;z-index:3;background:#fff;color:var(--grape);
+    border-radius:999px;padding:3px 10px;font-weight:700;font-size:.82rem}
+  .stamp .planned{position:absolute;top:8px;left:10px;z-index:3;background:var(--sun);color:#7a4f00;
+    border-radius:999px;padding:3px 10px;font-weight:700;font-size:.78rem}
+  .stamp .note{color:#52647d;font-size:.92rem;margin:8px 0 0;font-style:italic}
+  .stamp .acts{display:flex;gap:8px;margin-top:10px}
+  .stamp .acts button{flex:1;background:#f3f6fb;border:none;border-radius:10px;padding:7px;font-weight:600;
+    color:#41576f;font-size:.85rem}
+  .stamp .acts button:hover{background:#e6eef7}
+  .stamp .acts .del:hover{background:#ffe0e0;color:#c0392b}
+
+  .empty{background:#fff;border-radius:20px;padding:40px 20px;text-align:center;color:#5a6b82;box-shadow:var(--shadow-sm)}
+  .empty .big{font-size:3rem}
+
+  .footnote{text-align:center;color:#8597ab;margin-top:40px;font-size:.9rem}
+
+  /* leaflet popup */
+  .leaflet-popup-content-wrapper{border-radius:16px}
+  .leaflet-popup-content{font-family:'Fredoka';font-size:.95rem}
+  .lp{text-align:center}
+  .lp b{font-family:'Baloo 2';font-size:1.05rem;color:var(--grape)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="logo"><span class="globe">🌍</span> Globie's Big Adventure</div>
+    <nav>
+      <button class="navbtn active" data-view="explore">🧭 Explore</button>
+      <button class="navbtn" data-view="map">🗺️ My Map</button>
+      <button class="navbtn" data-view="trips">📔 My Trips</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ===================== EXPLORE ===================== -->
+  <section id="explore" class="view active">
+    <div class="hero">
+      <div class="mascot">🦊</div>
+      <div>
+        <h1>Where shall we go next?</h1>
+        <p>Hi explorer! I'm <b>Globie the Fox</b>. Pick a place on the map of the world and I'll show you how to get there, cool facts, lots of photos and the most fun things to do for kids!</p>
+        <div>
+          <span class="pill sun">✈️ Flying from Dublin</span>
+          <span class="pill">🏝️ Next stop: Kandima, Maldives</span>
+          <span class="pill pink" id="heroFact">💡 Loading a fun fact…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="dot">📍</span> Choose a Destination</div>
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="destGrid"></div>
+
+    <p class="footnote">Tip: tap any place to dive in. ⭐ ratings &amp; map links come straight from Google Maps.</p>
+  </section>
+
+  <!-- ===================== DETAIL ===================== -->
+  <section id="detail" class="view">
+    <button class="back" onclick="showView('explore')">← Back to all places</button>
+    <div class="dhero" id="dhero"></div>
+    <div class="tabs" id="dtabs"></div>
+    <div id="panels"></div>
+    <div style="margin-top:22px">
+      <button class="btn" style="max-width:340px" id="addFromDetail">➕ Add this to My Trips</button>
+    </div>
+  </section>
+
+  <!-- ===================== MAP ===================== -->
+  <section id="map-view" class="view">
+    <div class="section-title"><span class="dot">🗺️</span> My Adventure Map</div>
+    <p style="margin:0 0 12px;color:#52647d;max-width:680px">
+      Every trip you save draws a flight path from your home base in <b>Dublin 🇮🇪</b> across the world.
+      Click a marker to see your adventure! ✈️</p>
+    <div id="map"></div>
+    <div class="legend">
+      <span><span class="leg-dot" style="background:#f72585"></span> Places you've been</span>
+      <span><span class="leg-dot" style="background:#ffba08"></span> Trips coming up</span>
+      <span><span class="leg-dot" style="background:#4895ef"></span> Home base (Dublin)</span>
+    </div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <!-- ===================== TRIPS ===================== -->
+  <section id="trips" class="view">
+    <div class="section-title"><span class="dot">📔</span> My Travel Journal</div>
+    <div class="trip-wrap">
+      <div class="form-card">
+        <h3 id="formTitle">✏️ Add a Trip</h3>
+        <label for="fDest">Place</label>
+        <select id="fDest"></select>
+
+        <div id="customWrap" style="display:none">
+          <label for="fCity">City / place name</label>
+          <input id="fCity" placeholder="e.g. Tokyo" />
+          <label for="fLat">Latitude &nbsp;<small style="color:#8597ab">(optional, for the map)</small></label>
+          <input id="fLat" type="number" step="any" placeholder="e.g. 35.68" />
+          <label for="fLng">Longitude</label>
+          <input id="fLng" type="number" step="any" placeholder="e.g. 139.69" />
+          <label for="fEmoji">Emoji</label>
+          <input id="fEmoji" placeholder="🗾" maxlength="4" />
+        </div>
+
+        <label for="fYear">Year</label>
+        <input id="fYear" type="number" placeholder="2026" />
+
+        <label><input type="checkbox" id="fPlanned" style="width:auto;margin-right:6px;vertical-align:middle"> This trip is still coming up 🔜</label>
+
+        <label>How fun was it? (star rating)</label>
+        <div class="ratepick" id="ratepick">
+          <span class="s" data-v="1">⭐</span><span class="s" data-v="2">⭐</span>
+          <span class="s" data-v="3">⭐</span><span class="s" data-v="4">⭐</span>
+          <span class="s" data-v="5">⭐</span>
+        </div>
+
+        <label for="fNote">A memory or note</label>
+        <textarea id="fNote" rows="3" placeholder="The best bit was…"></textarea>
+
+        <button class="btn" id="saveTrip">💾 Save Trip</button>
+        <button class="btn ghost" id="cancelEdit" style="display:none">Cancel edit</button>
+      </div>
+
+      <div>
+        <div id="passport" class="passport"></div>
+      </div>
+    </div>
+    <p class="footnote">Your trips are saved right here in your browser — they'll be waiting when you come back. 🔒</p>
+  </section>
+</main>
+
+<script>
+/* =====================================================================
+   DATA  — built from Grant's "Travel - International" project artefacts:
+   home base Dublin (DUB), upcoming Maldives/Kandima trip, plus historic
+   trips (Lapland, Madagascar, Antarctica) and wishlist destinations.
+   ===================================================================== */
+const HOME = {code:'DUB', name:'Dublin', country:'Ireland', flag:'🇮🇪', lat:53.4264, lng:-6.2499};
+
+/* helper: a working Google-Maps search link (never a dead short-link) */
+const gmap = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+/* helper: keyword photo from LoremFlickr (topical, stable per lock id) */
+const photo = (kw, lock) => `https://loremflickr.com/600/450/${encodeURIComponent(kw)}?lock=${lock}`;
+
+const DESTS = [
+{
+  id:'maldives', name:'Maldives', short:'Kandima Resort', country:'Maldives', flag:'🇲🇻',
+  emoji:'🏝️', region:'Beach', tag:'Coming Soon', colors:['#06b6d4','#0ea5e9'],
+  tagline:'Turquoise lagoons, overwater villas and the longest waterslide in the Maldives!',
+  lat:2.7167, lng:72.95,
+  gettingThere:{
+    to:'MLE', toName:'Velana Int’l (Malé)', flightTime:'~13–16 h (1 stop)',
+    route:'Dublin → Doha / Abu Dhabi / Istanbul → Malé, then a 35-min seaplane to Kandima',
+    distance:'≈ 8,800 km', tz:'GMT +5', best:'Nov–Apr (dry season); you go Jul–Aug ☀️'
+  },
+  country_info:{
+    capital:'Malé', language:'Dhivehi', currency:'Rufiyaa (MVR) — US$ used too',
+    population:'≈ 520,000', tz:'GMT +5',
+    fun:[
+      'The Maldives is made of about 1,190 coral islands grouped into 26 ring-shaped atolls.',
+      'It is the lowest country on Earth — most land is barely 1–1.5 m above the sea.',
+      'Sometimes the sea glows blue at night because of tiny glowing plankton! 🌊✨'
+    ],
+    kid:[
+      'You sleep in a villa built on stilts right over the sea — look down and watch the fish!',
+      'You get to Kandima on a little seaplane that lands on the water 🛩️',
+      'You can snorkel with parrotfish, baby reef sharks and sea turtles 🐢'
+    ]
+  },
+  photos:[
+    ['maldives,overwater,villa','Overwater villas',201],['maldives,beach','White-sand beach',202],
+    ['maldives,seaplane','Seaplane ride',203],['maldives,snorkeling,turtle','Snorkel safari',204],
+    ['maldives,coral,reef','Coral reef',205],['maldives,sunset,palm','Island sunset',206]
+  ],
+  attractions:[
+    ['🤿','House Reef Snorkelling','Kandima’s reef is right off the beach — fish, rays and turtles.'],
+    ['🚤','Sandbank Picnic','Speedboat to a tiny island of pure sand in the middle of the ocean.'],
+    ['🐬','Dolphin Cruise','Sunset boat trips where pods of spinner dolphins leap by the boat.'],
+    ['🌊','Aquaholics Water Sports','Jet-ski, parasailing, glass-bottom kayaks and banana-boat rides.']
+  ],
+  kids:[
+    ['🛝','Kandiland Kids Club','Pirate ship, splash zone, slides & trampolines for ages 6 mo–12 yrs, 9am–8pm.',4.7,'1,420','Kandima Maldives Kandiland kids club'],
+    ['🏎️','Fast Track Go-Karts','The longest e-go-kart track in the Maldives — for thrill-seekers aged 10+.',4.7,'1,420','Kandima Maldives Fast Track go kart'],
+    ['💦','The Big Waterslide','A giant slide straight into the pool — Kandima’s most famous splash.',4.7,'1,420','Kandima Maldives'],
+    ['🐠','Glass-Bottom Kayak','Paddle over the lagoon and watch the reef through the see-through floor.',4.7,'1,420','Kandima Maldives water sports']
+  ]
+},
+{
+  id:'rabat', name:'Rabat', short:'Morocco', country:'Morocco', flag:'🇲🇦',
+  emoji:'🕌', region:'City', tag:'Wishlist', colors:['#e76f51','#9b2226'],
+  tagline:'A seaside capital with a blue-and-white old town, a real kasbah fortress and lions at the zoo!',
+  lat:34.0209, lng:-6.8416,
+  gettingThere:{
+    to:'RBA', toName:'Rabat–Salé', flightTime:'~6–8 h (1 stop)',
+    route:'Dublin → London / Paris / Casablanca → Rabat (no nonstop). Casablanca is the big gateway.',
+    distance:'≈ 2,150 km', tz:'GMT +1', best:'Mar–May & Sep–Nov (warm, not too hot)'
+  },
+  country_info:{
+    capital:'Rabat', language:'Arabic & Tamazight (Berber); French widely spoken',
+    currency:'Moroccan Dirham (MAD)', population:'≈ 37 million (Morocco)', tz:'GMT +1',
+    fun:[
+      'Rabat is Morocco’s capital and a UNESCO World Heritage city right on the Atlantic Ocean.',
+      'Morocco is where the Sahara Desert meets snowy Atlas Mountains — you can ski AND ride a camel!',
+      'Mint tea is poured from high up to make a frothy top — locals call it “Berber whisky”. 🍵'
+    ],
+    kid:[
+      'The Kasbah of the Udayas is an old fort where almost every house is painted blue and white. 💙',
+      'You can ride a little blue tram across the river to the city of Salé.',
+      'Markets called “souks” are like mazes full of spices, lanterns and treasures.'
+    ]
+  },
+  photos:[
+    ['rabat,morocco','Rabat city',211],['kasbah,udayas,rabat','Kasbah of the Udayas',212],
+    ['hassan,tower,rabat','Hassan Tower',213],['morocco,medina,market','Colourful souk',214],
+    ['morocco,mint,tea','Moroccan mint tea',215],['rabat,beach,atlantic','Atlantic beach',216]
+  ],
+  attractions:[
+    ['🏰','Kasbah of the Udayas','A 12th-century clifftop fort with blue-washed lanes and Andalusian gardens.'],
+    ['🗼','Hassan Tower','A giant unfinished minaret next to rows of stone columns from 1195.'],
+    ['🏛️','Mausoleum of Mohammed V','A dazzling marble royal tomb with guards on horseback.'],
+    ['🏺','Chellah','Romp through Roman ruins and a Muslim necropolis where storks nest. 🦤']
+  ],
+  kids:[
+    ['🦁','Rabat National Zoo','Big modern zoo with the famous Atlas lions, elephants and a desert zone.',4.4,'31,000','Rabat National Zoo Jardin Zoologique'],
+    ['🌿','Jardins Exotiques de Bouknadel','Jungle gardens with bridges, ponds and bamboo tunnels near Salé.',4.3,'9,500','Jardins Exotiques de Bouknadel'],
+    ['🚋','Rabat-Salé Tram','Ride the smart blue tram across the river — a fun, cheap adventure.',4.3,'2,100','Rabat Sale Tramway'],
+    ['🏖️','Rabat Beach & Marina','Atlantic sand, surf schools and the Bouregreg marina to watch boats.',4.2,'5,400','Rabat Beach Bouregreg Marina']
+  ]
+},
+{
+  id:'lapland', name:'Rovaniemi', short:'Lapland, Finland', country:'Finland', flag:'🇫🇮',
+  emoji:'🎅', region:'Snow', tag:'Been there', visited:true, colors:['#4895ef','#3a0ca3'],
+  tagline:'The official hometown of Santa Claus — huskies, reindeer and the Northern Lights!',
+  lat:66.5039, lng:25.7294,
+  gettingThere:{
+    to:'RVN', toName:'Rovaniemi', flightTime:'~5–6 h (1 stop)',
+    route:'Dublin → Helsinki → Rovaniemi (right on the Arctic Circle)',
+    distance:'≈ 2,750 km', tz:'GMT +2', best:'Dec–Mar for snow & Santa ❄️'
+  },
+  country_info:{
+    capital:'Helsinki', language:'Finnish & Swedish', currency:'Euro (€)',
+    population:'≈ 5.6 million', tz:'GMT +2',
+    fun:[
+      'Rovaniemi sits right on the Arctic Circle — cross the line and you’re in the Arctic!',
+      'In summer the sun never sets (Midnight Sun); in winter it barely rises (Polar Night).',
+      'Finland has more saunas than cars — about 3 million of them! 🧖'
+    ],
+    kid:[
+      'You can meet the real Santa Claus any day of the year at Santa Claus Village.',
+      'Huskies pull you through snowy forests on a sled 🛷',
+      'On clear winter nights the sky glows green with the Northern Lights.'
+    ]
+  },
+  photos:[
+    ['lapland,santa,village','Santa Claus Village',221],['husky,sled,snow','Husky sledding',222],
+    ['northern,lights,finland','Northern Lights',223],['reindeer,snow','Reindeer ride',224],
+    ['rovaniemi,winter','Snowy Rovaniemi',225],['arctic,igloo','Glass igloo',226]
+  ],
+  attractions:[
+    ['🎅','Santa Claus Village','Meet Santa, cross the Arctic Circle line and post a letter from his office.'],
+    ['🦌','Reindeer Farm','Ride a reindeer sleigh and learn how the Sámi people herd them.'],
+    ['🌌','Northern Lights Hunt','Snowshoe into the dark forest to watch the green Aurora dance.'],
+    ['🏛️','Arktikum Science Museum','A glass-tunnel museum all about the Arctic and the Aurora.']
+  ],
+  kids:[
+    ['🎅','Santa Claus Village','The big one — Santa, elves, reindeer and the Arctic Circle line.',4.5,'30,000','Santa Claus Village Rovaniemi'],
+    ['🐺','Husky Park','Cuddle husky puppies and ride a dog sled through the snow.',4.4,'1,200','Husky Park Rovaniemi'],
+    ['❄️','SnowMan World','Ice slides, an ice bar and ice sculptures you can climb.',4.2,'1,000','SnowMan World Rovaniemi'],
+    ['🦌','Santa Claus Reindeer','Gentle reindeer sleigh rides right next to the village.',4.4,'900','Santa Claus Reindeer Rovaniemi']
+  ]
+},
+{
+  id:'madagascar', name:'Madagascar', short:'Indian Ocean', country:'Madagascar', flag:'🇲🇬',
+  emoji:'🦎', region:'Wildlife', tag:'Been there', visited:true, colors:['#2a9d8f','#e9c46a'],
+  tagline:'The island of lemurs, giant baobab trees and chameleons found nowhere else on Earth!',
+  lat:-18.8792, lng:47.5079,
+  gettingThere:{
+    to:'TNR', toName:'Antananarivo (Ivato)', flightTime:'~15–18 h (1–2 stops)',
+    route:'Dublin → Paris / Addis Ababa → Antananarivo',
+    distance:'≈ 9,300 km', tz:'GMT +3', best:'Apr–Nov (dry season)'
+  },
+  country_info:{
+    capital:'Antananarivo', language:'Malagasy & French', currency:'Ariary (MGA)',
+    population:'≈ 30 million', tz:'GMT +3',
+    fun:[
+      'Madagascar split from Africa about 88 million years ago, so its animals grew up all on their own.',
+      'About 9 out of 10 animals here live nowhere else in the world!',
+      'The giant baobab trees can live for over 1,000 years and look upside-down. 🌳'
+    ],
+    kid:[
+      'There are over 100 kinds of lemur — including the dancing sifaka that hops sideways!',
+      'Chameleons here can be as tiny as your fingernail or as long as your arm.',
+      'The “Avenue of the Baobabs” looks like a road of giant trees from a storybook.'
+    ]
+  },
+  photos:[
+    ['lemur,madagascar','Ring-tailed lemurs',231],['baobab,madagascar','Avenue of Baobabs',232],
+    ['chameleon,madagascar','Chameleon',233],['madagascar,beach','Indian Ocean beach',234],
+    ['madagascar,rainforest','Rainforest',235],['madagascar,landscape','Wild landscape',236]
+  ],
+  attractions:[
+    ['🦎','Andasibe-Mantadia Park','Rainforest where you hear the indri lemur sing like a whale.'],
+    ['🌳','Avenue of the Baobabs','A magical sunset row of 800-year-old giant trees.'],
+    ['🐒','Lemurs’ Park','A reserve near the capital where lemurs leap free in the trees.'],
+    ['🏝️','Nosy Be','A tropical island for snorkelling and spotting whale sharks.']
+  ],
+  kids:[
+    ['🐒','Lemurs’ Park','See nine kinds of lemur up close in a safe, leafy reserve.',4.5,'2,300','Lemurs Park Antananarivo Madagascar'],
+    ['🌳','Avenue of the Baobabs','Walk the famous tree avenue at sunset — a photo wonderland.',4.7,'2,700','Avenue of the Baobabs Morondava'],
+    ['🦎','Andasibe-Mantadia NP','Hear the indri sing and spot chameleons on a guided forest walk.',4.7,'1,600','Andasibe Mantadia National Park'],
+    ['🐢','Tsimbazaza Zoo','City zoo & museum with lemurs, tortoises and dinosaur fossils.',4.0,'6,500','Tsimbazaza Zoo Antananarivo']
+  ]
+},
+{
+  id:'antarctica', name:'Antarctica', short:'The White Continent', country:'Antarctica', flag:'🇦🇶',
+  emoji:'🐧', region:'Wildlife', tag:'Been there', visited:true, colors:['#48cae4','#023e8a'],
+  tagline:'The coldest, windiest place on Earth — penguins, whales and icebergs as big as buildings!',
+  lat:-64.0, lng:-60.0,
+  gettingThere:{
+    to:'USH', toName:'Ushuaia → ship', flightTime:'~20 h + a 2-day sail',
+    route:'Dublin → Buenos Aires → Ushuaia (Argentina), then an expedition ship across the Drake Passage',
+    distance:'≈ 15,000 km', tz:'No official time zone!', best:'Nov–Mar (Antarctic summer)'
+  },
+  country_info:{
+    capital:'None — no countries!', language:'Scientists from many nations', currency:'None',
+    population:'≈ 1,000–5,000 scientists (no permanent residents)', tz:'Uses many / none',
+    fun:[
+      'Antarctica is a whole continent kept for science and peace — no one owns it.',
+      'It holds about 70% of the world’s fresh water, frozen as ice up to 4 km thick.',
+      'It’s technically the biggest desert on Earth because it almost never rains. 🏜️❄️'
+    ],
+    kid:[
+      'You can see thousands of penguins waddling and sliding on their tummies! 🐧',
+      'Whales swim right up to the boats, and seals nap on floating ice.',
+      'The icebergs glow bright blue and come in amazing shapes.'
+    ]
+  },
+  photos:[
+    ['penguin,antarctica','Penguin colony',241],['iceberg,antarctica','Blue icebergs',242],
+    ['whale,antarctica','Humpback whales',243],['antarctica,ship','Expedition ship',244],
+    ['seal,antarctica,ice','Seals on ice',245],['antarctica,mountains,snow','Snowy peaks',246]
+  ],
+  attractions:[
+    ['🐧','Penguin Colonies','Stand among thousands of gentoo and chinstrap penguins.'],
+    ['🛶','Zodiac Cruising','Zip between icebergs in little inflatable boats.'],
+    ['🐋','Whale Watching','Humpback and minke whales feed all around the ship.'],
+    ['🥾','Polar Landings','Step onto the white continent and post from the world’s southernmost post office.']
+  ],
+  kids:[
+    ['🐧','Port Lockroy','A museum & the world’s southernmost post office, surrounded by penguins.',4.8,'400','Port Lockroy Antarctica'],
+    ['⛰️','Lemaire Channel','Sail the “Kodak Gap” between towering icy cliffs.',4.8,'300','Lemaire Channel Antarctica'],
+    ['🛳️','Ushuaia — End of the World','The starting port; ride the “Train at the End of the World”.',4.6,'12,000','Ushuaia End of the World Argentina'],
+    ['🥾','Deception Island','Walk inside a volcano’s crater and see an old whaling base.',4.7,'500','Deception Island Antarctica']
+  ]
+},
+{
+  id:'athens', name:'Athens', short:'Greece', country:'Greece', flag:'🇬🇷',
+  emoji:'🏛️', region:'City', tag:'Wishlist', colors:['#1d72b8','#48cae4'],
+  tagline:'The 2,500-year-old home of myths, gods and the very first Olympic ideas!',
+  lat:37.9838, lng:23.7275,
+  gettingThere:{
+    to:'ATH', toName:'Athens Int’l', flightTime:'~3 h 55 (nonstop ✅)',
+    route:'Dublin → Athens nonstop (Aegean / Ryanair)',
+    distance:'≈ 2,860 km', tz:'GMT +2', best:'Apr–Jun & Sep–Oct'
+  },
+  country_info:{
+    capital:'Athens', language:'Greek', currency:'Euro (€)',
+    population:'≈ 10.4 million', tz:'GMT +2',
+    fun:[
+      'Athens is one of the oldest cities in the world — people have lived here for 3,400+ years.',
+      'The Ancient Greeks invented theatre, democracy and the Olympic Games.',
+      'Greek myths are full of heroes, gods and monsters like Medusa and the Minotaur. 🐍'
+    ],
+    kid:[
+      'Climb up to the Acropolis to see the Parthenon temple touching the sky.',
+      'Greece has around 6,000 islands — perfect for ferry-hopping adventures. ⛴️',
+      'Try souvlaki and sweet honey baklava — yum!'
+    ]
+  },
+  photos:[
+    ['acropolis,athens','The Acropolis',251],['parthenon,greece','The Parthenon',252],
+    ['athens,greece','Athens streets',253],['greek,island,sea','Greek islands',254],
+    ['greek,food,souvlaki','Greek food',255],['athens,sunset','Athens at sunset',256]
+  ],
+  attractions:[
+    ['🏛️','The Acropolis & Parthenon','The famous hilltop temple to the goddess Athena.'],
+    ['🏟️','Panathenaic Stadium','The marble stadium of the first modern Olympics (1896).'],
+    ['🏺','Acropolis Museum','Glass floors over real ruins and ancient statues.'],
+    ['🚋','Plaka & Mount Lycabettus','Old streets and a cable car to the city’s highest peak.']
+  ],
+  kids:[
+    ['🏛️','Acropolis of Athens','Hike up to the temples — bring water and pretend you’re an explorer.',4.7,'180,000','Acropolis of Athens'],
+    ['🦖','Hellenic Children’s Museum','Hands-on play and science for younger kids in the city.',4.3,'600','Hellenic Children Museum Athens'],
+    ['🚆','Athens Happy Train','A little road-train that loops the top sights — great little legs saver.',4.0,'1,500','Athens Happy Train Plaka'],
+    ['🦩','Attica Zoological Park','Greece’s only zoo — lions, penguins and a big bird park.',4.4,'14,000','Attica Zoological Park Athens']
+  ]
+},
+{
+  id:'rhodes', name:'Rhodes', short:'Greece', country:'Greece', flag:'🇬🇷',
+  emoji:'🏖️', region:'Beach', tag:'Wishlist', colors:['#f4a261','#2a9d8f'],
+  tagline:'A sunny island with a real medieval knights’ castle and a valley full of butterflies!',
+  lat:36.4349, lng:28.2176,
+  gettingThere:{
+    to:'RHO', toName:'Rhodes (Diagoras)', flightTime:'~4 h (nonstop, seasonal ✅)',
+    route:'Dublin → Rhodes nonstop in summer (Ryanair / TUI)',
+    distance:'≈ 3,300 km', tz:'GMT +2', best:'May–Oct'
+  },
+  country_info:{
+    capital:'Athens (Greece)', language:'Greek', currency:'Euro (€)',
+    population:'≈ 125,000 (island)', tz:'GMT +2',
+    fun:[
+      'Rhodes had one of the Seven Wonders of the Ancient World — a giant statue called the Colossus.',
+      'The Old Town is one of the best-kept medieval walled towns in Europe.',
+      'It’s called the “Island of the Sun” because it’s sunny about 300 days a year! ☀️'
+    ],
+    kid:[
+      'Walk through real knights’ gates and along castle walls.',
+      'In summer the Valley of the Butterflies fills with thousands of fluttering moths. 🦋',
+      'The beaches have warm, clear water perfect for paddling.'
+    ]
+  },
+  photos:[
+    ['rhodes,old,town','Medieval Old Town',261],['rhodes,greece,beach','Rhodes beaches',262],
+    ['lindos,acropolis','Lindos hilltop',263],['rhodes,harbour','Mandraki harbour',264],
+    ['rhodes,castle','Knights’ castle',265],['greek,island,boat','Island boat trip',266]
+  ],
+  attractions:[
+    ['🏰','Palace of the Grand Master','A huge medieval castle full of mosaics and towers.'],
+    ['⛪','Lindos Acropolis','A clifftop ancient site above a pretty white village.'],
+    ['🦋','Valley of the Butterflies','A shady forest valley where butterflies swarm in summer.'],
+    ['🏖️','Tsambika Beach','Soft golden sand and shallow, calm water for kids.']
+  ],
+  kids:[
+    ['🏰','Rhodes Old Town','Explore the moat, gates and cobbled lanes of the knights.',4.7,'40,000','Medieval Old Town of Rhodes'],
+    ['🐠','Rhodes Aquarium','See sharks, rays and Mediterranean sea life in a 1930s building.',4.2,'7,500','Rhodes Aquarium Hydrobiological Station'],
+    ['🎢','Water Park (Faliraki)','One of Europe’s biggest water parks — slides galore.',4.5,'13,000','Water Park Faliraki Rhodes'],
+    ['🫏','Lindos Donkey Ride','Ride a donkey up the hill to the Acropolis of Lindos.',4.4,'9,000','Lindos Acropolis Rhodes']
+  ]
+},
+{
+  id:'tenerife', name:'Tenerife', short:'Canary Islands, Spain', country:'Spain', flag:'🇪🇸',
+  emoji:'🌋', region:'Beach', tag:'Wishlist', colors:['#ffba08','#0096c7'],
+  tagline:'Year-round sunshine, a giant volcano, and one of the best whale-watching spots on Earth!',
+  lat:28.2916, lng:-16.6291,
+  gettingThere:{
+    to:'TFS', toName:'Tenerife South', flightTime:'~4 h 30 (nonstop ✅)',
+    route:'Dublin → Tenerife South nonstop (Ryanair / Aer Lingus)',
+    distance:'≈ 2,900 km', tz:'GMT +0', best:'All year! ☀️'
+  },
+  country_info:{
+    capital:'Madrid (Spain)', language:'Spanish', currency:'Euro (€)',
+    population:'≈ 950,000 (island)', tz:'GMT +0 (same as Ireland)',
+    fun:[
+      'Mount Teide is Spain’s highest mountain (3,715 m) — a volcano you can ride a cable car up!',
+      'The Canary Islands are named after dogs (“canis”), not the little birds.',
+      'You can see whales and dolphins off the coast almost every day of the year. 🐋'
+    ],
+    kid:[
+      'Siam Park is often voted the best water park in the whole world.',
+      'The sand on some beaches is black because it came from a volcano!',
+      'Take a boat trip to spot wild pilot whales and dolphins.'
+    ]
+  },
+  photos:[
+    ['teide,tenerife,volcano','Mount Teide',271],['tenerife,beach','Tenerife beach',272],
+    ['tenerife,canary,islands','Canary coast',273],['whale,dolphin,tenerife','Whale watching',274],
+    ['siam,park,waterslide','Water park',275],['tenerife,sunset','Atlantic sunset',276]
+  ],
+  attractions:[
+    ['🌋','Mount Teide Cable Car','Ride up Spain’s tallest peak for views above the clouds.'],
+    ['🐋','Whale & Dolphin Boat','Calm-water cruises to see wild whales year-round.'],
+    ['🏖️','Playa de las Teresitas','Golden imported-sand beach with calm, safe water.'],
+    ['🌴','Masca Village','A tiny village in a dramatic green gorge.']
+  ],
+  kids:[
+    ['🎢','Siam Park','A Thai-themed water kingdom — repeatedly voted #1 in the world.',4.7,'90,000','Siam Park Tenerife'],
+    ['🦧','Loro Parque','Famous animal park with orcas, penguins, gorillas and parrots.',4.6,'120,000','Loro Parque Tenerife'],
+    ['🐋','Tenerife Whale Watching','Boat trips from Los Cristianos to see pilot whales.',4.6,'10,000','Whale watching Los Cristianos Tenerife'],
+    ['🐪','Camel Park','Camel rides and a petting farm near the volcano foothills.',4.3,'4,000','Camel Park Tenerife']
+  ]
+},
+{
+  id:'porto', name:'Porto', short:'Portugal', country:'Portugal', flag:'🇵🇹',
+  emoji:'🌉', region:'City', tag:'Best deal', colors:['#e63946','#457b9d'],
+  tagline:'A colourful riverside city of bridges, blue tiles and a bookshop fit for a wizard!',
+  lat:41.1579, lng:-8.6291,
+  gettingThere:{
+    to:'OPO', toName:'Porto (Sá Carneiro)', flightTime:'~2 h 10 (nonstop ✅)',
+    route:'Dublin → Porto nonstop (Ryanair / Aer Lingus) — found from €125!',
+    distance:'≈ 1,300 km', tz:'GMT +0', best:'Apr–Oct'
+  },
+  country_info:{
+    capital:'Lisbon (Portugal)', language:'Portuguese', currency:'Euro (€)',
+    population:'≈ 10.3 million', tz:'GMT +0 (same as Ireland)',
+    fun:[
+      'Porto gave its name to the whole country — and to sweet “Port” wine.',
+      'The Lello bookshop’s swirly red staircase helped inspire Harry Potter. ⚡',
+      'Buildings are covered in blue-and-white painted tiles called “azulejos”.'
+    ],
+    kid:[
+      'Ride a vintage wooden tram along the river Douro. 🚋',
+      'Cross the giant double-decker Dom Luís I iron bridge.',
+      'Try a warm custard tart (pastel de nata) — Portugal’s tastiest treat!'
+    ]
+  },
+  photos:[
+    ['porto,portugal,river','Douro riverfront',281],['porto,bridge','Dom Luís Bridge',282],
+    ['porto,azulejo,tiles','Blue tiles',283],['porto,tram','Vintage tram',284],
+    ['pastel,de,nata','Custard tarts',285],['porto,sunset','Porto sunset',286]
+  ],
+  attractions:[
+    ['🌉','Dom Luís I Bridge','Walk the top deck of the famous iron bridge for big views.'],
+    ['📚','Livraria Lello','A magical 1906 bookshop with a swirling red staircase.'],
+    ['⛴️','Douro River Cruise','A “six bridges” boat trip along the river.'],
+    ['🚋','Historic Tram 1','A wooden tram that trundles to the seaside at Foz.']
+  ],
+  kids:[
+    ['🐟','Sea Life Porto','A friendly aquarium with an ocean tunnel and touch pool.',4.4,'9,000','Sea Life Porto'],
+    ['🎠','Jardins do Palácio de Cristal','Peacock gardens with city-and-river views to run around.',4.6,'30,000','Jardins do Palacio de Cristal Porto'],
+    ['📚','Livraria Lello','The “Harry Potter” bookshop — go early to beat the queue.',4.3,'45,000','Livraria Lello Porto'],
+    ['🚋','World of Discoveries','An indoor boat ride through the age of explorers.',4.4,'8,500','World of Discoveries Porto']
+  ]
+},
+{
+  id:'istanbul', name:'Istanbul', short:'Türkiye', country:'Türkiye', flag:'🇹🇷',
+  emoji:'🕌', region:'City', tag:'Wishlist', colors:['#e09f3e','#9e2a2b'],
+  tagline:'The only city on two continents — palaces, a sunken cistern and a giant spice bazaar!',
+  lat:41.0082, lng:28.9784,
+  gettingThere:{
+    to:'IST', toName:'Istanbul Airport', flightTime:'~4 h (nonstop ✅)',
+    route:'Dublin → Istanbul nonstop (Turkish Airlines)',
+    distance:'≈ 3,000 km', tz:'GMT +3', best:'Apr–May & Sep–Oct'
+  },
+  country_info:{
+    capital:'Ankara (Türkiye)', language:'Turkish', currency:'Turkish Lira (₺)',
+    population:'≈ 85 million', tz:'GMT +3',
+    fun:[
+      'Istanbul sits on two continents — you can have breakfast in Europe and lunch in Asia!',
+      'It was once called Constantinople and was the capital of two great empires.',
+      'Under the city is the spooky Basilica Cistern, an underground palace of water. 💧'
+    ],
+    kid:[
+      'Ride a ferry across the Bosphorus strait between two continents. ⛴️',
+      'Bargain for sweets and lanterns in the Grand Bazaar — 4,000 shops!',
+      'Try Turkish delight and a swirly “dondurma” stretchy ice cream. 🍦'
+    ]
+  },
+  photos:[
+    ['istanbul,mosque','Blue Mosque',291],['hagia,sophia,istanbul','Hagia Sophia',292],
+    ['istanbul,bosphorus','Bosphorus ferries',293],['grand,bazaar,istanbul','Grand Bazaar',294],
+    ['turkish,delight','Turkish delight',295],['istanbul,sunset','Istanbul skyline',296]
+  ],
+  attractions:[
+    ['🕌','Hagia Sophia & Blue Mosque','Two giant domed wonders facing each other.'],
+    ['👑','Topkapı Palace','A sultan’s palace with treasure, jewels and sea views.'],
+    ['💧','Basilica Cistern','Walk above water columns and the famous Medusa heads.'],
+    ['⛴️','Bosphorus Cruise','Sail between Europe and Asia past waterside palaces.']
+  ],
+  kids:[
+    ['🐠','Istanbul Akvaryum','A huge themed aquarium with a rainforest and ocean tunnel.',4.4,'40,000','Istanbul Akvaryum Florya aquarium'],
+    ['🚋','Nostalgic Tram (İstiklal)','Ride the red heritage tram down the busy shopping street.',4.5,'5,000','Nostalgic Tram Istiklal Istanbul'],
+    ['🎡','Miniatürk','A whole park of mini models of Turkey’s landmarks.',4.5,'25,000','Miniaturk Istanbul'],
+    ['🛍️','Grand Bazaar','One of the world’s oldest covered markets — a treasure maze.',4.6,'200,000','Grand Bazaar Istanbul']
+  ]
+}
+];
+
+/* ---------------- seed trips (Grant's real past adventures) ---------------- */
+const SEED_TRIPS = [
+  {id:'t1', destId:'lapland',    city:'Rovaniemi', country:'Finland',   flag:'🇫🇮', emoji:'🎅', lat:66.5039, lng:25.7294, year:2014, planned:false, rating:5, note:'Met the real Santa and went husky sledding in the snow!'},
+  {id:'t2', destId:'madagascar', city:'Madagascar', country:'Madagascar', flag:'🇲🇬', emoji:'🦎', lat:-18.8792, lng:47.5079, year:2016, planned:false, rating:4, note:'So many lemurs and the giant baobab trees at sunset.'},
+  {id:'t3', destId:'antarctica', city:'Antarctica', country:'Antarctica', flag:'🇦🇶', emoji:'🐧', lat:-64.0, lng:-60.0, year:2016, planned:false, rating:5, note:'Penguins everywhere and icebergs bigger than houses.'},
+  {id:'t4', destId:'maldives',   city:'Maldives', country:'Maldives',   flag:'🇲🇻', emoji:'🏝️', lat:2.7167, lng:72.95, year:2017, planned:false, rating:5, note:'Overwater villa and snorkelling with turtles.'},
+  {id:'t5', destId:'maldives',   city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'}
+];
+
+/* ===================================================================== */
+/*  STATE + STORAGE                                                       */
+/* ===================================================================== */
+const LS_KEY = 'globie_trips_v1';
+function loadTrips(){
+  try{ const s = localStorage.getItem(LS_KEY); if(s) return JSON.parse(s); }catch(e){}
+  return JSON.parse(JSON.stringify(SEED_TRIPS));
+}
+function saveTrips(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(trips)); }catch(e){} }
+let trips = loadTrips();
+let editingId = null;
+let formRating = 0;
+let currentDest = null;
+
+/* ===================================================================== */
+/*  VIEW SWITCHING                                                        */
+/* ===================================================================== */
+function showView(v){
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const map = {explore:'explore', map:'map-view', trips:'trips', detail:'detail'};
+  document.getElementById(map[v]).classList.add('active');
+  const nb = document.querySelector('.navbtn[data-view="'+v+'"]');
+  if(nb) nb.classList.add('active');
+  if(v==='map'){ setTimeout(initMap, 60); }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+/* ===================================================================== */
+/*  EXPLORE GRID                                                          */
+/* ===================================================================== */
+const regions = ['All', ...Array.from(new Set(DESTS.map(d=>d.region)))];
+let activeRegion = 'All';
+function renderFilters(){
+  const f = document.getElementById('filters');
+  f.innerHTML = regions.map(r=>`<button class="chip ${r===activeRegion?'active':''}" data-r="${r}">${r}</button>`).join('');
+  f.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{activeRegion=c.dataset.r; renderFilters(); renderGrid();}));
+}
+function visitedDestIds(){ return new Set(trips.filter(t=>!t.planned).map(t=>t.destId)); }
+function renderGrid(){
+  const g = document.getElementById('destGrid');
+  const vis = visitedDestIds();
+  const list = DESTS.filter(d=>activeRegion==='All'||d.region===activeRegion);
+  g.innerHTML = list.map(d=>`
+    <div class="card" onclick="openDest('${d.id}')">
+      <div class="thumb" style="background:linear-gradient(135deg,${d.colors[0]},${d.colors[1]})">
+        <img src="${photo(d.photos[0][0], d.photos[0][2])}" alt="" loading="lazy"
+             onerror="this.style.display='none'">
+        <div class="ov"></div>
+        <span class="emj">${d.emoji}</span>
+        <span class="badge-tag">${d.tag}</span>
+        ${vis.has(d.id)?'<span class="badge-visited">✓ Visited</span>':''}
+      </div>
+      <div class="body">
+        <h3><span class="flag">${d.flag}</span> ${d.name}</h3>
+        <div style="color:#7186a0;font-weight:600;font-size:.9rem">${d.short}</div>
+        <p class="tagline">${d.tagline}</p>
+        <div class="meta"><span>✈️ ${d.gettingThere.flightTime}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ===================================================================== */
+/*  DESTINATION DETAIL                                                    */
+/* ===================================================================== */
+function stars(n){ return '⭐'.repeat(Math.round(n)); }
+function openDest(id){
+  const d = DESTS.find(x=>x.id===id); if(!d) return;
+  currentDest = d;
+  document.getElementById('dhero').innerHTML = `
+    <div class="bg" style="background:linear-gradient(135deg,${d.colors[0]},${d.colors[1]})">
+      <img src="${photo(d.photos[0][0], d.photos[0][2])}" alt="" onerror="this.style.display='none'">
+    </div>
+    <div class="shade"></div>
+    <div class="content">
+      <div style="font-size:1rem;font-weight:600;opacity:.95">${d.flag} ${d.short}</div>
+      <h1>${d.emoji} ${d.name}</h1>
+      <div class="sub">${d.tagline}</div>
+    </div>`;
+
+  const tabs = [
+    ['get','✈️ Getting There'],['info','🌍 Country Info'],['photos','📸 Photos'],
+    ['see','🏛️ Main Attractions'],['kids','🧒 Cool for Kids']
+  ];
+  document.getElementById('dtabs').innerHTML = tabs.map((t,i)=>
+    `<button class="tab ${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
+
+  const gt = d.gettingThere, ci = d.country_info;
+  const panels = {
+    get:`
+      <div class="route">
+        <div class="airport"><div class="code">${HOME.code}</div><div class="nm">${HOME.name} ${HOME.flag}</div></div>
+        <div class="planeline"><div class="ln"></div><span class="pl">✈️</span><div class="ln"></div></div>
+        <div class="airport"><div class="code">${gt.to}</div><div class="nm">${gt.toName}</div></div>
+      </div>
+      <div class="info-grid" style="margin-top:16px">
+        <div class="info-box"><div class="k">Flight time</div><div class="v">${gt.flightTime}</div></div>
+        <div class="info-box"><div class="k">Distance</div><div class="v">${gt.distance}</div></div>
+        <div class="info-box"><div class="k">Time zone</div><div class="v">${gt.tz}</div></div>
+        <div class="info-box"><div class="k">Best time to go</div><div class="v" style="font-size:1rem">${gt.best}</div></div>
+      </div>
+      <div class="funbox"><h3>🧳 The journey</h3><ul><li>${gt.route}</li></ul></div>`,
+    info:`
+      <div class="info-grid">
+        <div class="info-box"><div class="k">Capital</div><div class="v">${ci.capital}</div></div>
+        <div class="info-box"><div class="k">Language</div><div class="v" style="font-size:1rem">${ci.language}</div></div>
+        <div class="info-box"><div class="k">Money</div><div class="v" style="font-size:1rem">${ci.currency}</div></div>
+        <div class="info-box"><div class="k">People</div><div class="v">${ci.population}</div></div>
+      </div>
+      <div class="funbox"><h3>🤓 Did you know?</h3><ul>${ci.fun.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+      <div class="funbox kidfacts"><h3>🧒 Just for kids</h3><ul>${ci.kid.map(f=>`<li>${f}</li>`).join('')}</ul></div>`,
+    photos:`<div class="gallery">${d.photos.map(p=>`
+        <div class="ph" style="background:linear-gradient(135deg,${d.colors[0]},${d.colors[1]})">
+          <span>${d.emoji}</span>
+          <img src="${photo(p[0],p[2])}" alt="${p[1]}" loading="lazy" onerror="this.style.display='none'">
+          <span class="cap">${p[1]}</span>
+        </div>`).join('')}</div>`,
+    see:d.attractions.map(a=>`
+        <div class="spot"><div class="ic">${a[0]}</div>
+          <div><h3>${a[1]}</h3><p>${a[2]}</p></div></div>`).join(''),
+    kids:d.kids.map(k=>`
+        <div class="spot"><div class="ic">${k[0]}</div>
+          <div style="flex:1">
+            <h3>${k[1]}</h3><p>${k[2]}</p>
+            <div class="stars">${stars(k[3])} ${k[3]} <span class="rev">on Google · ${k[4]} reviews</span></div>
+            <a class="maplink" href="${gmap(k[5])}" target="_blank" rel="noopener">📍 Open in Google Maps</a>
+          </div></div>`).join('')
+  };
+
+  const pc = document.getElementById('panels');
+  pc.innerHTML = tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}">${panels[t[0]]}</div>`).join('');
+  document.querySelectorAll('#dtabs .tab').forEach(tb=>tb.addEventListener('click',()=>{
+    document.querySelectorAll('#dtabs .tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('#panels .panel').forEach(x=>x.classList.remove('active'));
+    tb.classList.add('active');
+    document.getElementById('panel-'+tb.dataset.p).classList.add('active');
+  }));
+
+  document.getElementById('addFromDetail').onclick = ()=>{ showView('trips'); prefillForm(d.id); };
+  showView('detail');
+}
+
+/* ===================================================================== */
+/*  ADVENTURE MAP                                                         */
+/* ===================================================================== */
+let map=null, layer=null;
+function haversine(a,b){
+  const R=6371, toR=x=>x*Math.PI/180;
+  const dLat=toR(b.lat-a.lat), dLng=toR(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
+  return Math.round(2*R*Math.asin(Math.sqrt(s)));
+}
+/* build a gently curved arc (quadratic bezier with perpendicular lift) */
+function arc(a,b){
+  const pts=[], n=48;
+  const mid={lat:(a.lat+b.lat)/2, lng:(a.lng+b.lng)/2};
+  const dx=b.lng-a.lng, dy=b.lat-a.lat;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const lift=dist*0.18;                         // how high the arc bows
+  const ctrl={lat:mid.lat - dx/ (dist||1) *lift, lng:mid.lng + dy/(dist||1)*lift};
+  for(let i=0;i<=n;i++){
+    const t=i/n, mt=1-t;
+    pts.push([ mt*mt*a.lat + 2*mt*t*ctrl.lat + t*t*b.lat,
+               mt*mt*a.lng + 2*mt*t*ctrl.lng + t*t*b.lng ]);
+  }
+  return pts;
+}
+function planeIcon(emoji,color){
+  return L.divIcon({className:'',html:
+    `<div style="font-size:1.7rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))">${emoji}</div>`,
+    iconSize:[30,30], iconAnchor:[15,15]});
+}
+function initMap(){
+  if(!map){
+    map = L.map('map',{worldCopyJump:true, minZoom:1}).setView([28,15],2);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+      attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:18
+    }).addTo(map);
+  }
+  if(layer) layer.remove();
+  layer = L.layerGroup().addTo(map);
+
+  // home base
+  L.marker([HOME.lat,HOME.lng], {icon:planeIcon('🏠')}).addTo(layer)
+    .bindPopup(`<div class="lp"><b>Home Base</b><br>${HOME.flag} ${HOME.name}, ${HOME.country}</div>`);
+  L.circleMarker([HOME.lat,HOME.lng],{radius:7,color:'#fff',weight:2,fillColor:'#4895ef',fillOpacity:1}).addTo(layer);
+
+  const bounds=[[HOME.lat,HOME.lng]];
+  trips.forEach(t=>{
+    if(t.lat==null||t.lng==null) return;
+    const dest={lat:t.lat,lng:t.lng};
+    const col = t.planned ? '#ffba08' : '#f72585';
+    L.polyline(arc(HOME,dest),{color:col, weight:3, opacity:.85,
+      dashArray: t.planned?'2 9':null}).addTo(layer);
+    L.marker([t.lat,t.lng],{icon:planeIcon(t.emoji||'📍')}).addTo(layer)
+      .bindPopup(`<div class="lp">${t.planned?'<b>🔜 Coming up!</b><br>':''}
+        <b>${t.city}</b><br>${t.flag||''} ${t.country||''} · ${t.year}<br>
+        ${t.rating?('⭐'.repeat(t.rating)+'<br>'):''}
+        <span style="color:#52647d">${(t.note||'').replace(/</g,'&lt;')}</span><br>
+        <small>✈️ ${haversine(HOME,dest).toLocaleString()} km from home</small></div>`);
+    L.circleMarker([t.lat,t.lng],{radius:6,color:'#fff',weight:2,fillColor:col,fillOpacity:1}).addTo(layer);
+    bounds.push([t.lat,t.lng]);
+  });
+  if(bounds.length>1) map.fitBounds(bounds,{padding:[50,50]});
+  map.invalidateSize();
+  renderStats();
+}
+function renderStats(){
+  const done = trips.filter(t=>!t.planned);
+  const countries = new Set(done.map(t=>t.country)).size;
+  let km=0; done.forEach(t=>{ if(t.lat!=null) km+=haversine(HOME,{lat:t.lat,lng:t.lng})*2; });
+  const planned = trips.filter(t=>t.planned).length;
+  const s = document.getElementById('stats');
+  s.innerHTML = [
+    ['🌍', countries, 'Countries visited'],
+    ['📔', done.length, 'Trips taken'],
+    ['✈️', km.toLocaleString(), 'km flown (round trips)'],
+    ['🔜', planned, 'Trips coming up']
+  ].map(x=>`<div class="stat"><div class="big">${x[0]} ${x[1]}</div><div class="lbl">${x[2]}</div></div>`).join('');
+}
+
+/* ===================================================================== */
+/*  TRIPS / JOURNAL                                                       */
+/* ===================================================================== */
+function buildDestSelect(){
+  const sel = document.getElementById('fDest');
+  sel.innerHTML = DESTS.map(d=>`<option value="${d.id}">${d.flag} ${d.name} — ${d.short}</option>`).join('')
+    + `<option value="__custom">➕ Somewhere else…</option>`;
+  sel.onchange = ()=>{ document.getElementById('customWrap').style.display = sel.value==='__custom'?'block':'none'; };
+}
+function setRating(n){
+  formRating=n;
+  document.querySelectorAll('#ratepick .s').forEach(s=>s.classList.toggle('on', +s.dataset.v<=n));
+}
+document.querySelectorAll('#ratepick .s').forEach(s=>s.addEventListener('click',()=>setRating(+s.dataset.v)));
+
+function renderPassport(){
+  const p = document.getElementById('passport');
+  if(!trips.length){
+    p.innerHTML = `<div class="empty"><div class="big">🧳</div><h3>No trips yet!</h3>
+      <p>Add your first adventure on the left — it'll appear here and on your map.</p></div>`;
+    return;
+  }
+  const sorted = [...trips].sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
+  p.innerHTML = sorted.map(t=>{
+    const d = DESTS.find(x=>x.id===t.destId);
+    const grad = d ? `linear-gradient(135deg,${d.colors[0]},${d.colors[1]})` : 'linear-gradient(135deg,#7209b7,#f72585)';
+    const img = d ? `<img src="${photo(d.photos[0][0],d.photos[0][2])}" onerror="this.style.display='none'">` : '';
+    return `<div class="stamp">
+      <div class="top" style="background:${grad}">${img}<div class="ov"></div>
+        <span class="emj">${t.emoji||'📍'}</span>
+        <span class="yr">${t.year||''}</span>
+        ${t.planned?'<span class="planned">🔜 Upcoming</span>':''}
+      </div>
+      <div class="b">
+        <h3>${t.city}</h3>
+        <div class="loc">${t.flag||''} ${t.country||''}${t.rating?(' · '+'⭐'.repeat(t.rating)):''}</div>
+        ${t.note?`<p class="note">“${t.note.replace(/</g,'&lt;')}”</p>`:''}
+        <div class="acts">
+          <button onclick="editTrip('${t.id}')">✏️ Edit</button>
+          <button class="del" onclick="delTrip('${t.id}')">🗑️ Delete</button>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+function prefillForm(destId){
+  buildDestSelect();
+  document.getElementById('fDest').value = destId;
+  document.getElementById('customWrap').style.display='none';
+  document.getElementById('fYear').value = new Date().getFullYear();
+  document.getElementById('fNote').focus();
+}
+function readForm(){
+  const sel = document.getElementById('fDest').value;
+  const year = parseInt(document.getElementById('fYear').value)||new Date().getFullYear();
+  const planned = document.getElementById('fPlanned').checked;
+  const note = document.getElementById('fNote').value.trim();
+  if(sel==='__custom'){
+    const city = document.getElementById('fCity').value.trim();
+    if(!city){ alert('Please type a place name 🙂'); return null; }
+    return {destId:null, city, country:'', flag:'',
+      emoji:document.getElementById('fEmoji').value.trim()||'📍',
+      lat:parseFloat(document.getElementById('fLat').value)||null,
+      lng:parseFloat(document.getElementById('fLng').value)||null,
+      year, planned, rating:formRating, note};
+  }
+  const d = DESTS.find(x=>x.id===sel);
+  return {destId:d.id, city:d.name, country:d.country, flag:d.flag, emoji:d.emoji,
+    lat:d.lat, lng:d.lng, year, planned, rating:formRating, note};
+}
+document.getElementById('saveTrip').addEventListener('click',()=>{
+  const data = readForm(); if(!data) return;
+  if(editingId){ const i=trips.findIndex(t=>t.id===editingId); if(i>-1) trips[i]={...trips[i],...data}; }
+  else { data.id='t'+Date.now(); trips.push(data); }
+  saveTrips(); resetForm(); renderPassport(); renderGrid();
+  if(map) initMap();
+});
+function editTrip(id){
+  const t = trips.find(x=>x.id===id); if(!t) return;
+  editingId=id;
+  buildDestSelect();
+  document.getElementById('formTitle').textContent='✏️ Edit Trip';
+  document.getElementById('cancelEdit').style.display='block';
+  if(t.destId){ document.getElementById('fDest').value=t.destId; document.getElementById('customWrap').style.display='none'; }
+  else{
+    document.getElementById('fDest').value='__custom';
+    document.getElementById('customWrap').style.display='block';
+    document.getElementById('fCity').value=t.city||'';
+    document.getElementById('fLat').value=t.lat??'';
+    document.getElementById('fLng').value=t.lng??'';
+    document.getElementById('fEmoji').value=t.emoji||'';
+  }
+  document.getElementById('fYear').value=t.year||'';
+  document.getElementById('fPlanned').checked=!!t.planned;
+  document.getElementById('fNote').value=t.note||'';
+  setRating(t.rating||0);
+  showView('trips');
+  document.querySelector('.form-card').scrollIntoView({behavior:'smooth'});
+}
+function delTrip(id){
+  if(!confirm('Delete this trip from your journal?')) return;
+  trips = trips.filter(t=>t.id!==id);
+  saveTrips(); renderPassport(); renderGrid(); if(map) initMap();
+}
+function resetForm(){
+  editingId=null; formRating=0;
+  document.getElementById('formTitle').textContent='✏️ Add a Trip';
+  document.getElementById('cancelEdit').style.display='none';
+  document.getElementById('customWrap').style.display='none';
+  ['fCity','fLat','fLng','fEmoji','fNote'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('fYear').value=new Date().getFullYear();
+  document.getElementById('fPlanned').checked=false;
+  buildDestSelect();
+  setRating(0);
+}
+document.getElementById('cancelEdit').addEventListener('click',resetForm);
+
+/* ===================================================================== */
+/*  FUN FACT TICKER                                                       */
+/* ===================================================================== */
+const FACTS = [
+  '🐧 Penguins can’t fly, but they can “fly” underwater super fast!',
+  '🏝️ The Maldives is the flattest country on Earth.',
+  '🦒 A giraffe’s tongue is about 50 cm long — and bluish!',
+  '🗼 The Eiffel Tower grows ~15 cm taller in summer heat.',
+  '🐫 Camels have three eyelids to keep out the sand.',
+  '🌋 Iceland gets bigger every year as new lava cools.',
+  '🦋 Some butterflies in Rhodes only appear in summer.',
+  '🎅 Rovaniemi is the official hometown of Santa Claus!'
+];
+function rotateFact(){
+  const el=document.getElementById('heroFact');
+  el.textContent='💡 '+FACTS[Math.floor(Math.random()*FACTS.length)];
+}
+
+/* ===================================================================== */
+/*  INIT                                                                  */
+/* ===================================================================== */
+renderFilters();
+renderGrid();
+buildDestSelect();
+renderPassport();
+document.getElementById('fYear').value=new Date().getFullYear();
+rotateFact();
+setInterval(rotateFact, 6000);
+</script>
+</body>
+</html>
