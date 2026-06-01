@@ -614,9 +614,17 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .dgroup-head h3{font-size:clamp(1.3rem,3.6vw,1.75rem);display:flex;align-items:center;gap:10px}
 .dgroup-head h3 .cnt{font-size:.72rem;font-weight:800;color:var(--muted);background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:3px 11px}
 /* ===== login / profiles ===== */
-.login{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;
+.login{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;
   background:radial-gradient(120% 80% at 50% -10%, #FFD86B 0, transparent 45%), linear-gradient(155deg,#13B5AC,#46B3F0 55%,#7C6CF4)}
 .login.hidden{display:none}
+.login:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(62px 26px at 20% 26%,rgba(255,255,255,.5),transparent 70%),radial-gradient(86px 32px at 80% 18%,rgba(255,255,255,.42),transparent 70%),radial-gradient(54px 24px at 64% 74%,rgba(255,255,255,.35),transparent 70%),radial-gradient(70px 28px at 32% 82%,rgba(255,255,255,.3),transparent 70%);
+  animation:loginDrift 15s ease-in-out infinite alternate}
+.login:after{content:"✈️";position:absolute;top:16%;font-size:2rem;opacity:.9;z-index:0;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));animation:loginFly 17s linear infinite}
+@keyframes loginDrift{from{transform:translateX(-10px)}to{transform:translateX(10px)}}
+@keyframes loginFly{0%{left:-10%;top:20%;transform:rotate(7deg)}100%{left:110%;top:9%;transform:rotate(7deg)}}
+.login-card{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){.login:before,.login:after{animation:none}.login:after{display:none}}
 .login-card{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:30px 26px;text-align:center}
 .login-card .mark{width:104px;height:104px;margin:0 auto 4px;display:block;border-radius:22px;box-shadow:var(--shadow-sm)}
 .login-card h1{font-size:1.8rem;margin:12px 0 2px}
