@@ -52,6 +52,9 @@ Last updated: 2026-06-01
 - [x] **Photo captions back in step** — gallery + lightbox now use the curated caption that matches each image
 - [x] **Story cat photo** — show the full square photo in a rounded frame (no more circular clipping that cut the cat off), bias crop to the face, lead the keyword with "cat" so the image actually contains one
 - [x] **🌍 Countries of the World page** — click the "Countries visited" stat (or the Badges button) → list of countries you've explored + the **top 5 you haven't**, sortable by most popular / most beautiful / biggest / most people (77-country curated dataset)
+- [x] **Fix spot photo overlap** — reset the default `<figure>` margin that was pushing the What-to-see / Fun-stuff thumbnails over the text
+- [x] **Multiple cat stories for upcoming trips** — Coco (Maldives), Banjo (Sunshine Coast) & Zellij (Rabat) now each have **3 tales** (cover badges Tale 1/2/3); other places keep their single story
+- [x] **Added the missing Faro (Algarve), Portugal trip** — May 2026 ✈️🇵🇹
 
 ---
 
