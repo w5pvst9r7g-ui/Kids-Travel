@@ -1092,7 +1092,9 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
         </div>
         <label for="fYear">Year</label>
         <input id="fYear" type="number" placeholder="2026" />
-        <label class="inline"><input type="checkbox" id="fPlanned"> This trip is still coming up</label>
+        <label class="inline"><input type="checkbox" id="fPlanned" onchange="toggleDateField()"> This trip is still coming up</label>
+        <div id="dateWrap" style="display:none"><label for="fDate">Departure date (for the countdown)</label>
+          <input id="fDate" type="date" /></div>
         <label>How fun was it?</label>
         <div class="ratepick" id="ratepick"></div>
         <label for="fNote">A memory or note</label>
@@ -5518,19 +5520,23 @@ function readForm(){
   const year=parseInt(document.getElementById('fYear').value)||new Date().getFullYear();
   const planned=document.getElementById('fPlanned').checked;
   const note=document.getElementById('fNote').value.trim();
+  const dateV=(document.getElementById('fDate')||{}).value||'';
+  const dateExtra=(planned&&dateV)?{date:dateV,year:parseInt(dateV.slice(0,4))||year}:{};
   if(sel==='__custom'){
     const city=document.getElementById('fCity').value.trim();
     if(!city){alert('Please type a place name 🙂');return null;}
     const latRaw=document.getElementById('fLat').value, lngRaw=document.getElementById('fLng').value;
     const lat=parseFloat(latRaw), lng=parseFloat(lngRaw);
     if((latRaw||lngRaw) && (isNaN(lat)||isNaN(lng))){ alert('Add both latitude and longitude (or leave both blank) so I can pin it on the map. 🗺️'); return null; }
-    return {destId:null,city,country:'',flag:'',emoji:document.getElementById('fEmoji').value.trim()||'📍',
+    return Object.assign({destId:null,city,country:'',flag:'',emoji:document.getElementById('fEmoji').value.trim()||'📍',
       lat:isNaN(lat)?null:lat,lng:isNaN(lng)?null:lng,
-      year,planned,rating:formRating,note};
+      year,planned,rating:formRating,note},dateExtra);
   }
   const d=DESTS.find(x=>x.id===sel);
-  return {destId:d.id,city:d.name,country:d.country,flag:d.flag,emoji:d.emoji,lat:d.lat,lng:d.lng,year,planned,rating:formRating,note};
+  if(!d) return null;
+  return Object.assign({destId:d.id,city:d.name,country:d.country,flag:d.flag,emoji:d.emoji,lat:d.lat,lng:d.lng,year,planned,rating:formRating,note},dateExtra);
 }
+function toggleDateField(){ const w=document.getElementById('dateWrap'); if(w) w.style.display=document.getElementById('fPlanned').checked?'block':'none'; }
 document.getElementById('saveTrip').addEventListener('click',()=>{
   const data=readForm(); if(!data) return; const isNew=!editingId;
   if(editingId){const i=trips.findIndex(t=>t.id===editingId);if(i>-1)trips[i]={...trips[i],...data};}
@@ -5548,6 +5554,7 @@ function editTrip(id){
     document.getElementById('fCity').value=t.city||'';document.getElementById('fLat').value=t.lat??'';
     document.getElementById('fLng').value=t.lng??'';document.getElementById('fEmoji').value=t.emoji||'';}
   document.getElementById('fYear').value=t.year||'';document.getElementById('fPlanned').checked=!!t.planned;
+  const fd=document.getElementById('fDate'); if(fd) fd.value=t.date||''; toggleDateField();
   document.getElementById('fNote').value=t.note||'';setRating(t.rating||0);
   showView('trips');document.querySelector('.formcard').scrollIntoView({behavior:'smooth'});
 }
@@ -5562,7 +5569,8 @@ function resetForm(){
   document.getElementById('customWrap').style.display='none';
   ['fCity','fLat','fLng','fEmoji','fNote'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('fYear').value=new Date().getFullYear();
-  document.getElementById('fPlanned').checked=false;buildDestSelect();setRating(0);
+  const fd=document.getElementById('fDate'); if(fd) fd.value='';
+  document.getElementById('fPlanned').checked=false;toggleDateField();buildDestSelect();setRating(0);
 }
 document.getElementById('cancelEdit').addEventListener('click',resetForm);
 
