@@ -69,6 +69,10 @@ Last updated: 2026-06-01
 - [x] **Login backdrop** — drifting clouds + flying plane
 - [x] **Journal departure date** for upcoming trips → accurate countdowns
 - [x] **Visited years on Explore cards**; **continents-collected strip (X/7)** on the World page
+- [x] **Optional Supabase cloud sync** (Journal → ☁️ Cloud sync) + favicon, Open Graph share previews, "Share" button, deploy-safe service worker, `main` branch
+- [x] **More Poppy boop lines** — 72 generic (incl. 24 cat jokes + light toilet humour) + 14 local-cat insults; mascot renamed Poppie → **Poppy**
+- [x] **Extra visited trips** — Dublin (Ireland 🇮🇪), San Francisco + Washington DC (Dec 2022), Switzerland 🇨🇭 + Austria 🇦🇹 (Jan 2023)
+- [x] **💖 Dream list (wishlist)** — heart any place (cards, detail), collected on Explore, shown on the map as heart pins, with 2 new badges (Big Dreamer / Sky is the Limit)
 
 ---
 
