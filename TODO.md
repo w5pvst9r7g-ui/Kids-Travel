@@ -66,19 +66,19 @@ Last updated: 2026-06-01
 - [x] **Direct-to-Rabat** flight info update ✈️
 
 ### Medium
-- [x] **Map polish (part)** — animated plane flying along the next-trip arc ✈️  ·  [ ] still: cluster the dense Australian pins
+- [x] **Map polish** — animated plane along the next-trip arc ✈️ · **dense pins now cluster** (e.g. the Australian east coast collapses to one badge at world zoom and splits apart as you zoom in; tap a cluster to list/zoom)
 - [x] Expanded Brisbane, Auckland, Barcelona, Whitsundays, Gold Coast, Melbourne, Miami, Fuerteventura to 8/8/10
-- [ ] **Weather / best-time** mini-widget per destination
-- [ ] **Language mini-quiz** ("how do you say…?") using the phrases data
+- [x] **Language mini-quiz** ("how do you say…?") — phrase-matching game on the Talk-like-a-local tab ✅
 - [ ] Compress the Poppie PNGs (~20 MB → ~1.5 MB) for faster loads *(needs an image tool / external compressor)*
+- [ ] ~~Weather / best-time mini-widget~~ — **deprioritised**: real weather needs a network API, and each guide's boarding pass already shows the "Best time" to go
 
-### Polish / delight
+### Polish / delight (next up)
 - [ ] First-run onboarding tip from Poppie
-- [ ] Map: tap a country to filter guides to it
-- [ ] "Share / print a passport page" for a trip
-- [ ] Sound effects / haptics (subtle, toggleable)
-- [ ] Remove unused Madagascar/Antarctica photo entries (cleanup)
 - [ ] Per-destination "fun fact of the day" rotation
+- [ ] "Share / print a passport page" for a trip
+- [ ] Map: tap a country to filter guides to it
+- [ ] Remove unused Madagascar/Antarctica photo entries (cleanup)
+- [ ] Sound effects / haptics (subtle, toggleable)
 
 ### Needs Grant's input / accounts
 - [ ] Supabase project (cloud sync) — create free project, share URL + anon key

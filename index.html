@@ -396,6 +396,23 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .pop .km{color:var(--teal-d);font-size:.8rem;font-weight:800;margin-top:6px}
 .pop .soonbadge{display:inline-block;background:var(--yellow);color:#5a3d00;font-weight:800;font-size:.68rem;
   letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:5px}
+/* map clusters */
+.cluster{background:none;border:none}
+.cluster .cluster-badge{width:42px;height:42px;border-radius:50%;background:#FF8366;border:3px solid #fff;
+  box-shadow:0 5px 12px rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--display),system-ui;font-weight:800;font-size:1.15rem;transition:transform .15s}
+.cluster.planned .cluster-badge{background:#FFC23C;color:#5a3d00}
+.cluster:hover .cluster-badge{transform:scale(1.12)}
+.pop.clus{min-width:190px}
+.clus-list{display:grid;gap:5px;margin:8px 0}
+.clus-row{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--surface-2);
+  border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer;font-family:var(--sans);transition:.12s}
+.clus-row[disabled]{cursor:default;opacity:.85}
+.clus-row:not([disabled]):hover{border-color:var(--teal);transform:translateX(2px)}
+.clus-row .cr-fl{font-size:1.1rem;flex:none}
+.clus-row .cr-nm{font-weight:800;color:var(--ink);font-size:.92rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clus-row .cr-yr{color:var(--muted);font-weight:800;font-size:.72rem;flex:none}
+.clus-row .cr-go{color:var(--teal-d);font-weight:800;flex:none}
 
 /* ============ JOURNAL ============ */
 .journal{display:grid;grid-template-columns:1fr;gap:22px}
@@ -4920,6 +4937,41 @@ function arc(a,b){const pts=[],n=54,mid={lat:(a.lat+b.lat)/2,lng:(a.lng+b.lng)/2
   return pts;}
 function pinIcon(color){return L.divIcon({className:'pin',iconSize:[30,38],iconAnchor:[15,37],popupAnchor:[0,-32],
   html:`<svg width="30" height="38" viewBox="0 0 30 38"><path d="M15 1C7.3 1 1 7.3 1 15c0 9.5 14 22 14 22s14-12.5 14-22C29 7.3 22.7 1 15 1z" fill="${color}" stroke="#fff" stroke-width="2.4"/><circle cx="15" cy="15" r="5" fill="#fff"/></svg>`});}
+let markerLayer=null, tripMarkers=[];
+function clusterIcon(n,planned){return L.divIcon({className:'cluster'+(planned?' planned':''),iconSize:[42,42],iconAnchor:[21,21],popupAnchor:[0,-18],
+  html:`<div class="cluster-badge">${n}</div>`});}
+/* group nearby trip pins into one badge so dense areas (e.g. the Australian
+   east coast) stay readable; re-runs on zoom. No external plugin needed. */
+function clusterMarkers(){
+  if(!map||typeof L==='undefined') return;
+  if(markerLayer){ markerLayer.remove(); markerLayer=null; }
+  markerLayer=L.layerGroup().addTo(map);
+  const z=map.getZoom();
+  const pts=tripMarkers.map(m=>({m:m,p:map.project([m.lat,m.lng],z)}));
+  const used=new Array(pts.length).fill(false), R=34;
+  for(let i=0;i<pts.length;i++){
+    if(used[i]) continue;
+    const group=[pts[i]]; used[i]=true;
+    for(let j=i+1;j<pts.length;j++){ if(!used[j] && pts[i].p.distanceTo(pts[j].p)<=R){ group.push(pts[j]); used[j]=true; } }
+    if(group.length===1){
+      const m=group[0].m;
+      L.marker([m.lat,m.lng],{icon:pinIcon(m.col)}).addTo(markerLayer).bindPopup(m.html);
+    } else {
+      const lat=group.reduce((s,g)=>s+g.m.lat,0)/group.length, lng=group.reduce((s,g)=>s+g.m.lng,0)/group.length;
+      const anyPlanned=group.every(g=>g.m.planned);
+      const gb=group.map(g=>[g.m.lat,g.m.lng]);
+      const list=group.map(g=>{const m=g.m;
+        return `<button class="clus-row" ${m.destId?`onclick="exploreFromMap('${m.destId}')"`:'disabled'}>
+          <span class="cr-fl">${esc(m.flag||'📍')}</span><span class="cr-nm">${esc(m.city)}</span>
+          <span class="cr-yr">${m.planned2?'soon':esc(m.year)}</span>${m.destId?'<span class="cr-go">→</span>':''}</button>`;}).join('');
+      const cm=L.marker([lat,lng],{icon:clusterIcon(group.length,anyPlanned),zIndexOffset:400}).addTo(markerLayer);
+      cm.bindPopup(`<div class="pop clus"><div class="ttl">📍 ${group.length} adventures here</div><div class="clus-list">${list}</div>
+        <button class="pop-explore" onclick="zoomCluster(${lat.toFixed(4)},${lng.toFixed(4)})">🔍 Zoom in here</button></div>`);
+      cm._gb=gb;
+    }
+  }
+}
+function zoomCluster(lat,lng){ if(map) map.flyTo([lat,lng],Math.min(map.getZoom()+3,9),{duration:.6}); }
 function drawArc(line){ if(reduceMotion) return;
   try{const p=line._path; if(!p||!p.getTotalLength) return; const len=p.getTotalLength();
     p.style.transition='none';p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.getBoundingClientRect();
@@ -4971,23 +5023,27 @@ function buildMap(){
       .bindPopup(`<div class="pop"><div class="ttl">🏠 Home Base</div><div class="sub">${H.flag} ${H.name}, ${H.country}</div><div class="nt">${eid==='australia'?'Where the early adventures began!':'Where every adventure begins now!'}</div></div>`);
     bounds.push([H.lat,H.lng]);
   });
+  tripMarkers=[];
   trips.forEach(t=>{
     if(t.lat==null||t.lng==null) return;
     const origin=originFor(t), dest={lat:t.lat,lng:t.lng}, col=t.planned?'#FFC23C':'#FF8366';
     const line=L.polyline(arc(origin,dest),{color:col,weight:3,opacity:.92,dashArray:t.planned?'1 8':null,lineCap:'round'}).addTo(layer);
     drawArc(line);
     const d=DESTS.find(x=>x.id===t.destId),kw=d?d.photos[0][0]:(t.city||'travel'),lk=d?d.photos[0][2]:(t.year||1),th=themeFor(d);
-    L.marker([t.lat,t.lng],{icon:pinIcon(col)}).addTo(layer).bindPopup(
-      `<div class="pop"><div class="pframe frame" style="${frameStyle(th)}">${sticker(t.emoji||(d&&d.emoji))}${d?dpic(d.id,'hero',lk,360,220,t.city,kw):pimg(kw,lk,360,220,t.city)}</div>`
+    const html=`<div class="pop"><div class="pframe frame" style="${frameStyle(th)}">${sticker(t.emoji||(d&&d.emoji))}${d?dpic(d.id,'hero',lk,360,220,t.city,kw):pimg(kw,lk,360,220,t.city)}</div>`
       +(t.planned?'<span class="soonbadge">Coming up</span>':'')
       +`<div class="ttl">${esc(t.city)}</div><div class="sub">${esc(t.flag)} ${esc(t.country)} · ${esc(t.year)}</div>`
       +(t.rating?`<div>${stars(t.rating)}</div>`:'')
       +(t.note?`<div class="nt">“${esc(t.note)}”</div>`:'')
       +`<div class="km">✈️ ${haversine(origin,dest).toLocaleString()} km from ${esc(origin.name)}</div>`
       +(d?`<button class="pop-explore" onclick="exploreFromMap('${d.id}')">🔎 Explore ${esc(d.name)} →</button>`:'')
-      +`</div>`);
+      +`</div>`;
+    tripMarkers.push({lat:t.lat,lng:t.lng,col:col,planned:!!t.planned,html:html,
+      city:t.city,flag:t.flag,year:t.year,planned2:t.planned,destId:d?d.id:null});
     bounds.push([t.lat,t.lng]);
   });
+  clusterMarkers();
+  if(!map._clusterBound){ map.on('zoomend',clusterMarkers); map._clusterBound=true; }
   if(bounds.length>1) map.fitBounds(bounds,{padding:[60,60]});
   setTimeout(()=>map.invalidateSize(),60);
   /* animate a little plane flying along the arc to the next trip */
