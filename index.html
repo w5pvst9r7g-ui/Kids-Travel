@@ -507,8 +507,24 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .pin-err{color:var(--coral-d);font-weight:800;min-height:1.3em;margin:10px 0 4px}
 @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(6px)}50%{transform:translateX(-9px)}}
 .shake{animation:shake .4s}
-#profileChip{display:none;align-items:center;gap:7px;background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:800;color:var(--ink);font-size:.9rem;cursor:pointer}
+#profileChip{display:none;align-items:center;gap:7px;background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:800;color:var(--ink);font-size:.9rem;cursor:pointer}
 #profileChip:hover{border-color:var(--teal)}
+#profileChip .av-svg{width:22px;height:22px;display:inline-block}
+.av-svg{display:inline-flex;vertical-align:middle}.av-svg svg{width:100%;height:100%;display:block}
+.profile-card{position:relative}
+.profile-btn .av{font-size:3.2rem;display:flex;align-items:center;justify-content:center;line-height:1;height:54px}
+.profile-btn .av .av-svg{width:56px;height:56px}
+.av-edit{position:absolute;top:-8px;right:-8px;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:#fff;cursor:pointer;font-size:.95rem;box-shadow:var(--shadow-sm)}
+.av-edit:hover{border-color:var(--teal);transform:scale(1.08)}
+.amodal{position:fixed;inset:0;z-index:5500;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(20,22,40,.55);backdrop-filter:blur(3px)}
+.amodal.hidden{display:none}
+.amodal-card{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:24px;text-align:center;max-height:86vh;overflow:auto}
+.amodal-card h3{font-size:1.35rem;margin-bottom:16px}
+.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:10px}
+.av-choice{aspect-ratio:1;border:2px solid var(--line);border-radius:16px;background:var(--surface-2);cursor:pointer;font-size:2rem;display:flex;align-items:center;justify-content:center;transition:.12s;padding:6px}
+.av-choice:hover{transform:translateY(-3px) scale(1.05);border-color:var(--teal)}
+.av-choice.sel{border-color:var(--teal);background:#e7faf8;box-shadow:0 0 0 3px rgba(19,181,172,.18)}
+.av-choice .av-svg{width:100%;height:100%}
 @media(prefers-reduced-motion:reduce){.profile-btn:hover{transform:none}.shake{animation:none}}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
@@ -560,6 +576,14 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <button class="btn btn-primary" id="pinGo" style="width:100%;justify-content:center">Let's go! →</button>
       <button class="btn-text" id="pinBack" style="width:100%;justify-content:center;margin-top:6px">← Choose someone else</button>
     </div>
+  </div>
+</div>
+
+<div id="avatarModal" class="amodal hidden">
+  <div class="amodal-card">
+    <h3>Pick <span id="avName"></span>'s icon</h3>
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <button class="btn btn-primary" id="avClose" style="width:100%;justify-content:center;margin-top:14px">Done</button>
   </div>
 </div>
 
@@ -2980,26 +3004,50 @@ function finishQuiz(){
 }
 
 /* ===== login / profile gate ===== */
-let pendingProfile=null;
+let pendingProfile=null, avatarEditing=null;
+/* —— avatars: each kid picks their own icon —— */
+const DEFAULT_AVATARS={hailey:'🐱', jeanluc:'pokeball'};
+const SVG_AVATARS={
+  pokeball:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#26262B" stroke-width="6"/><path d="M7 50a43 43 0 0 1 86 0z" fill="#FF5350"/><rect x="7" y="46" width="86" height="9" fill="#26262B"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#26262B" stroke-width="6"/><circle cx="50" cy="50" r="5" fill="#fff" stroke="#26262B" stroke-width="3"/></svg>`,
+  poppie:`<svg viewBox="0 0 100 100" aria-hidden="true">${POPPIE_FACE}</svg>`
+};
+const AVATAR_CHOICES=['🐱','🐶','🦊','🦄','🐲','🐉','🦖','🦕','pokeball','⚡','👾','🤖','🐧','🦁','🐯','🐨','🐼','🐸','🦉','🦋','🐢','🦜','🐙','🦈','🐝','poppie','🌟','🚀','⚽','🎮','🦸','🧚'];
+function avatarFor(id){ try{return localStorage.getItem('globie_avatar_'+id)||DEFAULT_AVATARS[id]||'🙂';}catch(e){return DEFAULT_AVATARS[id]||'🙂';} }
+function avatarHTML(av){ return SVG_AVATARS[av]?`<span class="av-svg">${SVG_AVATARS[av]}</span>`:`<span>${esc(av)}</span>`; }
+function setAvatar(id,av){ try{localStorage.setItem('globie_avatar_'+id,av);}catch(e){} renderProfilePick(); updateProfileChip(); if(document.getElementById('avatarGrid')) renderAvatarGrid(); }
 function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) return;
   s.classList.remove('hidden');
   document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false;
-  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; }
+  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); }
 function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
-  if(p){ c.style.display='inline-flex'; c.innerHTML='<span aria-hidden="true">'+p.emoji+'</span> '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
+  if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest();
   renderFeatured(); renderFilters(); renderGrid(); renderPassport(); checkAchievements({silent:true}); if(map) initMap(); }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('explore'); }
+function renderProfilePick(){
+  const wrap=document.getElementById('profilePick'); if(!wrap) return;
+  wrap.innerHTML=PROFILES.map(p=>`<div class="profile-card">
+    <button class="profile-btn" data-p="${p.id}"><span class="av">${avatarHTML(avatarFor(p.id))}</span><span class="nm">${esc(p.name)}</span></button>
+    <button class="av-edit" data-edit="${p.id}" aria-label="Change ${esc(p.name)}'s icon" title="Change icon">✏️</button></div>`).join('');
+  wrap.querySelectorAll('.profile-btn').forEach(b=>b.addEventListener('click',()=>pickProfile(b.dataset.p)));
+  wrap.querySelectorAll('.av-edit').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openAvatarPicker(b.dataset.edit);}));
+}
+function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id);
+  document.getElementById('profilePick').hidden=true; document.getElementById('pinPad').hidden=false;
+  document.getElementById('pinGreet').textContent='Hi '+p.name+'! Enter your secret code 🔑';
+  document.getElementById('pinErr').textContent='';
+  const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60); }
+function openAvatarPicker(id){ avatarEditing=id; const p=PROFILES.find(x=>x.id===id);
+  const n=document.getElementById('avName'); if(n) n.textContent=p?p.name:'';
+  renderAvatarGrid(); document.getElementById('avatarModal').classList.remove('hidden'); }
+function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!g) return; const cur=avatarFor(avatarEditing);
+  g.innerHTML=AVATAR_CHOICES.map(a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`).join('');
+  g.querySelectorAll('.av-choice').forEach(b=>b.addEventListener('click',()=>setAvatar(avatarEditing,b.dataset.a))); }
 function setupLogin(){
   const mk=document.getElementById('loginMark'); if(mk) mk.innerHTML=POPPIE_FACE;
-  document.querySelectorAll('#profilePick .profile-btn').forEach(b=>b.addEventListener('click',()=>{
-    pendingProfile=b.dataset.p; const p=PROFILES.find(x=>x.id===pendingProfile);
-    document.getElementById('profilePick').hidden=true; document.getElementById('pinPad').hidden=false;
-    document.getElementById('pinGreet').textContent='Hi '+p.name+'! Enter your secret code 🔑';
-    document.getElementById('pinErr').textContent='';
-    const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60);
-  }));
+  renderProfilePick();
+  const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>document.getElementById('avatarModal').classList.add('hidden'));
   document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
   const submit=()=>{ const v=document.getElementById('pinInput').value.trim();
     if(v===PROFILE_PIN){ signIn(pendingProfile); }
