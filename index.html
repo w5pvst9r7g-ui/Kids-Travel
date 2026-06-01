@@ -373,6 +373,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .badge-ribbon .sub{color:var(--ink-2);font-weight:700;font-size:.9rem}
 .badge-ribbon .bar{height:10px;background:var(--line);border-radius:10px;margin-top:7px;overflow:hidden;width:200px;max-width:46vw}
 .badge-ribbon .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--coral));border-radius:10px;transition:width .8s ease}
+.heart-pin{background:none;border:none;font-size:1.5rem;text-align:center;line-height:1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35))}
 .map-tools{display:flex;justify-content:flex-end;margin:0 0 10px}
 .map-tools .btn{padding:9px 16px}
 .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;color:var(--ink-2);font-weight:700;font-size:.85rem}
@@ -1132,6 +1133,7 @@ create policy "atlas all" on atlas_sync
       <span><span class="leg-dot" style="background:#FFC23C"></span> Coming up next</span>
       <span><span class="leg-dot" style="background:#43C28A"></span> Home · Sunshine Coast 🇦🇺</span>
       <span><span class="leg-dot" style="background:#13B5AC"></span> Home · Dublin 🇮🇪</span>
+      <span>💖 Dream list</span>
     </div>
     <div class="stats" id="stats"></div>
   </section>
@@ -5422,6 +5424,12 @@ function buildMap(){
   });
   clusterMarkers();
   if(!map._clusterBound){ map.on('zoomend',clusterMarkers); map._clusterBound=true; }
+  /* dream-list places (hearted, not yet visited or booked) as pink heart pins */
+  if(typeof wishlist!=='undefined'){ const onMap=new Set(trips.map(t=>t.destId));
+    wishlist.forEach(id=>{ if(onMap.has(id)) return; const d=DESTS.find(x=>x.id===id); if(!d||d.lat==null) return;
+      L.marker([d.lat,d.lng],{icon:L.divIcon({className:'heart-pin',html:'💖',iconSize:[30,30],iconAnchor:[15,28],popupAnchor:[0,-24]}),zIndexOffset:300}).addTo(layer)
+        .bindPopup(`<div class="pop"><div class="ttl">💖 ${esc(d.name)}</div><div class="sub">${esc(d.flag)} ${esc(d.country)} · on your dream list</div><button class="pop-explore" onclick="exploreFromMap('${d.id}')">🔎 Explore ${esc(d.name)} →</button></div>`);
+      bounds.push([d.lat,d.lng]); }); }
   if(bounds.length>1) map.fitBounds(bounds,{padding:[60,60]});
   setTimeout(()=>map.invalidateSize(),60);
   /* animate a little plane flying along the arc to the next trip */
