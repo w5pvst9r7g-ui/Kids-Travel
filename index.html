@@ -770,6 +770,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   background:var(--surface);border:2px solid var(--line);border-radius:var(--r-xl);padding:18px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .18s,box-shadow .18s}
 .catcover:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .catcover-badge{position:absolute;top:8px;left:8px;z-index:5;background:var(--coral-d);color:#fff;font-family:var(--display);font-weight:800;font-size:.72rem;letter-spacing:.04em;padding:4px 10px;border-radius:999px;box-shadow:0 2px 7px rgba(0,0,0,.25)}
+.cover-read{position:absolute;top:8px;right:8px;z-index:5;background:var(--green-d);color:#fff;font-family:var(--display);font-weight:800;font-size:.72rem;padding:4px 10px;border-radius:999px;box-shadow:0 2px 7px rgba(0,0,0,.25)}
 @media(max-width:560px){.catcover{grid-template-columns:1fr}}
 .catcover-pic{margin:0;position:relative;aspect-ratio:1;border-radius:var(--r-lg);overflow:hidden;border:3px solid #fff;outline:1px solid var(--line)}
 .catcover-pic img{object-position:50% 35%}
@@ -4686,7 +4687,11 @@ function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(t
 let trips=loadTrips();
 let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null, planeTimer=null;
 /* —— local-cat story reader (full-screen page-turner) —— */
-let storyPages=[], storyPage=0, storyCat=null;
+let storyPages=[], storyPage=0, storyCat=null, storyId=null, storyIndex=0;
+function loadStoriesRead(){ try{const s=localStorage.getItem(dataKey('stories')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
+let storiesRead=loadStoriesRead();
+function markStoryRead(id,si){ const k=id+':'+si; if(storiesRead.has(k)) return; storiesRead.add(k);
+  try{localStorage.setItem(dataKey('stories'),JSON.stringify([...storiesRead]));}catch(e){} }
 function normalizeCatPages(c){ if(!c) return [];
   if(c.pages&&c.pages.length) return c.pages.map(p=>typeof p==='string'?p:((p.title?'**'+p.title+'**\n\n':'')+(p.text||'')));
   if(c.stories&&c.stories.length) return c.stories.map(s=>typeof s==='string'?s:((s.title?'**'+s.title+'**\n\n':'')+(s.text||'')));
@@ -4702,7 +4707,8 @@ function catStories(c){ if(!c) return [];
 function openStory(id,si){
   const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[id]; if(!c) return;
   const stories=catStories(c); if(!stories.length) return;
-  const story=stories[Math.max(0,Math.min(si||0,stories.length-1))];
+  storyIndex=Math.max(0,Math.min(si||0,stories.length-1)); storyId=id;
+  const story=stories[storyIndex];
   storyCat=c; storyPages=story.pages.slice(); storyPage=0;
   const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=story.title;
   const img=document.getElementById('storyCatImg');
@@ -4726,10 +4732,18 @@ function renderStoryPage(){
   const dots=document.getElementById('storyDots'); if(dots) dots.innerHTML=storyPages.map((_,i)=>`<span class="catdot ${i===storyPage?'on':''}"></span>`).join('');
   const pv=document.getElementById('storyPrev'), nx=document.getElementById('storyNext');
   if(pv) pv.style.visibility=storyPage===0?'hidden':'visible';
-  if(nx) nx.textContent=storyPage>=storyPages.length-1?'The End 🐾':'Next ›';
+  const last=storyPage>=storyPages.length-1;
+  if(nx) nx.textContent=last?'The End 🐾':'Next ›';
+  if(last&&storyId!=null) markStoryRead(storyId,storyIndex);  /* finished this tale */
 }
 function storyGo(d){ storyPage+=d; renderStoryPage(); }
-function closeStory(){ const o=document.getElementById('storyReader'); if(o) o.classList.add('hidden'); }
+function closeStory(){ const o=document.getElementById('storyReader'); if(o) o.classList.add('hidden');
+  /* if the tale was finished, mark its cover with a ✓ Read badge (in place) */
+  if(storyId!=null && storiesRead.has(storyId+':'+storyIndex)){
+    const panel=document.getElementById('panel-cat');
+    const covers=panel?panel.querySelectorAll('.catcover'):[];
+    const cov=covers[storyIndex], pic=cov&&cov.querySelector('.catcover-pic');
+    if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
 /* —— photo lightbox —— */
 function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=d.photos.length; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex];
@@ -4966,8 +4980,9 @@ function openDest(id){
       : `Meet ${esc(c.name)} — tap the storybook to read their adventure 🐈`;
     const covers=stories.map((s,si)=>{
       const n=s.pages.length;
+      const read=(typeof storiesRead!=='undefined')&&storiesRead.has(d.id+':'+si);
       return `<button class="catcover" onclick="openStory('${d.id}',${si})">
-        <figure class="catcover-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${multi?`<span class="catcover-badge">Tale ${si+1}</span>`:''}${pimg(kw,(d.id.length*13+7+si*5),700,560,c.name)}</figure>
+        <figure class="catcover-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${multi?`<span class="catcover-badge">Tale ${si+1}</span>`:''}${read?'<span class="cover-read">✓ Read</span>':''}${pimg(kw,(d.id.length*13+7+si*5),700,560,c.name)}</figure>
         <div class="catcover-info">
           <div class="catcover-name">${esc(c.name)}</div>
           <div class="catcover-title">“${esc(s.title)}”</div>
@@ -5923,7 +5938,7 @@ function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.cl
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
-function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); celebratedTrip=null;
+function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); storiesRead=loadStoriesRead(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function profileName(){ const p=PROFILES.find(x=>x.id===currentProfile); return p?p.name:''; }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
