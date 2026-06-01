@@ -1742,17 +1742,19 @@ const CONTINENT_OF={Ireland:'Europe',Finland:'Europe',Greece:'Europe',Spain:'Eur
 const continentOf=t=>CONTINENT_OF[t.country]||null;
 const ACHIEVEMENTS=[
   {id:'first_flight',em:'🛫',nm:'First Flight',ds:'Save your first trip',ac:'#13B5AC',test:c=>c.visited.length>=1},
-  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy place',ac:'#46B3F0',test:c=>c.regions.has('Snow')},
-  {id:'reef_explorer',em:'🐠',nm:'Reef Explorer',ds:'Visit a beach or island',ac:'#0FA7AF',test:c=>c.regions.has('Beach')},
-  {id:'city_slicker',em:'🏙️',nm:'City Slicker',ds:'Visit a big city',ac:'#F46A4B',test:c=>c.regions.has('City')},
-  {id:'wild_one',em:'🦎',nm:'Wild One',ds:'Visit a wildlife spot',ac:'#43C28A',test:c=>c.regions.has('Wildlife')},
+  {id:'down_under',em:'🦘',nm:'Down Under',ds:'Visit Australia',ac:'#43C28A',test:c=>c.countries.has('Australia')},
+  {id:'african_safari',em:'🦁',nm:'African Adventure',ds:'Visit Africa',ac:'#F0A91E',test:c=>c.continents.has('Africa')},
+  {id:'island_hopper',em:'🏝️',nm:'Island Hopper',ds:'Visit an island nation',ac:'#0FA7AF',test:c=>['Maldives','New Zealand','Vanuatu','Singapore','Iceland'].some(n=>c.countries.has(n))},
+  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland/Lapland)',ac:'#5BB8F0',test:c=>c.countries.has('Iceland')||c.countries.has('Finland')},
+  {id:'stars_stripes',em:'🗽',nm:'Stars & Stripes',ds:'Visit the United States',ac:'#46B3F0',test:c=>c.countries.has('United States')},
+  {id:'euro_explorer',em:'🏰',nm:'Euro Explorer',ds:'Visit 3 European countries',ac:'#F46A4B',test:c=>(c.continentCounts.Europe||0)>=3},
   {id:'five_countries',em:'🖐️',nm:'5 Countries',ds:'Visit 5 different countries',ac:'#FFC23C',test:c=>c.countries.size>=5},
   {id:'continent_hop',em:'🌐',nm:'Continent Hopper',ds:'Reach 3 continents',ac:'#7C6CF4',test:c=>c.continents.size>=3},
-  {id:'polar',em:'🐧',nm:'Polar Pioneer',ds:'Reach Antarctica',ac:'#48cae4',test:c=>c.continents.has('Antarctica')},
-  {id:'around_world',em:'🌍',nm:'Around the World',ds:'Fly 40,000 km in total',ac:'#FF7FB0',test:c=>c.km>=40000},
+  {id:'five_continents',em:'🌏',nm:'World Wanderer',ds:'Reach all 5 continents',ac:'#FF7FB0',test:c=>c.continents.size>=5},
+  {id:'around_world',em:'🌍',nm:'Around the World',ds:'Fly 40,000 km in total',ac:'#13B5AC',test:c=>c.km>=40000},
   {id:'super_fan',em:'⭐',nm:'Super Fan',ds:'Give a trip 5 fun stars',ac:'#F0A91E',test:c=>c.visited.some(t=>t.rating>=5)},
   {id:'planner',em:'🗓️',nm:'Trip Planner',ds:'Plan an upcoming trip',ac:'#7C6CF4',test:c=>c.planned.length>=1},
-  {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 8 trips in all',ac:'#FF8366',test:c=>c.visited.length>=8}
+  {id:'collector',em:'🏆',nm:'Atlas Champion',ds:'Take 10 trips in all',ac:'#FF8366',test:c=>c.visited.length>=10}
 ];
 function loadAch(){ try{const s=localStorage.getItem(ACH_KEY); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(ACH_KEY,JSON.stringify([...set]));}catch(e){} }
@@ -1762,8 +1764,9 @@ function achContext(){
   const countries=new Set(visited.map(t=>t.country).filter(Boolean));
   const continents=new Set(visited.map(continentOf).filter(Boolean));
   const regions=new Set(visited.map(t=>{const d=DESTS.find(x=>x.id===t.destId);return d&&d.region;}).filter(Boolean));
+  const continentCounts={}; countries.forEach(co=>{ const k=CONTINENT_OF[co]; if(k) continentCounts[k]=(continentCounts[k]||0)+1; });
   let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
-  return {visited,planned,countries,continents,regions,km};
+  return {visited,planned,countries,continents,regions,continentCounts,km};
 }
 function renderAchievements(){
   const host=document.getElementById('achShelf'); if(!host) return;
