@@ -523,6 +523,9 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .ach .nm{font-family:var(--display);font-weight:800;font-size:.92rem;color:var(--ink);margin-top:7px;line-height:1.15}
 .ach .ds{font-size:.74rem;color:var(--ink-2);font-weight:700;margin-top:3px;line-height:1.3}
 .ach.locked .nm,.ach.locked .ds{color:var(--muted)}
+.ach-prog{height:6px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}
+.ach-prog i{display:block;height:100%;background:var(--ac,var(--teal));border-radius:6px;transition:width .8s ease}
+.ach-progt{font-size:.66rem;font-weight:800;color:var(--muted);margin-top:4px;letter-spacing:.02em}
 .ach .lock{position:absolute;top:9px;right:10px;font-size:.86rem;opacity:.5}
 @keyframes achPop{0%{transform:scale(.4);opacity:0}55%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 .ach.justpop{animation:achPop .5s cubic-bezier(.2,.8,.3,1.2)}
@@ -5618,14 +5621,29 @@ function achContext(){
   let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
   return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size};
 }
+function badgeProgress(a,c){
+  const P={
+    five_countries:[c.countries.size,5],ten_countries:[c.countries.size,10],fifteen:[c.countries.size,15],twentyc:[c.countries.size,20],
+    collector:[c.visited.length,10],globetrotter:[c.visited.length,20],mega:[c.visited.length,30],forty:[c.visited.length,40],fifty:[c.visited.length,50],
+    continent_hop:[c.continents.size,3],five_continents:[c.continents.size,5],seven:[c.continents.size,7],
+    around_world:[Math.round(c.km),40000,'km'],longhaul:[Math.round(c.km),150000,'km'],millionmiler:[Math.round(c.km),300000,'km'],
+    five_star:[c.visited.filter(t=>t.rating>=5).length,5],euro_explorer:[c.continentCounts.Europe||0,3],
+    cat_tales:[c.catsRead,3],cat_whisperer:[c.catsRead,10],tale_master:[c.catsRead,20]
+  };
+  const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
+}
 function renderAchievements(){
   const host=document.getElementById('achShelf'); if(!host) return;
+  const ctx=achContext();
   const got=ACHIEVEMENTS.filter(a=>unlockedAch.has(a.id)).length;
+  const fmt=(v,u)=>v.toLocaleString()+(u?(' '+u):'');
   host.innerHTML=`<div class="head"><h3>🏅 Explorer Badges</h3><span class="count">${got} / ${ACHIEVEMENTS.length} collected</span></div>
-    <div class="ach-grid">${ACHIEVEMENTS.map(a=>{const on=unlockedAch.has(a.id);
-      return `<div class="ach ${on?'unlocked':'locked'}" style="--ac:${a.ac}" tabindex="0" role="group" aria-label="${esc(a.nm)}. ${on?'Unlocked':'Locked'}. ${esc(a.ds)}.">
+    <div class="ach-grid">${ACHIEVEMENTS.map(a=>{const on=unlockedAch.has(a.id); const pr=on?null:badgeProgress(a,ctx);
+      const pct=pr?Math.min(100,Math.round(pr.have/pr.need*100)):0;
+      return `<div class="ach ${on?'unlocked':'locked'}" style="--ac:${a.ac}" tabindex="0" role="group" aria-label="${esc(a.nm)}. ${on?'Unlocked':'Locked'}. ${esc(a.ds)}.${pr?(' Progress '+fmt(pr.have,pr.unit)+' of '+fmt(pr.need,pr.unit)+'.'):''}">
         ${on?'':'<span class="lock" aria-hidden="true">🔒</span>'}<div class="em" aria-hidden="true">${a.em}</div>
-        <div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div>`;}).join('')}</div>`;
+        <div class="nm">${a.nm}</div><div class="ds">${a.ds}</div>
+        ${pr?`<div class="ach-prog" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="ach-progt">${fmt(pr.have,pr.unit)} / ${fmt(pr.need,pr.unit)}</div>`:''}</div>`;}).join('')}</div>`;
 }
 function checkAchievements(opts){
   const ctx=achContext(); const fresh=[]; const now=new Set();
