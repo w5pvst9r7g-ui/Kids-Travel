@@ -536,6 +536,19 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .phrase .ph-en{font-weight:800;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
 .phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0}
 .phrase .ph-say{font-weight:700;color:var(--ink-2);font-size:.92rem}
+/* dramatic countdown hero */
+.cd-hero{position:relative;border-radius:var(--r-xl);overflow:hidden;min-height:clamp(320px,52vh,460px);display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);background:linear-gradient(140deg,var(--g1,#13B5AC),var(--g2,#46B3F0))}
+.cd-bg{position:absolute;inset:0}.cd-bg img{width:100%;height:100%;object-fit:cover}
+.cd-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,22,40,.4),rgba(20,22,40,.72))}
+.cd-inner{position:relative;z-index:2;color:#fff;padding:26px}
+.cd-eyebrow{display:inline-block;font-family:var(--display);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem;color:#FFD86B;background:rgba(0,0,0,.28);padding:6px 15px;border-radius:999px}
+.cd-count{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0 8px}
+.cd-num{font-family:var(--display);font-weight:800;font-size:clamp(4.5rem,19vw,8.5rem);line-height:.85;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.45);animation:cdpop 2.4s ease-in-out infinite}
+@keyframes cdpop{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.cd-lab{font-family:var(--display);font-weight:800;font-size:1.6rem;text-align:left;line-height:1.05;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.cd-place{color:#fff;font-size:clamp(1.7rem,5.5vw,2.6rem);text-shadow:0 2px 18px rgba(0,0,0,.55);margin:2px 0}
+.cd-date{font-weight:800;color:#fff;opacity:.95;margin:6px 0 18px;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+@media(prefers-reduced-motion:reduce){.cd-num{animation:none}}
 @media(prefers-reduced-motion:reduce){.profile-btn:hover{transform:none}.shake{animation:none}}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
@@ -2331,6 +2344,541 @@ const REMAINING_GUIDES = [
 ];
 DESTS.push(...REMAINING_GUIDES);
 
+/* ---- language phrases (stream) ---- */
+/* Poppie's Atlas — Languages feature
+ * Kid-friendly phrases for every language across our destinations.
+ * For non-Latin scripts (Greek, Arabic, Dhivehi) we use Latin transliteration
+ * so kids can read along. "say" = simple say-it-like-this pronunciation.
+ * English destinations teach FUN LOCAL LINGO instead of plain translations.
+ */
+
+const LANG_PHRASES = {
+  "French": {
+    native: "Français", flag: "🇫🇷",
+    phrases: [
+      {en:"Hello", local:"Bonjour", say:"bon-ZHOOR"},
+      {en:"Goodbye", local:"Au revoir", say:"oh ruh-VWAH"},
+      {en:"Please", local:"S'il vous plaît", say:"seel voo PLEH"},
+      {en:"Thank you", local:"Merci", say:"mair-SEE"},
+      {en:"Yes", local:"Oui", say:"WEE"},
+      {en:"No", local:"Non", say:"NOH(n)"},
+      {en:"My name is…", local:"Je m'appelle…", say:"zhuh ma-PELL"},
+      {en:"How are you?", local:"Ça va?", say:"sah VAH?"},
+      {en:"Where is the toilet?", local:"Où sont les toilettes?", say:"oo soh lay twa-LET?"},
+      {en:"How much is it?", local:"C'est combien?", say:"say kom-bee-YEN?"},
+      {en:"Can I have an ice cream please?", local:"Une glace, s'il vous plaît?", say:"oon GLASS, seel voo PLEH?"},
+      {en:"Water please", local:"De l'eau, s'il vous plaît", say:"duh LOH, seel voo PLEH"},
+      {en:"Help!", local:"Au secours!", say:"oh suh-KOOR!"},
+      {en:"Wow / Cool!", local:"Super!", say:"soo-PAIR!"},
+      {en:"One, Two, Three", local:"Un, deux, trois", say:"uh, DUH, TRWAH"}
+    ]
+  },
+
+  "Spanish": {
+    native: "Español", flag: "🇪🇸",
+    phrases: [
+      {en:"Hello", local:"Hola", say:"OH-lah"},
+      {en:"Goodbye", local:"Adiós", say:"ah-dee-OHS"},
+      {en:"Please", local:"Por favor", say:"por fah-VOR"},
+      {en:"Thank you", local:"Gracias", say:"GRAH-see-ahs"},
+      {en:"Yes", local:"Sí", say:"SEE"},
+      {en:"No", local:"No", say:"NOH"},
+      {en:"My name is…", local:"Me llamo…", say:"meh YAH-moh"},
+      {en:"How are you?", local:"¿Cómo estás?", say:"KOH-moh es-TAHS?"},
+      {en:"Where is the toilet?", local:"¿Dónde está el baño?", say:"DON-deh es-TAH el BAH-nyoh?"},
+      {en:"How much is it?", local:"¿Cuánto cuesta?", say:"KWAN-toh KWES-tah?"},
+      {en:"Can I have an ice cream please?", local:"Un helado, por favor", say:"oon eh-LAH-doh, por fah-VOR"},
+      {en:"Water please", local:"Agua, por favor", say:"AH-gwah, por fah-VOR"},
+      {en:"Help!", local:"¡Ayuda!", say:"ah-YOO-dah!"},
+      {en:"Wow / Cool!", local:"¡Genial!", say:"heh-nee-AHL!"},
+      {en:"One, Two, Three", local:"Uno, dos, tres", say:"OO-noh, DOSS, TRESS"}
+    ]
+  },
+
+  "Portuguese": {
+    native: "Português", flag: "🇵🇹",
+    phrases: [
+      {en:"Hello", local:"Olá", say:"oh-LAH"},
+      {en:"Goodbye", local:"Adeus", say:"ah-DEH-oosh"},
+      {en:"Please", local:"Por favor", say:"poor fah-VOR"},
+      {en:"Thank you", local:"Obrigado / Obrigada", say:"oh-bree-GAH-doo (boys) / -dah (girls)"},
+      {en:"Yes", local:"Sim", say:"SEENG"},
+      {en:"No", local:"Não", say:"NOWNG"},
+      {en:"My name is…", local:"Chamo-me…", say:"SHAH-moo-muh"},
+      {en:"How are you?", local:"Tudo bem?", say:"TOO-doo BENG?"},
+      {en:"Where is the toilet?", local:"Onde é a casa de banho?", say:"OND-eh eh ah KAH-zah duh BAH-nyoo?"},
+      {en:"How much is it?", local:"Quanto custa?", say:"KWAN-too KOOSH-tah?"},
+      {en:"Can I have an ice cream please?", local:"Um gelado, por favor", say:"oong zhuh-LAH-doo, poor fah-VOR"},
+      {en:"Water please", local:"Água, por favor", say:"AH-gwah, poor fah-VOR"},
+      {en:"Help!", local:"Socorro!", say:"soo-KOH-rroo!"},
+      {en:"Wow / Cool!", local:"Fixe!", say:"FEESH!"},
+      {en:"One, Two, Three", local:"Um, dois, três", say:"OONG, DOYSH, TRESH"}
+    ]
+  },
+
+  "Greek": {
+    native: "Ελληνικά (Elliniká)", flag: "🇬🇷",
+    phrases: [
+      {en:"Hello", local:"Yiá sou", say:"YAH soo"},
+      {en:"Goodbye", local:"Antío", say:"ah-DEE-oh"},
+      {en:"Please", local:"Parakaló", say:"pah-rah-kah-LOH"},
+      {en:"Thank you", local:"Efcharistó", say:"ef-hah-ree-STOH"},
+      {en:"Yes", local:"Ne", say:"NEH"},
+      {en:"No", local:"Óchi", say:"OH-hee"},
+      {en:"My name is…", local:"Me léne…", say:"meh LEH-neh"},
+      {en:"How are you?", local:"Ti kánis?", say:"tee KAH-niss?"},
+      {en:"Where is the toilet?", local:"Pou íne i toualéta?", say:"poo EE-neh ee twa-LEH-tah?"},
+      {en:"How much is it?", local:"Póso káni?", say:"POH-soh KAH-nee?"},
+      {en:"Can I have an ice cream please?", local:"Éna pagotó, parakaló", say:"EH-nah pah-goh-TOH, pah-rah-kah-LOH"},
+      {en:"Water please", local:"Neró, parakaló", say:"neh-ROH, pah-rah-kah-LOH"},
+      {en:"Help!", local:"Voíthia!", say:"VOH-ee-thee-ah!"},
+      {en:"Wow / Cool!", local:"Téleio!", say:"TEH-lee-oh!"},
+      {en:"One, Two, Three", local:"Éna, dío, tría", say:"EH-nah, THEE-oh, TREE-ah"}
+    ]
+  },
+
+  "Croatian": {
+    native: "Hrvatski", flag: "🇭🇷",
+    phrases: [
+      {en:"Hello", local:"Bok", say:"BOHK"},
+      {en:"Goodbye", local:"Doviđenja", say:"doh-vee-JEN-yah"},
+      {en:"Please", local:"Molim", say:"MOH-leem"},
+      {en:"Thank you", local:"Hvala", say:"HVAH-lah"},
+      {en:"Yes", local:"Da", say:"DAH"},
+      {en:"No", local:"Ne", say:"NEH"},
+      {en:"My name is…", local:"Zovem se…", say:"ZOH-vem seh"},
+      {en:"How are you?", local:"Kako si?", say:"KAH-koh see?"},
+      {en:"Where is the toilet?", local:"Gdje je WC?", say:"g-DYEH yeh VEH-tseh?"},
+      {en:"How much is it?", local:"Koliko košta?", say:"KOH-lee-koh KOSH-tah?"},
+      {en:"Can I have an ice cream please?", local:"Jedan sladoled, molim", say:"YEH-dan SLAH-doh-led, MOH-leem"},
+      {en:"Water please", local:"Vodu, molim", say:"VOH-doo, MOH-leem"},
+      {en:"Help!", local:"Upomoć!", say:"OO-poh-moch!"},
+      {en:"Wow / Cool!", local:"Super!", say:"SOO-per!"},
+      {en:"One, Two, Three", local:"Jedan, dva, tri", say:"YEH-dan, DVAH, TREE"}
+    ]
+  },
+
+  "Turkish": {
+    native: "Türkçe", flag: "🇹🇷",
+    phrases: [
+      {en:"Hello", local:"Merhaba", say:"MER-hah-bah"},
+      {en:"Goodbye", local:"Hoşça kal", say:"HOSH-cha kahl"},
+      {en:"Please", local:"Lütfen", say:"LOOT-fen"},
+      {en:"Thank you", local:"Teşekkürler", say:"teh-shek-koor-LER"},
+      {en:"Yes", local:"Evet", say:"EH-vet"},
+      {en:"No", local:"Hayır", say:"HAH-yuhr"},
+      {en:"My name is…", local:"Benim adım…", say:"beh-NEEM ah-DUHM"},
+      {en:"How are you?", local:"Nasılsın?", say:"NAH-suhl-suhn?"},
+      {en:"Where is the toilet?", local:"Tuvalet nerede?", say:"too-vah-LET NEH-reh-deh?"},
+      {en:"How much is it?", local:"Ne kadar?", say:"neh kah-DAR?"},
+      {en:"Can I have an ice cream please?", local:"Bir dondurma, lütfen", say:"beer don-door-MAH, LOOT-fen"},
+      {en:"Water please", local:"Su, lütfen", say:"SOO, LOOT-fen"},
+      {en:"Help!", local:"İmdat!", say:"eem-DAHT!"},
+      {en:"Wow / Cool!", local:"Harika!", say:"hah-ree-KAH!"},
+      {en:"One, Two, Three", local:"Bir, iki, üç", say:"BEER, ee-KEE, OOCH"}
+    ]
+  },
+
+  "Arabic": {
+    native: "Darija (Moroccan Arabic) العربية", flag: "🇲🇦",
+    phrases: [
+      {en:"Hello (Peace be with you)", local:"Salam", say:"sah-LAHM"},
+      {en:"Goodbye", local:"Bslama", say:"buh-slah-MAH"},
+      {en:"Please", local:"Afak", say:"ah-FAHK"},
+      {en:"Thank you", local:"Shukran", say:"SHOOK-rahn"},
+      {en:"Yes", local:"Naam / Iyeh", say:"NAH-am / EE-yeh"},
+      {en:"No", local:"La", say:"LAH"},
+      {en:"My name is…", local:"Smiti…", say:"SMEE-tee"},
+      {en:"How are you?", local:"Labas?", say:"lah-BAHS?"},
+      {en:"Where is the toilet?", local:"Fin kayn l-mirhad?", say:"FEEN kine el-meer-HAHD?"},
+      {en:"How much is it?", local:"Bish-hal?", say:"bish-HAHL?"},
+      {en:"Can I have an ice cream please?", local:"Afak, bghit glas", say:"ah-FAHK, b-GHEET glahs"},
+      {en:"Water please", local:"Afak, l-ma", say:"ah-FAHK, el-MAH"},
+      {en:"Help!", local:"Aawnni!", say:"AH-oo-nee!"},
+      {en:"Wow / Cool!", local:"Zwin!", say:"ZWEEN!"},
+      {en:"One, Two, Three", local:"Wahed, juj, tlata", say:"WAH-hed, ZHOOZH, TLAH-tah"}
+    ]
+  },
+
+  "Albanian": {
+    native: "Shqip", flag: "🇦🇱",
+    phrases: [
+      {en:"Hello", local:"Përshëndetje", say:"per-shen-DET-yeh"},
+      {en:"Goodbye", local:"Mirupafshim", say:"mee-roo-PAHF-sheem"},
+      {en:"Please", local:"Ju lutem", say:"yoo LOO-tem"},
+      {en:"Thank you", local:"Faleminderit", say:"fah-leh-MEEN-deh-reet"},
+      {en:"Yes", local:"Po", say:"POH"},
+      {en:"No", local:"Jo", say:"YOH"},
+      {en:"My name is…", local:"Unë quhem…", say:"OO-nuh CHOO-hem"},
+      {en:"How are you?", local:"Si je?", say:"see YEH?"},
+      {en:"Where is the toilet?", local:"Ku është tualeti?", say:"koo USH-tuh too-ah-LEH-tee?"},
+      {en:"How much is it?", local:"Sa kushton?", say:"sah koosh-TOHN?"},
+      {en:"Can I have an ice cream please?", local:"Një akullore, ju lutem", say:"nyuh ah-koo-LLOH-reh, yoo LOO-tem"},
+      {en:"Water please", local:"Ujë, ju lutem", say:"OO-yuh, yoo LOO-tem"},
+      {en:"Help!", local:"Ndihmë!", say:"un-DEEM!"},
+      {en:"Wow / Cool!", local:"Sa bukur!", say:"sah BOO-koor!"},
+      {en:"One, Two, Three", local:"Një, dy, tre", say:"NYUH, DUE, TREH"}
+    ]
+  },
+
+  "Icelandic": {
+    native: "Íslenska", flag: "🇮🇸",
+    phrases: [
+      {en:"Hello", local:"Halló", say:"HAH-loh"},
+      {en:"Goodbye", local:"Bless", say:"BLESS"},
+      {en:"Please (would you…)", local:"Gjörðu svo vel", say:"GYUR-thoo svo VEL"},
+      {en:"Thank you", local:"Takk", say:"TAHK"},
+      {en:"Yes", local:"Já", say:"YOW"},
+      {en:"No", local:"Nei", say:"NAY"},
+      {en:"My name is…", local:"Ég heiti…", say:"YEHG HAY-tee"},
+      {en:"How are you?", local:"Hvað segirðu?", say:"kvath SEH-yir-thoo?"},
+      {en:"Where is the toilet?", local:"Hvar er klósettið?", say:"kvar er KLOH-seh-tith?"},
+      {en:"How much is it?", local:"Hvað kostar þetta?", say:"kvath KOS-tar THEH-tah?"},
+      {en:"Can I have an ice cream please?", local:"Má ég fá ís?", say:"MOW yehg FOW EES?"},
+      {en:"Water please", local:"Vatn, takk", say:"VAHTN, TAHK"},
+      {en:"Help!", local:"Hjálp!", say:"HYOWLP!"},
+      {en:"Wow / Cool!", local:"Geggjað!", say:"GED-jath!"},
+      {en:"One, Two, Three", local:"Einn, tveir, þrír", say:"AYTN, TVAYR, THREER"}
+    ]
+  },
+
+  "Dhivehi": {
+    native: "Dhivehi ދިވެހި", flag: "🇲🇻",
+    phrases: [
+      {en:"Hello", local:"Assalaamu alaikum", say:"ah-sah-LAH-moo ah-LAY-koom"},
+      {en:"Goodbye", local:"Dhanee", say:"DHAH-nee"},
+      {en:"Please", local:"Adhes kohffa", say:"AH-dhes KOH-fah"},
+      {en:"Thank you", local:"Shukuriyyaa", say:"shoo-koo-ree-YAH"},
+      {en:"Yes", local:"Aan", say:"AAN"},
+      {en:"No", local:"Noon", say:"NOON"},
+      {en:"My name is…", local:"Aharenge nakee…", say:"ah-hah-REN-geh NAH-kee"},
+      {en:"How are you?", local:"Haalu kihineh?", say:"HAH-loo kee-hee-NEH?"},
+      {en:"Where is the toilet?", local:"Faakhaanaa kobaa?", say:"fah-KHAH-naa koh-BAA?"},
+      {en:"How much is it?", local:"Agu kihaavareh?", say:"AH-goo kee-HAA-vah-reh?"},
+      {en:"Can I have an ice cream please?", local:"Ice cream eh dheeba?", say:"ICE-creem eh DHEE-bah?"},
+      {en:"Water please", local:"Fen dheeba", say:"FEN DHEE-bah"},
+      {en:"Help!", local:"Eheyves!", say:"eh-HEY-ves!"},
+      {en:"Wow / Cool!", local:"Varah salhi!", say:"VAH-rah SAL-hee!"},
+      {en:"One, Two, Three", local:"Ekeh, dheyh, thineh", say:"EH-keh, DHEY, THEE-neh"}
+    ]
+  },
+
+  "Bislama": {
+    native: "Bislama", flag: "🇻🇺",
+    phrases: [
+      {en:"Hello", local:"Halo", say:"HAH-loh"},
+      {en:"Goodbye", local:"Tata", say:"TAH-tah"},
+      {en:"Please", local:"Plis", say:"PLEES"},
+      {en:"Thank you", local:"Tankyu", say:"TANK-yoo"},
+      {en:"Yes", local:"Yes", say:"YES"},
+      {en:"No", local:"No", say:"NOH"},
+      {en:"My name is…", local:"Nem blong mi…", say:"NEM blong MEE"},
+      {en:"How are you?", local:"Yu olraet?", say:"yoo ol-RITE?"},
+      {en:"Where is the toilet?", local:"Toilet i stap wea?", say:"TOY-let ee stap WAY-ah?"},
+      {en:"How much is it?", local:"Hemia hamas?", say:"HEM-ya hah-MAHS?"},
+      {en:"Can I have an ice cream please?", local:"Mi wantem wan aiskrim, plis", say:"mee WAN-tem wan ICE-creem, PLEES"},
+      {en:"Water please", local:"Wota, plis", say:"WO-tah, PLEES"},
+      {en:"Help!", local:"Halpem mi!", say:"HAL-pem MEE!"},
+      {en:"Wow / Cool!", local:"Hemi naes tumas!", say:"HEM-ee NICE too-MAHS!"},
+      {en:"One, Two, Three", local:"Wan, tu, tri", say:"WAN, TOO, TREE"}
+    ]
+  },
+
+  "Finnish": {
+    native: "Suomi", flag: "🇫🇮",
+    phrases: [
+      {en:"Hello", local:"Hei", say:"HAY"},
+      {en:"Goodbye", local:"Hei hei", say:"HAY HAY"},
+      {en:"Please (thanks)", local:"Kiitos", say:"KEE-toss"},
+      {en:"Thank you", local:"Kiitos", say:"KEE-toss"},
+      {en:"Yes", local:"Kyllä", say:"KOO-lah"},
+      {en:"No", local:"Ei", say:"AY"},
+      {en:"My name is…", local:"Nimeni on…", say:"NEE-meh-nee on"},
+      {en:"How are you?", local:"Mitä kuuluu?", say:"MEE-tah KOO-loo?"},
+      {en:"Where is the toilet?", local:"Missä on vessa?", say:"MISS-ah on VES-sah?"},
+      {en:"How much is it?", local:"Paljonko se maksaa?", say:"PAHL-yon-koh seh MAHK-sah?"},
+      {en:"Can I have an ice cream please?", local:"Saisinko jäätelön?", say:"SIGH-sin-koh YAA-teh-lurn?"},
+      {en:"Water please", local:"Vettä, kiitos", say:"VET-tah, KEE-toss"},
+      {en:"Help!", local:"Apua!", say:"AH-poo-ah!"},
+      {en:"Wow / Cool!", local:"Mahtavaa!", say:"MAH-tah-vaa!"},
+      {en:"One, Two, Three", local:"Yksi, kaksi, kolme", say:"OOK-see, KAHK-see, KOHL-meh"}
+    ]
+  },
+
+  /* ----- ENGLISH-SPEAKING DESTINATIONS: fun local lingo, not translations ----- */
+
+  "English (Australia)": {
+    native: "Aussie English", flag: "🇦🇺",
+    phrases: [
+      {en:"Hello / Hi", local:"G'day", say:"g'DAY"},
+      {en:"Afternoon", local:"Arvo", say:"AR-voh"},
+      {en:"Flip-flops", local:"Thongs", say:"THONGZ"},
+      {en:"Lots / a heap", local:"Heaps", say:"HEEPS"},
+      {en:"McDonald's", local:"Maccas", say:"MAK-uhz"},
+      {en:"Breakfast", local:"Brekkie", say:"BREK-ee"},
+      {en:"Sandwich", local:"Sanga", say:"SANG-uh"},
+      {en:"Mosquito", local:"Mozzie", say:"MOZ-ee"},
+      {en:"Sunglasses", local:"Sunnies", say:"SUN-eez"},
+      {en:"Swimsuit (Queensland)", local:"Togs", say:"TOGZ"},
+      {en:"Very / really", local:"Heaps good", say:"HEEPS good"},
+      {en:"No worries / it's fine", local:"No wuckas", say:"no WUK-uhz"},
+      {en:"Cool! / Great!", local:"Ripper!", say:"RIP-uh!"},
+      {en:"Good on you (well done)", local:"Good onya", say:"good ON-yuh"},
+      {en:"Goodbye", local:"Hooroo", say:"hoo-ROO"}
+    ]
+  },
+
+  "English (New Zealand)": {
+    native: "Kiwi English & Māori", flag: "🇳🇿",
+    phrases: [
+      {en:"Hi / Hello (Māori)", local:"Kia ora", say:"KEE-ah OR-ah"},
+      {en:"Welcome (Māori)", local:"Haere mai", say:"HIGH-reh MY"},
+      {en:"Thank you (Māori)", local:"Kia ora / Ngā mihi", say:"KEE-ah OR-ah / ngah MEE-hee"},
+      {en:"Great / awesome", local:"Sweet as", say:"SWEET az"},
+      {en:"Flip-flops", local:"Jandals", say:"JAN-dulz"},
+      {en:"Cool / no problem", local:"Choice", say:"CHOYSS"},
+      {en:"Cold box / chilly bin", local:"Chilly bin", say:"CHIL-ee bin"},
+      {en:"Friend / mate", local:"Bro / cuz", say:"BROH / KUZ"},
+      {en:"Lots", local:"Heaps", say:"HEEPS"},
+      {en:"Land / country (Māori)", local:"Aotearoa", say:"ah-oh-teh-ah-ROH-ah"},
+      {en:"Yummy food", local:"Kai", say:"KYE"},
+      {en:"Family (Māori)", local:"Whānau", say:"FAH-noh"},
+      {en:"Cool! / Wow!", local:"Mean!", say:"MEEN!"},
+      {en:"Goodbye / see ya", local:"Hooray / Ka kite", say:"HOO-ray / kah KEE-teh"},
+      {en:"One, Two, Three (Māori)", local:"Tahi, rua, toru", say:"TAH-hee, ROO-ah, TOH-roo"}
+    ]
+  },
+
+  "English (USA)": {
+    native: "American English", flag: "🇺🇸",
+    phrases: [
+      {en:"Hi / Hello", local:"Howdy", say:"HOW-dee"},
+      {en:"Hi everyone", local:"Hey y'all", say:"hey YAWL"},
+      {en:"Great / fantastic", local:"Awesome", say:"AW-sum"},
+      {en:"Fizzy drink", local:"Soda / pop", say:"SOH-dah"},
+      {en:"Fries", local:"French fries", say:"french FRIZE"},
+      {en:"Cookies", local:"Cookies", say:"KUK-eez"},
+      {en:"Cool!", local:"Sweet!", say:"SWEET!"},
+      {en:"Sweets / candy", local:"Candy", say:"KAN-dee"},
+      {en:"Sidewalk (footpath)", local:"Sidewalk", say:"SIDE-wawk"},
+      {en:"Sneakers (trainers)", local:"Sneakers", say:"SNEE-kerz"},
+      {en:"Restroom (toilet)", local:"Restroom", say:"REST-room"},
+      {en:"Very / really", local:"Super", say:"SOO-per"},
+      {en:"Wow!", local:"No way!", say:"no WAY!"},
+      {en:"Buddy / friend", local:"Buddy", say:"BUD-ee"},
+      {en:"Goodbye", local:"See ya later", say:"see ya LAY-ter"}
+    ]
+  },
+
+  "English (UK)": {
+    native: "British English", flag: "🇬🇧",
+    phrases: [
+      {en:"Hello", local:"Hiya", say:"HY-uh"},
+      {en:"Goodbye", local:"Cheerio", say:"cheer-ee-OH"},
+      {en:"Toilet", local:"Loo", say:"LOO"},
+      {en:"Great / fantastic", local:"Brilliant", say:"BRILL-yunt"},
+      {en:"Chips (fries)", local:"Chips", say:"CHIPS"},
+      {en:"Crisps (potato chips)", local:"Crisps", say:"KRISPS"},
+      {en:"Sweets / candy", local:"Sweets", say:"SWEETS"},
+      {en:"Trousers", local:"Trousers", say:"TROW-zerz"},
+      {en:"Jumper (sweater)", local:"Jumper", say:"JUM-per"},
+      {en:"Rubbish / yuck", local:"Rubbish", say:"RUB-ish"},
+      {en:"Tired (sleepy)", local:"Knackered", say:"NAK-erd"},
+      {en:"Hungry (very)", local:"Peckish", say:"PEK-ish"},
+      {en:"Cool! / Great!", local:"Smashing!", say:"SMASH-ing!"},
+      {en:"Thank you", local:"Ta / Cheers", say:"TAH / CHEERZ"},
+      {en:"Goodbye (informal)", local:"Ta-ra", say:"tah-RAH"}
+    ]
+  },
+
+  "English (Singapore)": {
+    native: "Singlish", flag: "🇸🇬",
+    phrases: [
+      {en:"Friendly word added to the end", local:"Lah", say:"LAH"},
+      {en:"Yes, it's possible!", local:"Can!", say:"KAN!"},
+      {en:"No / cannot", local:"Cannot", say:"KAN-not"},
+      {en:"Delicious / awesome", local:"Shiok", say:"SHEE-ock"},
+      {en:"Food / let's eat", local:"Makan", say:"MAH-kahn"},
+      {en:"Hawker food court", local:"Hawker centre", say:"HAW-ker SEN-ter"},
+      {en:"Why like that?", local:"Why like dat?", say:"why like DAT?"},
+      {en:"A little bit", local:"A bit only", say:"a BIT OH-nee"},
+      {en:"To queue / line up", local:"Chope (save a seat)", say:"CHOHP"},
+      {en:"Wow! / really?!", local:"Wah!", say:"WAH!"},
+      {en:"Are you okay?", local:"You okay or not?", say:"you oh-KAY or not?"},
+      {en:"Let's go!", local:"Go go go!", say:"GO GO GO!"},
+      {en:"Hello (Malay)", local:"Apa khabar", say:"AH-pah kah-BAR"},
+      {en:"Thank you (Malay)", local:"Terima kasih", say:"teh-REE-mah KAH-see"},
+      {en:"One, Two, Three (Malay)", local:"Satu, dua, tiga", say:"SAH-too, DOO-ah, TEE-gah"}
+    ]
+  },
+
+  "English (South Africa)": {
+    native: "South African English", flag: "🇿🇦",
+    phrases: [
+      {en:"Hello (Zulu)", local:"Sawubona", say:"sah-woo-BOH-nah"},
+      {en:"Thank you (Zulu)", local:"Ngiyabonga", say:"ngee-yah-BONG-gah"},
+      {en:"Hi / hello (Afrikaans)", local:"Howzit", say:"HOW-zit"},
+      {en:"Cool / no problem", local:"Lekker", say:"LECK-uh"},
+      {en:"Yes (Afrikaans)", local:"Ja", say:"YAH"},
+      {en:"Now-now (soon)", local:"Now-now", say:"now-NOW"},
+      {en:"Barbecue", local:"Braai", say:"BRYE"},
+      {en:"Traffic light", local:"Robot", say:"ROH-bot"},
+      {en:"Friend / mate", local:"Boet / china", say:"BOOT / CHY-nah"},
+      {en:"Sweets / candy", local:"Lekkers / sweets", say:"LECK-erz"},
+      {en:"Flip-flops", local:"Slops", say:"SLOPS"},
+      {en:"Let's go!", local:"Come, let's go", say:"come, lets GO"},
+      {en:"Wow! / awesome!", local:"Eish! / Lekker!", say:"AYSH! / LECK-uh!"},
+      {en:"Goodbye (Afrikaans)", local:"Totsiens", say:"TOT-seens"},
+      {en:"One, Two, Three (Zulu)", local:"Kunye, kubili, kuthathu", say:"KOON-yeh, koo-BEE-lee, koo-TAH-too"}
+    ]
+  }
+};
+
+/* Maps EVERY destination id in DESTS to its language key above. */
+const DEST_LANG = {
+  "maldives": "Dhivehi",
+  "rabat": "Arabic",
+  "lapland": "Finnish",
+  "athens": "Greek",
+  "rhodes": "Greek",
+  "tenerife": "Spanish",
+  "porto": "Portuguese",
+  "istanbul": "Turkish",
+  "antalya": "Turkish",
+  "split": "Croatian",
+  "algarve": "Portuguese",
+  "fez": "Arabic",
+  "tirana": "Albanian",
+  "iceland": "Icelandic",
+  "sydney": "English (Australia)",
+  "melbourne": "English (Australia)",
+  "goldcoast": "English (Australia)",
+  "sunshinecoast": "English (Australia)",
+  "whitsundays": "English (Australia)",
+  "brisbane": "English (Australia)",
+  "auckland": "English (New Zealand)",
+  "vanuatu": "Bislama",
+  "singapore": "English (Singapore)",
+  "capetown": "English (South Africa)",
+  "johannesburg": "English (South Africa)",
+  "paris": "French",
+  "london": "English (UK)",
+  "barcelona": "Spanish",
+  "losangeles": "English (USA)",
+  "miami": "English (USA)",
+  "fuerteventura": "Spanish",
+  "adelaide": "English (Australia)",
+  "darwin": "English (Australia)",
+  "agneswater": "English (Australia)",
+  "herveybay": "English (Australia)",
+  "christchurch": "English (New Zealand)",
+  "kentroma": "Greek"
+};
+
+/* ---- expanded upcoming guides ---- */
+// Expanded guide content for the two upcoming trips — merged over DESTS via Object.assign.
+// Maldives = Kandima Resort, Dhaalu Atoll (family trip 23 Jul–9 Aug 2026).
+// Sunshine Coast = Queensland, Australia (Christmas, Dec 2026).
+const UPCOMING_EXPAND = {
+  "maldives": {
+    tagline:'Turquoise lagoons, an overwater villa and the longest waterslide in the Maldives — splash, snorkel and seaplane your way through Kandima!',
+    attractions:[
+      ['🤿','House Reef Snorkelling','Kandima’s coral reef starts right off the beach — meet parrotfish, rays and turtles.'],
+      ['💦','The Big Waterslide','Whoosh down Kandima’s giant slide straight into the pool — the island’s most famous splash.'],
+      ['🚤','Sandbank Picnic','Speedboat to Thilabolhufushi, a tiny island of pure white sand in the middle of the ocean.'],
+      ['🐬','Sunset Dolphin Cruise','Hop on a boat at golden hour and watch pods of spinner dolphins leap beside you.'],
+      ['🌊','Aquaholics Water Sports','Jet-ski, parasailing, sea-bob, banana-boat and glass-bottom kayak adventures.'],
+      ['🏎️','Fast Track E-Karting','Race the longest and fastest electric go-kart circuit in the Maldives (ages 10+).'],
+      ['🎣','Sunset Fishing','Sail out on a traditional dhoni and try handline fishing as the sky turns orange.'],
+      ['🍦','Burju Café Ice Cream','Cool down with scoops of ice cream and milkshakes at the island’s sweet-treat café.']
+    ],
+    kids:[
+      ['🛝','Kandiland Kids Club','Pirate ship, splash zone, slides & games for ages 6 mo–12 yrs, with friendly carers.',4.7,'1,460','Kandima Maldives Kandiland kids club'],
+      ['💦','The Big Waterslide','A giant slide straight into the pool — Kandima’s most famous splash.',4.6,'980','Kandima Maldives waterslide'],
+      ['🌊','Aquaholics Water Sports','Jet-ski, parasailing, sea-bob and banana-boat rides on the lagoon.',4.7,'1,210','Kandima Maldives Aquaholics water sports'],
+      ['🐠','Glass-Bottom Kayak','Paddle over the lagoon and watch the reef through the see-through floor.',4.6,'640','Kandima Maldives water sports'],
+      ['🤿','House Reef Snorkelling','Swim straight off the beach to meet reef fish, rays and sea turtles.',4.8,'1,540','Kandima Maldives house reef snorkelling'],
+      ['🐬','Sunset Dolphin Cruise','Sail out at sunset to spot pods of wild spinner dolphins leaping by.',4.7,'870','Kandima Maldives dolphin cruise'],
+      ['🏎️','Fast Track E-Karting','The longest e-go-kart track in the Maldives — for thrill-seekers aged 10+.',4.5,'420','Kandima Maldives Fast Track go kart'],
+      ['🏝️','Sandbank Picnic','A speedboat drops you on a deserted sandbank with a picnic hamper.',4.8,'560','Kandima Maldives sandbank picnic']
+    ],
+    photos:[
+      ['maldives overwater villa lagoon','Our overwater villa',701],
+      ['maldives white sand beach','Powdery white-sand beach',702],
+      ['maldives seaplane landing water','Seaplane to Kandima',703],
+      ['snorkeling sea turtle reef','Snorkel safari',704],
+      ['coral reef tropical fish','Colourful coral reef',705],
+      ['waterslide resort pool splash','The big waterslide',706],
+      ['glass bottom kayak lagoon','Glass-bottom kayak',707],
+      ['spinner dolphins ocean sunset','Dolphin cruise',708],
+      ['sandbank island ocean aerial','Sandbank picnic',709],
+      ['maldives palm sunset silhouette','Island sunset',710]
+    ],
+    highlights:[
+      'Sleep in an overwater villa and watch fish swim right under your feet 🐠',
+      'Ride the seaplane that lands on the water to reach Kandima 🛩️',
+      'Zoom down the longest waterslide in the Maldives 💦',
+      'Snorkel the house reef and find turtles, rays and baby reef sharks 🐢',
+      'Speedboat to a tiny private sandbank for a picnic in the middle of the sea 🏝️'
+    ],
+    tips:[
+      'Bring reef-safe sunscreen — it protects the coral and the fish 🐟',
+      'The seaplane to Kandima takes ~35 min — grab a window seat for the view! 🛩️',
+      'Kandiland kids club welcomes ages 6 mo–12 yrs; ages 4+ can stay without a grown-up.',
+      'July–August is warm and humid — pack a rash vest and a hat for all that water play.'
+    ]
+  },
+  "sunshinecoast": {
+    tagline:'Calm family beaches, Steve Irwin’s wildlife zoo and giant pineapples under the warm Queensland Christmas sun!',
+    attractions:[
+      ['🐊','Australia Zoo','Steve Irwin’s zoo at Beerwah with crocs, tigers, koalas and the Wildlife Warriors show.'],
+      ['🏖️','Noosa Main Beach','A rare north-facing beach with calm, sparkling water just right for little swimmers.'],
+      ['🍍','The Big Pineapple','A giant walk-in pineapple landmark with a train ride and a treetop ropes course.'],
+      ['🐠','SEA LIFE Sunshine Coast','Touch pools, seals, sharks and an underwater glass tunnel at Mooloolaba.'],
+      ['🎢','Aussie World','Over 30 old-school carnival rides, dodgems, a Ferris wheel and mazes.'],
+      ['🫚','The Ginger Factory','Ride the 120-year-old Ginger Train, taste ginger treats and meet the gingerbread man (free entry!).'],
+      ['🏰','Sunshine Castle','A quirky medieval castle at Bli Bli with armour, a dragon and a doll museum.'],
+      ['⛰️','Glass House Mountains','Climb and explore craggy volcanic peaks shaped like pointy hats.']
+    ],
+    kids:[
+      ['🐊','Australia Zoo','Home of the Crocodile Hunter — crocs, koalas and the Crocoseum feeding shows.',4.6,'46,000','Australia Zoo Beerwah'],
+      ['🐠','SEA LIFE Sunshine Coast Aquarium','Seals, sharks and a glass tunnel at Mooloolaba.',4.4,'13,000','SEA LIFE Sunshine Coast Aquarium Mooloolaba'],
+      ['🎢','Aussie World','Over 30 carnival rides, dodgems and slides for all ages.',4.4,'9,800','Aussie World Palmview'],
+      ['🍍','The Big Pineapple','Train rides, a treetop ropes course and a wildlife zoo.',4.2,'4,700','The Big Pineapple Woombye'],
+      ['🫚','The Ginger Factory','A historic ginger train, a boat ride and free-entry gardens at Yandina.',4.3,'7,100','The Ginger Factory Yandina'],
+      ['🛶','Noosa Everglades','Cruise or canoe the mirror-still waterways — one of only two everglades on Earth.',4.6,'1,300','Noosa Everglades Eco Safaris'],
+      ['🏰','Sunshine Castle','A medieval castle at Bli Bli with armour, a dragon and a doll museum.',3.8,'1,000','Sunshine Castle Bli Bli'],
+      ['🏖️','Mooloolaba Beach','A patrolled golden beach with calm swimming, rock pools and an esplanade.',4.7,'5,400','Mooloolaba Beach']
+    ],
+    photos:[
+      ['noosa main beach queensland','Noosa Main Beach',711],
+      ['mooloolaba beach esplanade','Mooloolaba bay',712],
+      ['australia zoo crocodile show','Australia Zoo',713],
+      ['glass house mountains queensland','Glass House Mountains',714],
+      ['big pineapple woombye landmark','The Big Pineapple',715],
+      ['koala eucalyptus tree australia','Cuddly koalas',716],
+      ['noosa everglades river reflection','Noosa Everglades',717],
+      ['ginger factory train garden','The Ginger Train',718],
+      ['maleny hinterland rolling hills','Maleny hinterland',719],
+      ['sunshine coast surf golden sand','Surf and sand',720]
+    ],
+    highlights:[
+      'Meet crocs, koalas and tigers at Steve Irwin’s Australia Zoo 🐊',
+      'Splash in the calm, shallow bays at Noosa and Mooloolaba 🏖️',
+      'Walk inside the giant Big Pineapple and ride the little train 🍍',
+      'Cruise the mirror-still Noosa Everglades to spot birds and wildlife 🛶',
+      'Climb the funny pointy Glass House Mountains ⛰️'
+    ],
+    tips:[
+      'Australia Zoo is a full day — go early to catch the morning animal encounters.',
+      'It’s summer at Christmas in Queensland — pack sun hats, swimmers and lots of water 🌞',
+      'Always swim between the red-and-yellow flags on patrolled beaches.',
+      'The Ginger Factory has free entry — a great budget-friendly rainy-day stop.'
+    ]
+  }
+};
+DESTS.forEach(d=>{ if(UPCOMING_EXPAND[d.id]) Object.assign(d,UPCOMING_EXPAND[d.id]); });
+
 const SEED_TRIPS = [
   // —— Australia era (home: Sunshine Coast) ——
   {id:'t01', era:'australia', destId:'sydney', city:'Sydney', country:'Australia', flag:'🇦🇺', emoji:'🌉', lat:-33.8688, lng:151.2093, year:2019, planned:false, rating:5, note:'Our most-visited city (2016–2019) — Harbour Bridge & the Opera House!'},
@@ -2360,8 +2908,9 @@ const SEED_TRIPS = [
   {id:'t25', era:'ireland', destId:'kentroma', city:'Kentroma', country:'Greece', flag:'🇬🇷', emoji:'🏖️', lat:39.4000, lng:20.2500, year:2025, planned:false, rating:5, note:'Quiet Greek beaches and crystal-clear water.'},
   {id:'t26', era:'ireland', destId:'brisbane', city:'Brisbane', country:'Australia', flag:'🇦🇺', emoji:'🏠', lat:-27.4698, lng:153.0251, year:2025, planned:false, rating:5, note:'Going back to visit our old home in Queensland.'},
   // —— Coming up ——
-  {id:'t27', era:'ireland', destId:'maldives', city:'Kandima (Dhaalu Atoll)', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, year:2026, planned:true, rating:0, note:'The big family trip — 23 Jul to 9 Aug! Kandiland & the waterslide await.'},
-  {id:'t28', era:'ireland', destId:'sunshinecoast', city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-26.6500, lng:153.0667, year:2026, planned:true, rating:0, note:'Three weeks back on the Sunshine Coast for Christmas! 🎄🏖️'}
+  {id:'t27', era:'ireland', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, date:'2026-07-23', year:2026, planned:true, rating:0, note:'The big family trip — 23 July to 9 August! Overwater villas, snorkelling and the famous waterslide await.'},
+  {id:'t28', era:'ireland', destId:'sunshinecoast', city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-26.6500, lng:153.0667, date:'2026-12-20', year:2026, planned:true, rating:0, note:'Three weeks back on the Sunshine Coast for Christmas! 🎄🏖️'},
+  {id:'t29', era:'ireland', destId:'rabat', city:'Rabat', country:'Morocco', flag:'🇲🇦', emoji:'🕌', lat:34.0209, lng:-6.8416, date:'2026-06-19', year:2026, planned:true, rating:0, note:'Exploring the blue kasbah, Hassan Tower and Rabat Zoo!'}
 ];
 
 /* =====================================================================
@@ -2402,7 +2951,7 @@ const PROFILES=[
 ];
 const PROFILE_PIN='1985';            // simple family gate (not real security)
 let currentProfile=null;             // chosen at the login screen each visit
-const dataKey=base=>'globie_atlas_'+base+'_v8_'+(currentProfile||'guest');
+const dataKey=base=>'globie_atlas_'+base+'_v9_'+(currentProfile||'guest');
 function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
@@ -2460,23 +3009,26 @@ document.querySelectorAll('nav.top button[data-view], .tabbar button[data-view]'
 /* =====================================================================
    FEATURED (upcoming Kandima trip)
    ===================================================================== */
+function tripDate(t){ return t.date?new Date(t.date+'T00:00:00'):(t.year?new Date(t.year+'-07-01T00:00:00'):null); }
+function daysUntil(t){ const d=tripDate(t); if(!d) return null; return Math.max(0,Math.ceil((d-new Date())/86400000)); }
+function nextPlanned(){ const a=trips.filter(t=>t.planned).map(t=>({t,d:tripDate(t)})).filter(x=>x.d).sort((a,b)=>a.d-b.d); return a.length?a[0].t:trips.find(t=>t.planned); }
 function renderFeatured(){
-  const d=DESTS.find(x=>x.id==='maldives'); if(!d) return; const th=themeFor(d);
-  const days=Math.max(0,Math.round((new Date('2026-07-23T00:00:00')-new Date())/86400000));
-  const count=days>0?`${days} sleeps to take-off!`:'Adventure under way!';
-  document.getElementById('featured').innerHTML=`
-    <div class="featured">
-      <div class="pic frame" style="${frameStyle(th)}"><span class="stamp thunk">Next trip!</span>
-        ${sticker('🏝️')}${dpic('maldives','hero',207,900,700,'Kandima Maldives','maldives,overwater,villa,resort')}
-      </div>
-      <div class="txt">
-        <span class="eyebrow teal">Counting down</span>
-        <h3>Kandima, Maldives ${d.flag}</h3>
-        <div class="countdown">🗓️ ${count} · 23 Jul – 9 Aug 2026</div>
-        <p class="lead">Overwater villas, a pirate-ship kids' club, the longest waterslide in the Maldives and turtles on the reef. The big family adventure is almost here!</p>
-        <div style="margin-top:18px"><button class="btn btn-teal" onclick="openDest('maldives')">Explore the Maldives →</button></div>
-      </div>
-    </div>`;
+  const host=document.getElementById('featured'); if(!host) return;
+  const t=nextPlanned();
+  if(!t){ host.innerHTML='<div class="empty">No trips booked yet — add one with a future date in your Journal! ✈️</div>'; return; }
+  const d=DESTS.find(x=>x.id===t.destId), th=themeFor(d), days=daysUntil(t), dt=tripDate(t);
+  const dstr=dt?dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const wks=days!=null?Math.floor(days/7):null;
+  host.innerHTML=`<div class="cd-hero" style="${frameStyle(th)}">
+    <div class="cd-bg">${d?dpic(d.id,'hero',d.photos[0][2],1200,640,t.city,d.photos[0][0]):''}</div>
+    <div class="cd-scrim"></div>
+    <div class="cd-inner">
+      <span class="cd-eyebrow">✈️ Next adventure</span>
+      <div class="cd-count"><span class="cd-num">${days==null?'—':days}</span><span class="cd-lab">${days===1?'sleep':'sleeps'}<br>to go!</span></div>
+      <h2 class="cd-place">${esc(t.flag||'')} ${esc(t.city)}</h2>
+      <div class="cd-date">📅 ${esc(dstr)}${wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:''}</div>
+      ${d?`<button class="btn btn-yellow" onclick="openDest('${d.id}')">Explore ${esc(d.name)} →</button>`:''}
+    </div></div>`;
 }
 
 /* =====================================================================
@@ -2528,10 +3080,13 @@ function renderGrid(){
 }
 function renderUpcoming(){
   const host=document.getElementById('upcomingGroups'); if(!host) return;
-  const soon=plannedDestIds();
-  const cards=DESTS.filter(d=>soon.has(d.id)).map(d=>cardHTML(d,'<span class="t soon">🔜 Coming up</span>'));
-  host.innerHTML = cards.length ? `<div class="deck">${cards.join('')}</div>`
-    : `<div class="empty">No upcoming trips yet — add one with a future year in your Journal! ✈️</div>`;
+  const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
+  const seen=new Set(), cards=[];
+  planned.forEach(t=>{ const d=DESTS.find(x=>x.id===t.destId); if(!d||seen.has(d.id)) return; seen.add(d.id);
+    const dys=daysUntil(t); const lab=dys==null?'Coming up':(dys===0?'Today!':`in ${dys} sleep${dys===1?'':'s'}`);
+    cards.push(cardHTML(d,`<span class="t soon">🔜 ${lab}</span>`)); });
+  host.innerHTML = cards.length ? `<div class="section-head" style="margin-top:8px"><div><span class="eyebrow">Every booked adventure</span><h3 style="font-size:1.4rem">All our upcoming trips</h3></div></div><div class="deck">${cards.join('')}</div>`
+    : `<div class="empty">No upcoming trips yet — add one with a future date in your Journal! ✈️</div>`;
 }
 
 /* =====================================================================
@@ -2902,7 +3457,20 @@ const ACHIEVEMENTS=[
   {id:'island_hopper',em:'🏝️',nm:'Island Hopper',ds:'Visit an island nation',ac:'#0FA7AF',test:c=>['Maldives','New Zealand','Vanuatu','Singapore','Iceland'].some(n=>c.countries.has(n))},
   {id:'maldives_dream',em:'🐠',nm:'Maldives Dreamer',ds:'Visit the Maldives',ac:'#22B0BE',test:c=>c.countries.has('Maldives')},
   // —— still to earn ——
-  {id:'antarctic',em:'🐧',nm:'Polar Explorer',ds:'Reach Antarctica one day!',ac:'#48cae4',test:c=>c.continents.has('Antarctica')}
+  {id:'antarctic',em:'🐧',nm:'Polar Explorer',ds:'Reach Antarctica one day!',ac:'#48cae4',test:c=>c.continents.has('Antarctica')},
+  // —— goals to chase next ——
+  {id:'desert',em:'🏜️',nm:'Desert Explorer',ds:'Visit Morocco',ac:'#E0760E',test:c=>c.countries.has('Morocco')},
+  {id:'aurora',em:'🌌',nm:'Aurora Chaser',ds:'See the Northern Lights (Iceland/Lapland)',ac:'#7C6CF4',test:c=>c.countries.has('Iceland')||c.countries.has('Finland')},
+  {id:'volcano',em:'🌋',nm:'Volcano Spotter',ds:'Visit Iceland',ac:'#F46A4B',test:c=>c.countries.has('Iceland')},
+  {id:'turkiye',em:'🕌',nm:'Two Continents',ds:'Visit Türkiye (Europe + Asia!)',ac:'#0FA7AF',test:c=>c.countries.has('Türkiye')||c.countries.has('Turkey')},
+  {id:'samerica',em:'🌎',nm:'Amazon Explorer',ds:'Set foot in South America',ac:'#43C28A',test:c=>c.continents.has('South America')},
+  {id:'japan',em:'🎌',nm:'Land of the Rising Sun',ds:'Visit Japan',ac:'#FF7FB0',test:c=>c.countries.has('Japan')},
+  {id:'fifteen',em:'🧭',nm:'Fifteen Countries',ds:'Visit 15 countries',ac:'#13B5AC',test:c=>c.countries.size>=15},
+  {id:'twentyc',em:'🌐',nm:'Twenty Countries',ds:'Visit 20 countries',ac:'#7C6CF4',test:c=>c.countries.size>=20},
+  {id:'forty',em:'✈️',nm:'40 Adventures',ds:'Take 40 trips',ac:'#46B3F0',test:c=>c.visited.length>=40},
+  {id:'fifty',em:'🎖️',nm:'50 Adventures',ds:'Take 50 trips',ac:'#F0A91E',test:c=>c.visited.length>=50},
+  {id:'seven',em:'🌍',nm:'Seven Continents',ds:'Reach all 7 continents!',ac:'#FF8366',test:c=>c.continents.size>=7},
+  {id:'millionmiler',em:'🚀',nm:'Million-Miler',ds:'Fly 300,000 km in total',ac:'#C2410C',test:c=>c.km>=300000}
 ];
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
@@ -3070,7 +3638,7 @@ function updateProfileChip(){ const c=document.getElementById('profileChip'); if
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function applyProfileData(){ trips=loadTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest();
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
-function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('explore'); }
+function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming'); }
 function renderProfilePick(){
   const wrap=document.getElementById('profilePick'); if(!wrap) return;
   wrap.innerHTML=PROFILES.map(p=>`<div class="profile-card">
