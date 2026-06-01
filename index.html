@@ -525,6 +525,17 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .av-choice:hover{transform:translateY(-3px) scale(1.05);border-color:var(--teal)}
 .av-choice.sel{border-color:var(--teal);background:#e7faf8;box-shadow:0 0 0 3px rgba(19,181,172,.18)}
 .av-choice .av-svg{width:100%;height:100%}
+/* highlights / tips boxes */
+.hibox{background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-left:6px solid var(--coral);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
+.hibox.tips{border-left-color:var(--teal);margin:16px 0 4px}
+.hibox h4{font-family:var(--display);font-size:1.1rem;margin-bottom:8px;color:var(--ink)}
+.hibox ul{margin:0;padding-left:20px}.hibox li{margin:5px 0;font-weight:600;color:var(--ink-2)}
+/* phrases */
+.phrases{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.phrase{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow-sm)}
+.phrase .ph-en{font-weight:800;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+.phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0}
+.phrase .ph-say{font-weight:700;color:var(--ink-2);font-size:.92rem}
 @media(prefers-reduced-motion:reduce){.profile-btn:hover{transform:none}.shake{animation:none}}
 @media(max-width:560px){.hero-trail{display:none}}
 @media(prefers-reduced-motion:reduce){.hero-trail.float-slow,.featured .stamp.thunk{animation:none}.brand:hover .mark{transform:none}.dcard,.dcard:hover{transform:none}}
@@ -2536,13 +2547,22 @@ function openDest(id){
     <div class="inner"><span class="reg">${d.flag} ${d.country} · ${regionEmoji[d.region]||''} ${d.region}</span><h1>${d.name}</h1>${visChip}</div>`;
   document.getElementById('dlead').textContent=d.tagline;
 
-  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['quiz','🧠 Quiz']];
+  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
   const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
   dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
   const gt=d.gettingThere,ci=d.country_info;
   const meta=(k,v)=>`<div class="meta-item"><div class="k">${k}</div><div class="v">${v}</div></div>`;
   const gallery=d.photos.map((p,i)=>`<figure class="${i===0?'big':(i===3?'wide':'')}"><div class="frame" style="${frameStyle(th)}">${sticker(d.emoji)}${dpic(d.id,i,p[2],700,560,'',p[0])}</div><figcaption>${p[1]}</figcaption></figure>`).join('');
+  const hiBox = (d.highlights&&d.highlights.length)?`<div class="hibox"><h4>⭐ Don't miss!</h4><ul>${d.highlights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
+  const tipsBox = (d.tips&&d.tips.length)?`<div class="hibox tips"><h4>💡 Family tips</h4><ul>${d.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
+  const langPanel=(function(){
+    const lk=(typeof DEST_LANG!=='undefined'&&DEST_LANG[d.id])||null;
+    const L=(lk&&typeof LANG_PHRASES!=='undefined')?LANG_PHRASES[lk]:null;
+    if(!L||!L.phrases) return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">Handy phrases for ${esc(d.country)} are coming soon!</p>`;
+    return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">${L.flag||'🗣️'} A few handy words in ${esc(L.native||lk)}</p>
+      <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>`;
+  })();
 
   const panels={
     get:`<h3 class="blockhead">✈️ Getting there</h3><p class="sub">From your home base in Dublin</p>
@@ -2563,8 +2583,11 @@ function openDest(id){
         <div class="factcard kid"><h4>🧒 Just for kids</h4><ol>${ci.kid.map(f=>`<li>${f}</li>`).join('')}</ol></div>
       </div>`,
     photos:`<h3 class="blockhead">📸 Photo story</h3><p class="sub">A few postcards from ${d.name}</p><div class="gallery">${gallery}</div>`,
-    see:`<h3 class="blockhead">🏛️ What to see</h3><p class="sub">The big highlights</p>`+
-      d.attractions.map((a,i)=>`<div class="spot"><div class="num">${i+1}</div><div><h4>${a[1]}</h4><p>${a[2]}</p></div></div>`).join(''),
+    see:`<h3 class="blockhead">🏛️ What to see</h3><p class="sub">The big highlights — tap one to find it on the map</p>`+hiBox+
+      d.attractions.map((a,i)=>`<div class="spot"><div class="num">${i+1}</div><div style="flex:1"><h4>${a[1]}</h4><p>${a[2]}</p>
+        <a class="maplink" href="${gmap(a[1]+' '+(d.country||d.name))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
+      </div></div>`).join('')+tipsBox,
+    lang:langPanel,
     kids:`<h3 class="blockhead">🧒 Best for kids</h3><p class="sub">Top spots — with their Google Maps rating</p>`+
       d.kids.map((k,i)=>`<div class="spot"><div class="num">${i+1}</div><div><h4>${k[1]}</h4><p>${k[2]}</p>
         <div class="rating">${stars(k[3])}<span class="num2">${k[3]}</span><span class="rev">${k[4]} reviews</span></div>
