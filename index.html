@@ -494,7 +494,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   background:radial-gradient(120% 80% at 50% -10%, #FFD86B 0, transparent 45%), linear-gradient(155deg,#13B5AC,#46B3F0 55%,#7C6CF4)}
 .login.hidden{display:none}
 .login-card{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:30px 26px;text-align:center}
-.login-card .mark{width:78px;height:78px;margin:0 auto;display:block}
+.login-card .mark{width:104px;height:104px;margin:0 auto 4px;display:block;border-radius:22px;box-shadow:var(--shadow-sm)}
 .login-card h1{font-size:1.8rem;margin:12px 0 2px}
 .login-card .who{color:var(--ink-2);font-weight:700;margin-bottom:20px}
 .profiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -564,7 +564,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 
 <div id="loginScreen" class="login">
   <div class="login-card">
-    <svg class="mark" id="loginMark" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    <div class="mark" id="loginMark" aria-hidden="true"></div>
     <h1>Poppie's Atlas</h1>
     <div class="who">Who's exploring today?</div>
     <div class="profiles" id="profilePick">
@@ -2826,10 +2826,9 @@ function rotateFact(){document.getElementById('heroFact').textContent=FACTS[fact
    PWA polish
    ===================================================================== */
 (function(){
-  const svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2313B5AC'/><path d='M21 33 L25 7 L46 27 Z' fill='%2326262B'/><path d='M79 33 L75 7 L54 27 Z' fill='%2326262B'/><path d='M28 28 L30 15 L40 26 Z' fill='%23FF9DB0'/><path d='M72 28 L70 15 L60 26 Z' fill='%23FF9DB0'/><path d='M50 24 C71 24 84 39 84 57 C84 76 69 89 50 89 C31 89 16 76 16 57 C16 39 29 24 50 24 Z' fill='%23FFFFFF' stroke='%2326262B' stroke-width='2'/><path d='M17 56 C18 38 31 24 50 24 C69 24 82 38 83 56 C74 47 64 46 57 49 L50 62 L43 49 C36 46 26 47 17 56 Z' fill='%2326262B'/><ellipse cx='38' cy='62' rx='6' ry='7' fill='%23FFFFFF'/><ellipse cx='62' cy='62' rx='6' ry='7' fill='%23FFFFFF'/><ellipse cx='38' cy='63' rx='3.2' ry='5' fill='%237CC36B'/><ellipse cx='62' cy='63' rx='3.2' ry='5' fill='%237CC36B'/><ellipse cx='38' cy='64' rx='1.5' ry='3.4' fill='%2326262B'/><ellipse cx='62' cy='64' rx='1.5' ry='3.4' fill='%2326262B'/><path d='M50 71 l-4 -3.5 h8 z' fill='%23FF8FA3'/><path d='M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z' fill='%23FF8A1E'/></svg>";
-  const uri='data:image/svg+xml,'+svg;
+  const uri='poppie.jpg';   // the real Poppie app icon (sits next to index.html)
   document.getElementById('appicon').href=uri;
-  try{const m={name:"Poppie's Atlas",short_name:"Poppie",start_url:".",display:"standalone",background_color:"#FFFCF5",theme_color:"#13B5AC",icons:[{src:uri,sizes:"any",type:"image/svg+xml"}]};
+  try{const m={name:"Poppie's Atlas",short_name:"Poppie",start_url:".",display:"standalone",background_color:"#CDEFE6",theme_color:"#13B5AC",icons:[{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"any"}]};
     document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));}catch(e){}
 })();
 
@@ -3069,7 +3068,9 @@ function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!
   g.innerHTML=AVATAR_CHOICES.map(a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`).join('');
   g.querySelectorAll('.av-choice').forEach(b=>b.addEventListener('click',()=>setAvatar(avatarEditing,b.dataset.a))); }
 function setupLogin(){
-  const mk=document.getElementById('loginMark'); if(mk) mk.innerHTML=POPPIE_FACE;
+  const mk=document.getElementById('loginMark');
+  if(mk){ const im=new Image(); im.alt='Poppie the cat'; im.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:22px';
+    im.onerror=()=>{ mk.innerHTML='<svg viewBox="0 0 100 100">'+POPPIE_FACE+'</svg>'; }; im.src='poppie.jpg'; mk.innerHTML=''; mk.appendChild(im); }
   renderProfilePick();
   const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>document.getElementById('avatarModal').classList.add('hidden'));
   document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
