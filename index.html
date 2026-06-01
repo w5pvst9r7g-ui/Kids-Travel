@@ -622,10 +622,21 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .catstory-text{background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-left:5px solid var(--coral);border-radius:var(--r);padding:18px 22px;box-shadow:var(--shadow-sm)}
 .catstory-text p{margin:0 0 12px;font-size:1.06rem;line-height:1.6;color:var(--ink)}
 .catstory-text p:last-child{margin-bottom:0}
-.cat-chapter+.cat-chapter{margin-top:16px;padding-top:16px;border-top:2px dashed var(--line)}
-.cat-ch-title{font-family:var(--display);font-weight:800;color:var(--coral-d);font-size:1.08rem;margin-bottom:7px}
-.catstory-text .cat-chapter:first-child p:first-child:first-letter{font-family:var(--display);font-weight:800;font-size:2.6rem;line-height:.8;float:left;margin:4px 10px 0 0;color:var(--coral-d)}
-.cat-ch-title:first-letter{float:none;font-size:inherit;margin:0;color:var(--coral-d)}
+/* storybook pager */
+.catbook{background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-left:5px solid var(--coral);border-radius:var(--r);padding:18px 22px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;min-height:230px}
+.catbook-page{flex:1}
+.catbook-page p{margin:0 0 12px;font-size:1.08rem;line-height:1.65;color:var(--ink)}
+.catbook-page p:last-child{margin-bottom:0}
+.catbook-page strong{font-family:var(--display);color:var(--coral-d);font-size:1.12rem}
+.catbook-page p:first-child:first-letter{font-family:var(--display);font-weight:800;font-size:2.7rem;line-height:.8;float:left;margin:4px 10px 0 0;color:var(--coral-d)}
+@keyframes pageturn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.catbook-page.turn{animation:pageturn .28s ease}
+.catbook-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:2px dashed var(--line)}
+.catnav{background:var(--teal);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-weight:800;font-family:var(--sans);cursor:pointer;min-height:42px;box-shadow:0 3px 0 0 var(--teal-d)}
+.catnav:active{transform:translateY(2px);box-shadow:none}
+.catbook-dots{display:flex;gap:6px}
+.catdot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.catdot.on{background:var(--coral);transform:scale(1.25)}
 /* dramatic countdown hero */
 .cd-hero{position:relative;border-radius:var(--r-xl);overflow:hidden;min-height:clamp(320px,52vh,460px);display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);background:linear-gradient(140deg,var(--g1,#13B5AC),var(--g2,#46B3F0))}
 .cd-bg{position:absolute;inset:0}.cd-bg img{width:100%;height:100%;object-fit:cover}
@@ -4155,7 +4166,19 @@ let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
   catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
-let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null, planeTimer=null;
+let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null, planeTimer=null, catPages=[], catPage=0;
+function renderCatPage(){
+  const area=document.getElementById('catPageText'); if(!area) return;
+  if(!catPages.length){ area.innerHTML=''; return; }
+  catPage=Math.max(0,Math.min(catPage,catPages.length-1));
+  const html=String(catPages[catPage]).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').split(/\n\n+/).map(p=>'<p>'+p+'</p>').join('');
+  area.innerHTML=html; if(!reduceMotion){ area.classList.remove('turn'); void area.offsetWidth; area.classList.add('turn'); }
+  const dots=document.getElementById('catDots'); if(dots) dots.innerHTML=catPages.map((_,i)=>`<span class="catdot ${i===catPage?'on':''}"></span>`).join('');
+  const pv=document.getElementById('catPrev'), nx=document.getElementById('catNext');
+  if(pv) pv.style.visibility=catPage===0?'hidden':'visible';
+  if(nx) nx.textContent=catPage>=catPages.length-1?'The End 🐾':'Next ›';
+}
+function catGoPage(delta){ catPage+=delta; renderCatPage(); }
 /* —— photo lightbox —— */
 function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=d.photos.length; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex];
@@ -4371,15 +4394,19 @@ function openDest(id){
   })();
   const catPanel=(function(){
     const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[d.id];
+    catPages=[]; catPage=0;
     if(!c) return `<h3 class="blockhead">🐾 The local cat's tale</h3><p class="sub">${esc(d.name)}'s local cat is still snoozing — story coming soon!</p>`;
     const kw=c.photoKw||('cat,'+d.name);
-    let chapters=(c.stories&&c.stories.length)?c.stories.map(s=>typeof s==='string'?{text:s}:s):(c.story?[{text:c.story}]:[]);
-    const multi=chapters.length>1;
-    const storyHTML=chapters.map((ch,i)=>`<div class="cat-chapter">${ch.title?`<h4 class="cat-ch-title">${multi?'📖 '+(i+1)+'. ':''}${esc(ch.title)}</h4>`:''}${String(ch.text||'').split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('')}</div>`).join('');
-    return `<h3 class="blockhead">🐾 Meet ${esc(c.name)}</h3><p class="sub">${esc(d.name)}'s local cat — ${multi?chapters.length+' tales of adventure 🐈':'a tail of adventure 🐈'}</p>
+    if(c.pages&&c.pages.length) catPages=c.pages.map(p=>typeof p==='string'?p:((p.title?'**'+p.title+'**\n\n':'')+(p.text||'')));
+    else if(c.stories&&c.stories.length) catPages=c.stories.map(s=>typeof s==='string'?s:((s.title?'**'+s.title+'**\n\n':'')+(s.text||'')));
+    else if(c.story) catPages=[c.story];
+    return `<h3 class="blockhead">🐾 ${esc(c.name)}’s Tale</h3><p class="sub">A storybook adventure in ${esc(d.name)} — tap Next to turn the page 🐈</p>
       <div class="catstory">
         <figure class="catstory-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${pimg(kw,(d.id.length*13+7),700,560,c.name)}<figcaption>${esc(c.name)} · ${esc(d.name)}</figcaption></figure>
-        <div class="catstory-text">${storyHTML}</div>
+        <div class="catbook">
+          <div class="catbook-page" id="catPageText"></div>
+          <div class="catbook-nav"><button class="catnav" id="catPrev" onclick="catGoPage(-1)">‹ Back</button><span class="catbook-dots" id="catDots"></span><button class="catnav" id="catNext" onclick="catGoPage(1)">Next ›</button></div>
+        </div>
       </div>`;
   })();
 
@@ -4434,6 +4461,7 @@ function openDest(id){
     });
   });
   const _qs=document.getElementById('quizStart'); if(_qs) _qs.addEventListener('click',startQuiz);
+  renderCatPage();
   document.getElementById('addFromDetail').onclick=()=>{showView('trips');prefillForm(d.id);};
   showView('detail');
 }
