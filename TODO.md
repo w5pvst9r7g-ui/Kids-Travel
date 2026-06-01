@@ -78,6 +78,7 @@ Last updated: 2026-06-01
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppie → full-screen grumpy Poppie with a funny insult (pops in)
