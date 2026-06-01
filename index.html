@@ -294,8 +294,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .detail-cta .note{color:var(--muted);font-size:.9rem;font-weight:700}
 
 /* ============ MAP ============ */
-#map{height:min(60vh,560px);border-radius:var(--r-xl);box-shadow:var(--shadow);border:3px solid #fff;
-  outline:2px solid var(--line);margin-top:6px;z-index:1;background:#dfeef5}
+#map{height:min(60vh,560px);height:min(60dvh,560px);border-radius:var(--r-xl);box-shadow:var(--shadow);border:4px solid #fff;
+  outline:1px solid var(--line);margin-top:6px;z-index:1;background:#dfeef5}
 .maperr{height:min(60vh,560px);border-radius:var(--r-xl);background:var(--surface);border:2px solid var(--line);
   display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;padding:24px}
 .badge-ribbon{display:flex;align-items:center;gap:15px;background:linear-gradient(120deg,#fff,var(--surface-2));
@@ -305,9 +305,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .badge-ribbon .sub{color:var(--ink-2);font-weight:700;font-size:.9rem}
 .badge-ribbon .bar{height:10px;background:var(--line);border-radius:10px;margin-top:7px;overflow:hidden;width:200px;max-width:46vw}
 .badge-ribbon .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--coral));border-radius:10px;transition:width .8s ease}
-.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;color:var(--ink-2);font-weight:700;font-size:.9rem}
-.legend span{display:inline-flex;align-items:center;gap:8px}
-.leg-dot{width:14px;height:14px;border-radius:50%}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;color:var(--ink-2);font-weight:700;font-size:.85rem}
+.legend span{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 13px;box-shadow:var(--shadow-sm)}
+.leg-dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.04)}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:16px}
 .stat{background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);padding:20px 16px;text-align:center;box-shadow:var(--shadow-sm)}
 .stat .big{font-family:var(--display);font-size:2.4rem;font-weight:800;color:var(--teal-d);line-height:1}
@@ -315,7 +315,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .stat .lbl{color:var(--ink-2);font-weight:800;font-size:.82rem;margin-top:6px}
 
 .pin svg{filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
-.plane-fly{font-size:1.4rem;line-height:1;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.plane-fly .pe{display:block;font-size:1.55rem;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));transition:transform .12s linear}
 .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:var(--shadow);padding:4px}
 .leaflet-popup-content{margin:10px 12px;font-family:var(--sans)}
 .pop{width:200px}
@@ -4146,8 +4146,17 @@ function buildMap(){
   const np=nextPlanned();
   if(np && np.lat!=null && !reduceMotion){
     const pts=arc(originFor(np),{lat:np.lat,lng:np.lng});
-    const pm=L.marker(pts[0],{icon:L.divIcon({className:'plane-fly',html:'✈️',iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500,interactive:false}).addTo(layer);
-    let k=0; planeTimer=setInterval(()=>{ k=(k+2)%pts.length; pm.setLatLng(pts[k]); },90);
+    L.polyline(pts,{color:'#FFD86B',weight:12,opacity:.16,lineCap:'round',interactive:false}).addTo(layer);  /* soft glow */
+    L.polyline(pts,{color:'#FFC23C',weight:3.5,opacity:.95,lineCap:'round',interactive:false}).addTo(layer); /* bright route */
+    const pm=L.marker(pts[0],{icon:L.divIcon({className:'plane-fly',html:'<span class="pe">✈️</span>',iconSize:[30,30],iconAnchor:[15,15]}),zIndexOffset:1500,interactive:false}).addTo(layer);
+    let k=0;
+    planeTimer=setInterval(()=>{
+      const a=pts[k], b=pts[(k+3)%pts.length];
+      const rot=Math.atan2(b[1]-a[1], b[0]-a[0])*180/Math.PI - 45;   /* ✈️ points NE by default */
+      pm.setLatLng(pts[k]);
+      const ic=pm._icon&&pm._icon.querySelector('.pe'); if(ic) ic.style.transform='rotate('+rot+'deg)';
+      k=(k+1)%(pts.length-1);
+    },70);
   }
   const sum=document.getElementById('mapSummary');
   if(sum) sum.textContent='Home bases: Gold Coast, Australia and Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
