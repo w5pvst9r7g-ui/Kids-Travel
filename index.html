@@ -656,6 +656,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .catcover:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 @media(max-width:560px){.catcover{grid-template-columns:1fr}}
 .catcover-pic{margin:0;position:relative;aspect-ratio:1;border-radius:var(--r-lg);overflow:hidden;border:3px solid #fff;outline:1px solid var(--line)}
+.catcover-pic img{object-position:50% 35%}
 .catcover-name{font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--ink)}
 .catcover-title{font-style:italic;color:var(--ink-2);font-weight:700;margin:3px 0 8px}
 .catcover-meta{color:var(--muted);font-weight:700;font-size:.86rem;margin-bottom:14px}
@@ -669,7 +670,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .story-title{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--coral-d);text-align:center;padding:0 36px 14px}
 .story-body{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start}
 @media(max-width:520px){.story-body{grid-template-columns:96px 1fr;gap:12px}}
-.story-cat{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;border:4px solid #fff;box-shadow:var(--shadow-sm);background:#CDEFE6}
+.story-cat{width:100%;aspect-ratio:1;object-fit:cover;object-position:50% 32%;border-radius:20px;border:4px solid #fff;box-shadow:var(--shadow-sm);background:#CDEFE6}
 .story-bubble{position:relative;background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-radius:18px;padding:18px 20px;min-height:200px}
 .story-bubble:before{content:"";position:absolute;left:-13px;top:34px;width:0;height:0;border:11px solid transparent;border-right-color:var(--line);border-left:0}
 .story-bubble:after{content:"";position:absolute;left:-10px;top:36px;width:0;height:0;border:9px solid transparent;border-right-color:#fff;border-left:0}
@@ -4425,7 +4426,14 @@ function openStory(id){
   storyCat=c; storyPages=normalizeCatPages(c); storyPage=0;
   const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=c.title||(c.name+'’s Tale');
   const img=document.getElementById('storyCatImg');
-  if(img){ img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(c.photoKw||('cat,'+id),77,520,520); }
+  if(img){
+    /* lead with the "cat" tag and keep it to 2 tags — loremflickr requires ALL tags to match,
+       so a long keyword often returns a scene with no cat in it */
+    var parts=(c.photoKw||('cat,'+id)).split(',').map(s=>s.trim()).filter(Boolean);
+    if(parts[0]!=='cat') parts.unshift('cat');
+    var kw=parts.slice(0,2).join(',');
+    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(kw,77,520,520);
+  }
   renderStoryPage();
   document.getElementById('storyReader').classList.remove('hidden');
   if(currentDest) markCatRead(currentDest.id);
