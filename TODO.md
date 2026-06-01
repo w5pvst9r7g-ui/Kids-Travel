@@ -76,7 +76,9 @@ Last updated: 2026-06-01
 
 ### High value
 - [x] **Offline / PWA** — service worker (network-first HTML so deploys stay fresh, cache-first assets), web manifest, **Add-to-home-screen** button, favicon + Open Graph share previews. Live once GitHub Pages serves the branch ✅
-- [ ] **Cross-device cloud sync (Supabase)** — true multi-device persistence *(needs a free Supabase project + URL/key from Grant)*
+- [x] **Cross-device cloud sync (Supabase)** — built! Journal → ☁️ Cloud sync: paste your project URL + anon key + a family code, then Back up / Restore all explorers' data across devices. Dormant until configured. *(needs Grant to create the free project & run the one-line table SQL shown in the dialog)*
+- [x] **Spot photos** — "What to see" & "Fun stuff to do" now use the **curated destination photos** (no more random stock)
+- [x] **`main` branch** created so GitHub Pages serves from a conventional branch (kept in sync)
 - [x] **Direct-to-Rabat** flight info update ✈️
 
 ### Medium
