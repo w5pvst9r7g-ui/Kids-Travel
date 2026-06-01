@@ -647,6 +647,9 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .pin-err{color:var(--coral-d);font-weight:800;min-height:1.3em;margin:10px 0 4px}
 @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(6px)}50%{transform:translateX(-9px)}}
 .shake{animation:shake .4s}
+#installBtn{margin-left:auto;background:var(--teal-d);color:#fff;border:none;border-radius:999px;padding:8px 14px;font-weight:800;font-size:.84rem;cursor:pointer;font-family:var(--sans);box-shadow:0 3px 0 0 var(--teal-dd);white-space:nowrap}
+#installBtn:hover{transform:translateY(-1px)}
+#installBtn[hidden]{display:none}
 #profileChip{display:none;align-items:center;gap:7px;background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:800;color:var(--ink);font-size:.9rem;cursor:pointer}
 #profileChip:hover{border-color:var(--teal)}
 #profileChip .av-svg{width:22px;height:22px;display:inline-block}
@@ -883,6 +886,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <button data-view="trips">Journal</button>
       <button data-view="badges">🏅 Badges</button>
     </nav>
+    <button id="installBtn" type="button" hidden onclick="doInstall()" title="Add Poppie's Atlas to your home screen">📲 Install</button>
     <button id="profileChip" onclick="showLogin()" title="Switch explorer" aria-label="Switch explorer"></button>
   </div>
 </header>
@@ -5636,6 +5640,17 @@ function openHeroSpot(){ if(heroSpotId) openDest(heroSpotId); }
     window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
   }
 })();
+/* "Add to home screen" — show a small Install pill when the browser offers it */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e;
+  try{ if(localStorage.getItem('globie_installed')) return; }catch(_){}
+  const b=document.getElementById('installBtn'); if(b) b.hidden=false; });
+function doInstall(){ const b=document.getElementById('installBtn');
+  if(!deferredInstall){ if(b) b.hidden=true; return; }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.finally(()=>{ deferredInstall=null; if(b) b.hidden=true; }); }
+window.addEventListener('appinstalled',()=>{ try{localStorage.setItem('globie_installed','1');}catch(_){}
+  const b=document.getElementById('installBtn'); if(b) b.hidden=true; });
 
 /* =====================================================================
    INIT
