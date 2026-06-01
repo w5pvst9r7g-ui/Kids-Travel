@@ -45,7 +45,7 @@ Last updated: 2026-06-01
 ---
 
 ## 🔜 In progress
-- [ ] **Hero photo upgrade** — re-curate ~17 less-iconic heroes to more "wow" shots *(agent running; integrate when done)*
+- [x] **Hero photo upgrade** — 17 less-iconic heroes swapped for more "wow" shots (Whitehaven aerial, Flinders St at night, Avon punting, Düden Falls…)
 
 ---
 

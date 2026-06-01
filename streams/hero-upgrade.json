@@ -1,0 +1,146 @@
+{
+  "antalya": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Lower%20D%C3%BCden%20Waterfall.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Antalya%2C%20Turkey%20March%202022%20-%20D%C3%BCden%20Park%20-%20Lower%20D%C3%BCden%20Waterfalls.jpg?width=1280"
+    ],
+    "fallbackKeywords": "lower,duden,waterfall,antalya,cliff,sea,mediterranean",
+    "caption": "The Lower Duden Waterfall crashing off the cliff straight into the sea"
+  },
+  "tirana": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Colorful%20buildings%20in%20Tirana.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Tirana%20colorful%20buildings.jpg?width=1280"
+    ],
+    "fallbackKeywords": "tirana,colourful,painted,buildings,facades,albania,rainbow",
+    "caption": "Tirana's rainbow of painted buildings, a whole city turned into art",
+    "_notes": "Exact Commons filenames for Tirana's painted buildings not confirmed via search; both candidates are best-guess constructions. fallbackKeywords are the reliable safety net here."
+  },
+  "fez": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Chowara%20traditional%20tannery%20with%20dyeing%20vats%20Fez%20Morocco%20(16741144778).jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Rooftop%20Aerials%20and%20Satellite%20Dishes%20-%20Medina%20(Old%20City)%20-%20Fez%20-%20Morocco.jpg?width=1280"
+    ],
+    "fallbackKeywords": "fez,chouara,tannery,colourful,dye,vats,morocco,medina",
+    "caption": "The honeycomb of colourful dye pits at the Chouara tannery"
+  },
+  "melbourne": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Flinders%20St%20Station%20at%20night%20(cropped).jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Melbourne%20skyline%20view%20from%20Southbank%20with%20Princes%20Bridge%20and%20Flinders%20St%2C%202018.jpg?width=1280"
+    ],
+    "fallbackKeywords": "melbourne,flinders,street,station,night,lights,skyline",
+    "caption": "Flinders Street Station glowing gold against the night skyline"
+  },
+  "goldcoast": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Surfers%20Paradise%20Skyline.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Skylines%20of%20Main%20Beach%20and%20Surfers%20Paradise%2C%20Queensland%20in%20January%202017.jpg?width=1280"
+    ],
+    "fallbackKeywords": "gold,coast,surfers,paradise,skyline,beach,skyscrapers",
+    "caption": "Surfers Paradise skyscrapers towering over the golden beach"
+  },
+  "sunshinecoast": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Noosa%20beach-raffi%20kojian-CIMG6544.JPG?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Glass%20House%20Mountains.jpg?width=1280"
+    ],
+    "fallbackKeywords": "noosa,sunshine,coast,beach,glass,house,mountains,queensland",
+    "caption": "Noosa's turquoise bays on the sunny Sunshine Coast",
+    "_notes": "Second candidate 'Glass House Mountains.jpg' is a best-guess filename; lean on fallbackKeywords if it misses."
+  },
+  "whitsundays": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Hill%20Inlet%20and%20Whitehaven%20Beach.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Whitehaven%20Beach%2C%20Whitsunday%20Island%2C%20Queensland%2C%20Australia.jpg?width=1280"
+    ],
+    "fallbackKeywords": "whitsundays,hill,inlet,whitehaven,beach,aerial,swirling,sand,turquoise",
+    "caption": "Swirling white sand and turquoise water at Hill Inlet, Whitehaven Beach"
+  },
+  "brisbane": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Brisbane%20Skyline%20at%20Night.JPG?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Storey%20Bridge%20and%20Brisbane%20CBD%20May%202013.JPG?width=1280"
+    ],
+    "fallbackKeywords": "brisbane,story,bridge,skyline,night,river,lights,south,bank",
+    "caption": "Brisbane's skyline and Story Bridge lit up over the river at night"
+  },
+  "adelaide": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Adelaide%20Oval%20stadium%20at%20night%2C%20viewed%20from%20City%20Bridge%20on%20King%20William%20Road.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Adelaide%20skyline%20from%20Montefiore%20Hill.jpg?width=1280"
+    ],
+    "fallbackKeywords": "adelaide,oval,torrens,river,skyline,night,lights,city",
+    "caption": "Adelaide Oval glowing over the Torrens River at night"
+  },
+  "darwin": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Mindil%20Sunset%20-%20panoramio.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Saltwater%20crocodile%20jumping%20Adelaide%20River.jpg?width=1280"
+    ],
+    "fallbackKeywords": "darwin,mindil,beach,sunset,fiery,orange,sky,palm",
+    "caption": "A blazing sunset over Mindil Beach in Darwin",
+    "_notes": "Second candidate (jumping croc) is a best-guess filename; if it misses the Mindil sunset primary stands strong."
+  },
+  "herveybay": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Humpback%20whale%20breaching%20Hervey%20Bay.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Humpback%20Whale%20underwater%20shot.jpg?width=1280"
+    ],
+    "fallbackKeywords": "hervey,bay,humpback,whale,breaching,jumping,ocean,splash",
+    "caption": "A giant humpback whale bursting out of the water at Hervey Bay",
+    "_notes": "No confirmed Hervey-Bay-specific breaching file found on Commons; candidates are best-guess. fallbackKeywords (breaching humpback whale) are the reliable safety net."
+  },
+  "agneswater": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Agnes%20Water%20Beach.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Town%20of%201770%20Queensland.jpg?width=1280"
+    ],
+    "fallbackKeywords": "agnes,water,1770,surf,beach,golden,sand,queensland,waves",
+    "caption": "Rolling surf on the golden sand at Agnes Water",
+    "_notes": "Exact Commons filenames for Agnes Water beach not confirmed via search; candidates are best-guess. Lean on fallbackKeywords."
+  },
+  "christchurch": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Avon%20Punting.JPG?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/River%20Avon%20by%20Christchurch%20Botanic%20Gardens%2C%20New%20Zealand.jpg?width=1280"
+    ],
+    "fallbackKeywords": "christchurch,punting,avon,river,boat,botanic,gardens,green",
+    "caption": "Gliding along the Avon River on a punt through Christchurch"
+  },
+  "kentroma": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Blue%20Lagoon%20Sivota.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Sivota%20Thesprotia%20Greece.jpg?width=1280"
+    ],
+    "fallbackKeywords": "sivota,blue,lagoon,turquoise,water,greece,boats,clear,sea",
+    "caption": "The glowing turquoise water of Sivota's Blue Lagoon",
+    "_notes": "Primary 'Blue Lagoon Sivota' filename is a best-guess; the second candidate is the existing confirmed Sivota file. fallbackKeywords cover the turquoise blue lagoon look."
+  },
+  "vanuatu": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Nanda%20Blue%20Hole%2C%20Espiritu%20Santo%2C%20Vanuatu.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Blue%20Lagoon%20Efate%20Vanuatu.jpg?width=1280"
+    ],
+    "fallbackKeywords": "vanuatu,blue,hole,lagoon,turquoise,crystal,water,espiritu,santo",
+    "caption": "Vanuatu's electric-blue swimming hole hidden in the jungle",
+    "_notes": "Both candidate filenames are best-guess constructions; no exact JPG confirmed via search. fallbackKeywords are the primary safety net for the turquoise blue-hole look."
+  },
+  "johannesburg": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Lion%20at%20Lion%20%26%20Safari%20Park.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Panthera%20leo%20-%20Lion%20Park%2C%20South%20Africa.jpg?width=1280"
+    ],
+    "fallbackKeywords": "lion,safari,johannesburg,wildlife,big,cat,south,africa,mane",
+    "caption": "A magnificent lion on safari near Johannesburg",
+    "_notes": "Exact lion-photo filenames at the Lion & Safari Park near Johannesburg not confirmed via search; candidates are best-guess. Lean on fallbackKeywords (safari lion)."
+  },
+  "fuerteventura": {
+    "candidates": [
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Dunas%20de%20Corralejo%20Fuerteventura.jpg?width=1280",
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Corralejo%20dunes%20and%20beach%20Fuerteventura.jpg?width=1280"
+    ],
+    "fallbackKeywords": "fuerteventura,corralejo,dunes,turquoise,sea,beach,sand,canary",
+    "caption": "Golden Corralejo dunes meeting the turquoise sea"
+  }
+}
