@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Poppie's Atlas — A Kids' Travel Adventure</title>
-<meta name="theme-color" content="#10B5AE" />
+<meta name="theme-color" content="#2FAEA2" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -5576,8 +5576,14 @@ function rotateFact(){const el=document.getElementById('heroFact'); if(el) el.te
 (function(){
   const uri='poppie.jpg';   // the real Poppie app icon (sits next to index.html)
   document.getElementById('appicon').href=uri;
-  try{const m={name:"Poppie's Atlas",short_name:"Poppie",start_url:".",display:"standalone",background_color:"#CDEFE6",theme_color:"#13B5AC",icons:[{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"any"}]};
+  try{const m={name:"Poppie's Atlas",short_name:"Poppie",description:"A fun travel atlas for kids — countdowns, photos, quizzes, cat stories and a passport of every adventure.",
+    start_url:".",scope:".",display:"standalone",orientation:"portrait",lang:"en",background_color:"#FAF6EF",theme_color:"#2FAEA2",
+    icons:[{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"any"},{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"maskable"}]};
     document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));}catch(e){}
+  /* register the offline service worker only when hosted (skips file://) */
+  if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+    window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+  }
 })();
 
 /* =====================================================================
