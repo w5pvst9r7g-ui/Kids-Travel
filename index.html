@@ -6,6 +6,8 @@
 <title>Poppie's Atlas — A Kids' Travel Adventure</title>
 <meta name="theme-color" content="#10B5AE" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Poppie's Atlas" />
 <link id="appicon" rel="apple-touch-icon" href="" />
 <link id="manifest" rel="manifest" href="" />
@@ -22,9 +24,10 @@
 :root{
   /* —— bright, friendly, NO red —— */
   --bg:#FFFCF5; --surface:#FFFFFF; --surface-2:#FFF8EC;
-  --ink:#26324A; --ink-2:#5A6582; --muted:#939CB2; --line:#ECEFF6; --line-2:#F4F1E8;
-  --teal:#13B5AC; --teal-d:#0E9890; --sky:#46B3F0; --yellow:#FFC23C; --yellow-d:#F0A91E;
-  --coral:#FF8366; --coral-d:#F46A4B; --grape:#7C6CF4; --green:#43C28A; --pink:#FF7FB0;
+  --ink:#26324A; --ink-2:#535C77; --muted:#5E6480; --line:#ECEFF6; --line-2:#F4F1E8;
+  --teal:#13B5AC; --teal-d:#0A7F78; --sky:#46B3F0; --yellow:#FFC23C; --yellow-d:#F0A91E;
+  --coral:#FF8366; --coral-d:#C2410C; --grape:#7C6CF4; --green:#43C28A; --pink:#FF7FB0;
+  --header-h:74px;
   --shadow:0 16px 36px -18px rgba(38,50,74,.34), 0 4px 12px -6px rgba(38,50,74,.14);
   --shadow-sm:0 8px 20px -12px rgba(38,50,74,.30);
   --shadow-pop:0 10px 0 0 rgba(0,0,0,.04);
@@ -370,6 +373,36 @@ textarea{resize:vertical}
 
 .footnote{text-align:center;color:var(--muted);margin-top:44px;font-size:.86rem;font-weight:700}
 .footnote .mini{display:inline-block;margin-bottom:6px;color:var(--line)}
+
+/* ===== accessibility + mobile hardening (from UX audit) ===== */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:3px solid var(--grape);outline-offset:2px;border-radius:6px}
+.dcard:focus-visible{outline-offset:-3px}
+nav.top button.active{background:var(--teal-d)}
+.snav button.active{background:var(--coral-d);border-color:var(--coral-d)}
+.maplink{background:var(--teal-d);box-shadow:0 4px 0 0 #08665f}
+.site{padding-top:env(safe-area-inset-top)}
+.site .wrap{padding-left:max(var(--pad),env(safe-area-inset-left));padding-right:max(var(--pad),env(safe-area-inset-right))}
+main{padding-left:max(var(--pad),env(safe-area-inset-left));padding-right:max(var(--pad),env(safe-area-inset-right))}
+.hero{min-height:clamp(330px,50dvh,470px)}
+.dhero{min-height:clamp(290px,44dvh,420px)}
+#map,.maperr{height:min(60dvh,560px)}
+body{overscroll-behavior-y:none}
+#map{touch-action:pan-x pan-y}
+nav.top button,.snav button,.chip,.back{min-height:44px}
+.entry .acts button{min-height:44px}
+.ratepick svg{width:38px;height:38px;padding:3px}
+.snav{top:calc(var(--header-h) + env(safe-area-inset-top));-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}
+@media(max-width:760px){
+  .tabbar button{min-height:50px}
+  body{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+}
+@media(prefers-reduced-motion:reduce){
+  .panel.active{animation:none}
+  .dcard:hover,.entry:hover{transform:none}
+  .frame img{transition:none}
+  *{scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
@@ -393,7 +426,7 @@ textarea{resize:vertical}
       </svg>
       <span><span class="name">Poppie's Atlas</span><span class="tag">Kids' Travel Adventure</span></span>
     </a>
-    <nav class="top">
+    <nav class="top" aria-label="Primary">
       <button class="active" data-view="explore">Explore</button>
       <button data-view="map">Atlas Map</button>
       <button data-view="trips">Travel Journal</button>
@@ -451,7 +484,8 @@ textarea{resize:vertical}
   <section id="map-view" class="view">
     <div class="section-head"><div><span class="eyebrow teal">Every journey, charted</span><h2>My Atlas Map 🗺️</h2></div></div>
     <p class="lead" style="max-width:680px;margin:-6px 0 18px">Each trip draws a flight path from home in Dublin 🇮🇪 across the world. Tap a marker to remember the adventure!</p>
-    <div id="map"></div>
+    <div id="map" role="application" aria-label="World map of your trips. A text summary follows."></div>
+    <div id="mapSummary" class="sr-only" aria-live="polite"></div>
     <div class="legend">
       <span><span class="leg-dot" style="background:#FF8366"></span> Places visited</span>
       <span><span class="leg-dot" style="background:#FFC23C"></span> Coming up next</span>
@@ -496,7 +530,7 @@ textarea{resize:vertical}
   </section>
 </main>
 
-<nav class="tabbar">
+<nav class="tabbar" aria-label="Primary">
   <button class="active" data-view="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="16.2,7.8 11,11 7.8,16.2 13,13" fill="currentColor" stroke="none"/></svg>Explore</button>
   <button data-view="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3z"/><path d="M9 3v15M15 6v15"/></svg>Map</button>
   <button data-view="trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg>Journal</button>
@@ -509,7 +543,8 @@ textarea{resize:vertical}
 const HOME = {code:'DUB', name:'Dublin', country:'Ireland', flag:'🇮🇪', lat:53.4264, lng:-6.2499};
 const gmap  = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 const flick = (kw, lock, w=800, h=600) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
-const pimg  = (kw, lock, w, h, alt='') => `<img loading="lazy" alt="${alt}" src="${flick(kw,lock,w,h)}" onerror="this.classList.add('failed')">`;
+const esc   = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const pimg  = (kw, lock, w, h, alt='') => `<img loading="lazy" decoding="async" width="${w}" height="${h}" alt="${esc(alt)}" src="${flick(kw,lock,w,h)}" onerror="this.classList.add('failed')">`;
 
 const DESTS = [
 {
@@ -975,9 +1010,11 @@ const POPPIE = `<svg class="globie" viewBox="0 0 100 100" aria-label="Poppie the
    STATE + STORAGE
    ===================================================================== */
 const LS_KEY='globie_atlas_trips_v2';
-function loadTrips(){ try{const s=localStorage.getItem(LS_KEY); if(s) return JSON.parse(s);}catch(e){}
+function loadTrips(){ try{const s=localStorage.getItem(LS_KEY); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
-function saveTrips(){ try{localStorage.setItem(LS_KEY,JSON.stringify(trips));}catch(e){} }
+let storageOK=true;
+function saveTrips(){ try{localStorage.setItem(LS_KEY,JSON.stringify(trips));}
+  catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
 let editingId=null, formRating=0, currentDest=null, map=null, layer=null;
 const reduceMotion=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -988,7 +1025,7 @@ function starSVG(filled){
     +`<path d="M12 2.2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 17l-6 3.5 1.5-6.6-5-4.4 6.7-.6z"/></svg>`;
 }
 function stars(n){let s='<span class="stars">';for(let i=1;i<=5;i++)s+=starSVG(i<=Math.round(n));return s+'</span>';}
-function sticker(emoji){return `<span class="sticker">${emoji||'🌍'}</span>`;}
+function sticker(emoji){return `<span class="sticker" aria-hidden="true">${esc(emoji||'🌍')}</span>`;}
 function frameStyle(th){return `--g1:${th.g1};--g2:${th.g2}`;}
 
 const io=('IntersectionObserver'in window)?new IntersectionObserver(es=>{
@@ -1016,10 +1053,10 @@ function confetti(){
 function showView(v){
   const ids={explore:'explore',map:'map-view',trips:'trips',detail:'detail'};
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
-  document.getElementById(ids[v]).classList.add('active');
+  (document.getElementById(ids[v])||document.getElementById('explore')).classList.add('active');
   document.querySelectorAll('nav.top button, .tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
-  if(v==='map') setTimeout(initMap,90);
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='map') setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90);
+  window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
 }
 document.querySelectorAll('nav.top button[data-view], .tabbar button[data-view]').forEach(b=>
@@ -1068,7 +1105,7 @@ function renderGrid(){
     if(vis.has(d.id))tag='<span class="t visited">✓ Visited</span>';
     else if(soon.has(d.id))tag='<span class="t soon">Coming up</span>';
     else tag=`<span class="t">${d.tag}</span>`;
-    return `<article class="dcard" onclick="openDest('${d.id}')">
+    return `<article class="dcard" role="button" tabindex="0" aria-label="Explore ${esc(d.name)}, ${esc(d.country)}" onclick="openDest('${d.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDest('${d.id}')}">
       <div class="frame" style="${frameStyle(th)}">
         <div class="tags">${tag}</div>${sticker(d.emoji)}
         ${pimg(d.photos[0][0],d.photos[0][2],800,540,d.name)}
@@ -1094,11 +1131,12 @@ function openDest(id){
   document.getElementById('dlead').textContent=d.tagline;
 
   const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids']];
-  document.getElementById('dtabs').innerHTML=tabs.map((t,i)=>`<button class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
+  const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
+  dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
   const gt=d.gettingThere,ci=d.country_info;
   const meta=(k,v)=>`<div class="meta-item"><div class="k">${k}</div><div class="v">${v}</div></div>`;
-  const gallery=d.photos.map((p,i)=>`<figure class="${i===0?'big':(i===3?'wide':'')}"><div class="frame" style="${frameStyle(th)}">${sticker(d.emoji)}${pimg(p[0],p[2],700,560,p[1])}</div><figcaption>${p[1]}</figcaption></figure>`).join('');
+  const gallery=d.photos.map((p,i)=>`<figure class="${i===0?'big':(i===3?'wide':'')}"><div class="frame" style="${frameStyle(th)}">${sticker(d.emoji)}${pimg(p[0],p[2],700,560,'')}</div><figcaption>${p[1]}</figcaption></figure>`).join('');
 
   const panels={
     get:`<h3 class="blockhead">✈️ Getting there</h3><p class="sub">From your home base in Dublin</p>
@@ -1127,12 +1165,23 @@ function openDest(id){
         <a class="maplink" href="${gmap(k[5])}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
       </div></div>`).join('')
   };
-  document.getElementById('panels').innerHTML=tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}">${panels[t[0]]}</div>`).join('');
-  document.querySelectorAll('#dtabs button').forEach(tb=>tb.addEventListener('click',()=>{
-    document.querySelectorAll('#dtabs button').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('#panels .panel').forEach(x=>x.classList.remove('active'));
-    tb.classList.add('active');document.getElementById('panel-'+tb.dataset.p).classList.add('active');
-  }));
+  document.getElementById('panels').innerHTML=tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}" role="tabpanel" aria-labelledby="tab-${t[0]}" tabindex="0" ${i!==0?'hidden':''}>${panels[t[0]]}</div>`).join('');
+  const dtabsBtns=[...document.querySelectorAll('#dtabs button')];
+  function activateTab(tb,focus){
+    dtabsBtns.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');x.tabIndex=-1;});
+    document.querySelectorAll('#panels .panel').forEach(x=>{x.classList.remove('active');x.hidden=true;});
+    tb.classList.add('active');tb.setAttribute('aria-selected','true');tb.tabIndex=0;
+    const p=document.getElementById('panel-'+tb.dataset.p); p.classList.add('active'); p.hidden=false;
+    if(focus) tb.focus();
+    tb.scrollIntoView({inline:'center',block:'nearest',behavior:reduceMotion?'auto':'smooth'});
+  }
+  dtabsBtns.forEach((tb,i)=>{
+    tb.addEventListener('click',()=>activateTab(tb,false));
+    tb.addEventListener('keydown',e=>{
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();
+        const dir=e.key==='ArrowRight'?1:-1; activateTab(dtabsBtns[(i+dir+dtabsBtns.length)%dtabsBtns.length],true);}
+    });
+  });
   document.getElementById('addFromDetail').onclick=()=>{showView('trips');prefillForm(d.id);};
   showView('detail');
 }
@@ -1206,14 +1255,16 @@ function buildMap(){
     L.marker([t.lat,t.lng],{icon:pinIcon(col)}).addTo(layer).bindPopup(
       `<div class="pop"><div class="pframe frame" style="${frameStyle(th)}">${sticker(t.emoji||(d&&d.emoji))}${pimg(kw,lk,360,220,t.city)}</div>`
       +(t.planned?'<span class="soonbadge">Coming up</span>':'')
-      +`<div class="ttl">${t.city}</div><div class="sub">${t.flag||''} ${t.country||''} · ${t.year||''}</div>`
+      +`<div class="ttl">${esc(t.city)}</div><div class="sub">${esc(t.flag)} ${esc(t.country)} · ${esc(t.year)}</div>`
       +(t.rating?`<div>${stars(t.rating)}</div>`:'')
-      +(t.note?`<div class="nt">“${t.note.replace(/</g,'&lt;')}”</div>`:'')
+      +(t.note?`<div class="nt">“${esc(t.note)}”</div>`:'')
       +`<div class="km">✈️ ${haversine(HOME,dest).toLocaleString()} km from home</div></div>`);
     bounds.push([t.lat,t.lng]);
   });
   if(bounds.length>1) map.fitBounds(bounds,{padding:[60,60]});
   setTimeout(()=>map.invalidateSize(),60);
+  const sum=document.getElementById('mapSummary');
+  if(sum) sum.textContent='Home base Dublin, Ireland. '+(trips.length?trips.map(t=>`${t.city}${t.country?', '+t.country:''}, ${t.planned?'coming up':t.year}`).join('. '):'No trips yet — add one in your Journal.')+'.';
   renderStats();
 }
 function renderStats(){
@@ -1248,10 +1299,24 @@ function buildDestSelect(){
 }
 function buildRatePick(){
   const r=document.getElementById('ratepick');
-  r.innerHTML=[1,2,3,4,5].map(v=>`<span data-v="${v}">${starSVG(false)}</span>`).join('');
-  r.querySelectorAll('span').forEach(s=>s.addEventListener('click',()=>setRating(+s.dataset.v)));
+  r.setAttribute('role','radiogroup');
+  r.setAttribute('aria-label','How fun was it, 1 to 5 stars');
+  r.innerHTML=[1,2,3,4,5].map(v=>`<span role="radio" tabindex="${v===1?0:-1}" aria-checked="false" aria-label="${v} star${v>1?'s':''}" data-v="${v}">${starSVG(false)}</span>`).join('');
+  r.querySelectorAll('span').forEach(s=>{
+    s.addEventListener('click',()=>setRating(+s.dataset.v));
+    s.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();setRating(+s.dataset.v);}
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();setRating(Math.min(5,(formRating||0)+1));focusStar();}
+      else if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();setRating(Math.max(1,(formRating||1)-1));focusStar();}
+    });
+  });
 }
-function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').forEach(s=>{s.innerHTML=starSVG(+s.dataset.v<=n);});}
+function focusStar(){const el=document.querySelector(`#ratepick [data-v="${formRating}"]`); if(el) el.focus();}
+function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').forEach(s=>{
+  const v=+s.dataset.v; s.innerHTML=starSVG(v<=n);
+  s.setAttribute('aria-checked',v===n?'true':'false');
+  s.tabIndex=(v===n||(n===0&&v===1))?0:-1;
+});}
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
@@ -1265,9 +1330,9 @@ function renderPassport(){
       <div class="pic frame" style="${frameStyle(th)}">
         ${t.planned?'<span class="soon">Upcoming</span>':''}<span class="yr">${t.year||''}</span>
         ${sticker(t.emoji||(d&&d.emoji))}${pimg(kw,lk,520,330,t.city)}<div class="scrim"></div>
-        <div class="where"><div class="c">${t.flag||''} ${t.country||''}</div><h4>${t.city}</h4></div>
+        <div class="where"><div class="c">${esc(t.flag)} ${esc(t.country)}</div><h4>${esc(t.city)}</h4></div>
       </div>
-      <div class="b">${t.rating?stars(t.rating):''}${t.note?`<p class="nt">“${t.note.replace(/</g,'&lt;')}”</p>`:''}
+      <div class="b">${t.rating?stars(t.rating):''}${t.note?`<p class="nt">“${esc(t.note)}”</p>`:''}
         <div class="acts">
           <button onclick="editTrip('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit</button>
           <button class="del" onclick="delTrip('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Delete</button>
@@ -1285,8 +1350,11 @@ function readForm(){
   if(sel==='__custom'){
     const city=document.getElementById('fCity').value.trim();
     if(!city){alert('Please type a place name 🙂');return null;}
+    const latRaw=document.getElementById('fLat').value, lngRaw=document.getElementById('fLng').value;
+    const lat=parseFloat(latRaw), lng=parseFloat(lngRaw);
+    if((latRaw||lngRaw) && (isNaN(lat)||isNaN(lng))){ alert('Add both latitude and longitude (or leave both blank) so I can pin it on the map. 🗺️'); return null; }
     return {destId:null,city,country:'',flag:'',emoji:document.getElementById('fEmoji').value.trim()||'📍',
-      lat:parseFloat(document.getElementById('fLat').value)||null,lng:parseFloat(document.getElementById('fLng').value)||null,
+      lat:isNaN(lat)?null:lat,lng:isNaN(lng)?null:lng,
       year,planned,rating:formRating,note};
   }
   const d=DESTS.find(x=>x.id===sel);
@@ -1354,6 +1422,8 @@ document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"',
 renderFeatured();renderFilters();renderGrid();buildDestSelect();buildRatePick();renderPassport();
 document.getElementById('fYear').value=new Date().getFullYear();
 rotateFact();setInterval(rotateFact,6000);observeReveals();
+function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
+addEventListener('resize',syncHeader); syncHeader();
 </script>
 </body>
 </html>
