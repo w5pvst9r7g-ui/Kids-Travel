@@ -142,6 +142,11 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .hero .inner{position:relative;z-index:2;color:#fff;padding:clamp(22px,5vw,46px);max-width:660px}
 .hero .who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .hero .who .globie{width:54px;height:54px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
+.hero .who .hero-poppie{width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 5px 9px rgba(0,0,0,.35))}
+@media(max-width:560px){.hero .who .hero-poppie{width:68px;height:68px}}
+.dhero-poppie{position:absolute;right:14px;bottom:0;z-index:2;width:120px;height:120px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 6px 9px rgba(0,0,0,.4));animation:poppiebob 4.2s ease-in-out infinite}
+@media(max-width:560px){.dhero-poppie{width:84px;right:6px}}
+@media(prefers-reduced-motion:reduce){.dhero-poppie{animation:none}}
 .hero .who span{font-family:var(--display);font-weight:700;background:#fff;color:var(--teal-d);
   padding:5px 13px;border-radius:999px;font-size:.88rem;box-shadow:var(--shadow-sm)}
 .hero h1{color:#fff;font-size:clamp(2.1rem,6.6vw,3.6rem);margin:.06em 0 .26em;font-weight:800;
@@ -3361,7 +3366,7 @@ const POPPIE_FACE = `
   <path d="M37 19 L43 11 L50 17 L57 11 L63 19 L61 25 L39 25 Z" fill="#FF8A1E" stroke="#E0760E" stroke-width="1"/>`;
 const POPPIE = `<img class="globie" src="poppie.jpg" alt="Poppie the cat" onerror="this.onerror=null;this.outerHTML='<svg class=&quot;globie&quot; viewBox=&quot;0 0 100 100&quot;>'+POPPIE_FACE+'</svg>'">`;
 /* —— Poppie the guide: pose pack —— */
-const POPPIE_PICS={hi:'poppie-hi.png',yay:'poppie-yay.png',sit:'poppie-sit.png',play:'poppie-play.png',fish:'poppie-fish.png',walk:'poppie-walk.png',calm:'poppie-calm.png',stand:'poppie-stand.png',badge:'poppie-badge.png'};
+const POPPIE_PICS={hi:'poppie-hi.png',yay:'poppie-yay.png',sit:'poppie-sit.png',play:'poppie-play.png',fish:'poppie-fish.png',walk:'poppie-walk.png',calm:'poppie-calm.png',stand:'poppie-stand.png',badge:'poppie-yay.png'};
 function poppiePic(name,cls,alt){return `<img class="poppie-pic ${cls||''}" loading="lazy" alt="${esc(alt||'Poppie')}" src="${POPPIE_PICS[name]||'poppie.jpg'}">`;}
 
 /* =====================================================================
@@ -3557,7 +3562,8 @@ function openDest(id){
   document.getElementById('dhero').innerHTML=`
     <div class="bg" style="${frameStyle(th)}"><div class="frame" style="position:absolute;inset:0;${frameStyle(th)}">${sticker(d.emoji)}${dpic(d.id,'hero',d.photos[0][2],1280,760,d.name,d.photos[0][0])}</div></div>
     <div class="scrim"></div>
-    <div class="inner"><span class="reg">${d.flag} ${d.country} · ${regionEmoji[d.region]||''} ${d.region}</span><h1>${d.name}</h1>${visChip}</div>`;
+    <div class="inner"><span class="reg">${d.flag} ${d.country} · ${regionEmoji[d.region]||''} ${d.region}</span><h1>${d.name}</h1>${visChip}</div>
+    <img class="dhero-poppie" loading="lazy" alt="" src="poppie-walk.png">`;
   document.getElementById('dlead').textContent=d.tagline;
 
   const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
@@ -4148,7 +4154,7 @@ function setupLogin(){
   document.getElementById('pinInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();submit();} });
 }
 
-document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"','class="globie bob"');
+document.getElementById('heroGlobie').innerHTML=poppiePic('play','hero-poppie bob','Poppie the cat');
 renderFeatured();renderFilters();renderGrid();renderUpcoming();buildDestSelect();buildRatePick();renderPassport();
 renderStats();checkAchievements({silent:true});
 const _sb=document.getElementById('surpriseBtn'); if(_sb) _sb.addEventListener('click',surpriseMe);
