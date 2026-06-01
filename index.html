@@ -613,6 +613,15 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .phrase .ph-en{font-weight:800;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
 .phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0}
 .phrase .ph-say{font-weight:700;color:var(--ink-2);font-size:.92rem}
+/* —— local cat's tale —— */
+.catstory{display:grid;grid-template-columns:280px 1fr;gap:22px;align-items:start}
+@media(max-width:680px){.catstory{grid-template-columns:1fr}}
+.catstory-pic{margin:0;position:relative;aspect-ratio:5/4;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);border:3px solid #fff;outline:1px solid var(--line)}
+.catstory-pic figcaption{position:absolute;left:0;right:0;bottom:0;z-index:4;color:#fff;font-weight:800;font-size:.82rem;padding:16px 12px 9px;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.catstory-text{background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-left:5px solid var(--coral);border-radius:var(--r);padding:18px 22px;box-shadow:var(--shadow-sm)}
+.catstory-text p{margin:0 0 12px;font-size:1.06rem;line-height:1.6;color:var(--ink)}
+.catstory-text p:first-child:first-letter{font-family:var(--display);font-weight:800;font-size:2.6rem;line-height:.8;float:left;margin:4px 10px 0 0;color:var(--coral-d)}
+.catstory-text p:last-child{margin-bottom:0}
 /* dramatic countdown hero */
 .cd-hero{position:relative;border-radius:var(--r-xl);overflow:hidden;min-height:clamp(320px,52vh,460px);display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);background:linear-gradient(140deg,var(--g1,#13B5AC),var(--g2,#46B3F0))}
 .cd-bg{position:absolute;inset:0}.cd-bg img{width:100%;height:100%;object-fit:cover}
@@ -4033,7 +4042,7 @@ function openDest(id){
     <img class="dhero-poppie" loading="lazy" alt="" src="poppie-walk.png">`;
   document.getElementById('dlead').textContent=d.tagline;
 
-  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
+  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['cat','🐾 Local cat'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
   const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
   dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
@@ -4048,6 +4057,17 @@ function openDest(id){
     if(!L||!L.phrases) return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">Handy phrases for ${esc(d.country)} are coming soon!</p>`;
     return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">${L.flag||'🗣️'} A few handy words in ${esc(L.native||lk)}</p>
       <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>`;
+  })();
+  const catPanel=(function(){
+    const c=(typeof LOCAL_CATS!=='undefined')&&LOCAL_CATS[d.id];
+    if(!c) return `<h3 class="blockhead">🐾 The local cat's tale</h3><p class="sub">${esc(d.name)}'s local cat is still snoozing — story coming soon!</p>`;
+    const kw=c.photoKw||('cat,'+d.name);
+    const story=String(c.story||'').split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('');
+    return `<h3 class="blockhead">🐾 Meet ${esc(c.name)}</h3><p class="sub">${esc(d.name)}'s local cat — and a tail of adventure 🐈</p>
+      <div class="catstory">
+        <figure class="catstory-pic frame" style="${frameStyle(th)}"><span class="sticker">🐱</span>${pimg(kw,(d.id.length*13+7),700,560,c.name)}<figcaption>${esc(c.name)} · ${esc(d.name)}</figcaption></figure>
+        <div class="catstory-text">${story}</div>
+      </div>`;
   })();
 
   const panels={
@@ -4073,6 +4093,7 @@ function openDest(id){
       d.attractions.map((a,i)=>`<div class="spot"><div class="num">${i+1}</div><div style="flex:1"><h4>${a[1]}</h4><p>${a[2]}</p>
         <a class="maplink" href="${gmap(a[1]+' '+(d.country||d.name))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
       </div></div>`).join('')+tipsBox,
+    cat:catPanel,
     lang:langPanel,
     kids:`<h3 class="blockhead">🧒 Best for kids</h3><p class="sub">Top spots — with their Google Maps rating</p>`+
       d.kids.map((k,i)=>`<div class="spot"><div class="num">${i+1}</div><div><h4>${k[1]}</h4><p>${k[2]}</p>
