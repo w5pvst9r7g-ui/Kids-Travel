@@ -1,7 +1,13 @@
-# 🌍 Globie's Big Adventure — Kids Travel Explorer
+# 🧭 Globie's Atlas — A Kids' Travel Journal
 
 A single, standalone `index.html` travel app for kids. **No build step, no server** — just
 open the file in any modern browser (or double-click it).
+
+Designed in an **"editorial explorer"** style (think a beautiful kids' travel magazine):
+a warm paper palette, Fraunces serif headlines paired with Inter, full-bleed photography
+with caption overlays, atlas/map motifs, a bottom tab-bar on mobile, animated flight-path
+arcs, subtle reveal-on-scroll motion (respecting `prefers-reduced-motion`), and
+"Add to Home Screen" PWA polish.
 
 Built using the destinations from the **"Travel – International"** project: home base **Dublin (DUB)**,
 the upcoming **Maldives / Kandima** family trip, and past adventures (Lapland, Madagascar, Antarctica).
