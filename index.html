@@ -446,6 +446,25 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 @keyframes sayIn{from{opacity:0;transform:translateX(-6px) scale(.96)}to{opacity:1;transform:none}}
 @media(max-width:520px){.globie-say{display:none}}
 @media(prefers-reduced-motion:reduce){.ach.justpop{animation:none}.ach.unlocked:hover{transform:none}.btn-surprise.spinning .reel{animation:none}.globie-say{animation:none}}
+.quiz{max-width:680px}
+.quiz .qbest{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--coral-d);font-weight:800;border-radius:999px;padding:7px 14px;margin-bottom:16px}
+.qcard{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow-sm);margin-bottom:14px}
+.qcard .qn{font-family:var(--display);font-weight:800;font-size:1.12rem;color:var(--ink);margin-bottom:13px;display:flex;gap:9px}
+.qcard .qn .qi{flex:none;width:28px;height:28px;border-radius:50%;background:var(--grape);color:#fff;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.qopts{display:grid;gap:9px}
+.qopt{display:flex;align-items:center;gap:11px;text-align:left;width:100%;background:var(--surface-2);border:2px solid var(--line);border-radius:var(--r-sm);padding:12px 15px;font-weight:700;color:var(--ink);font-size:1rem;font-family:var(--sans);transition:.15s;min-height:44px}
+.qopt:hover:not(:disabled){border-color:var(--teal);transform:translateX(3px)}
+.qopt .mk{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.84rem;color:var(--muted)}
+.qopt.correct{border-color:var(--green);background:#EAFBF2;color:#1f8f63}
+.qopt.correct .mk{border-color:var(--green);background:var(--green);color:#fff}
+.qopt.wrong{border-color:var(--coral);background:#FFF1EC;color:var(--coral-d)}
+.qopt.wrong .mk{border-color:var(--coral);background:var(--coral);color:#fff}
+.qopt:disabled{cursor:default}
+.quiz-result{text-align:center;background:linear-gradient(180deg,#fff,var(--surface-2));border:2px solid var(--line);border-radius:var(--r-lg);padding:26px 22px;box-shadow:var(--shadow-sm)}
+.quiz-result .globie{width:76px;height:76px;margin:0 auto 8px}
+.quiz-result h4{font-size:1.5rem;margin-bottom:4px}
+.quiz-result .score{font-family:var(--display);font-weight:800;color:var(--coral-d);font-size:1.05rem;margin:6px 0}
+.quiz-result .stars svg{width:26px;height:26px}
 </style>
 </head>
 <body>
@@ -1473,7 +1492,7 @@ function openDest(id){
     <div class="inner"><span class="reg">${d.flag} ${d.country} · ${regionEmoji[d.region]||''} ${d.region}</span><h1>${d.name}</h1></div>`;
   document.getElementById('dlead').textContent=d.tagline;
 
-  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids']];
+  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🧒 Best for kids'],['quiz','🧠 Quiz']];
   const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
   dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
@@ -1506,7 +1525,8 @@ function openDest(id){
       d.kids.map((k,i)=>`<div class="spot"><div class="num">${i+1}</div><div><h4>${k[1]}</h4><p>${k[2]}</p>
         <div class="rating">${stars(k[3])}<span class="num2">${k[3]}</span><span class="rev">${k[4]} reviews</span></div>
         <a class="maplink" href="${gmap(k[5])}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
-      </div></div>`).join('')
+      </div></div>`).join(''),
+    quiz:quizPanelHTML(d)
   };
   document.getElementById('panels').innerHTML=tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}" role="tabpanel" aria-labelledby="tab-${t[0]}" tabindex="0" ${i!==0?'hidden':''}>${panels[t[0]]}</div>`).join('');
   const dtabsBtns=[...document.querySelectorAll('#dtabs button')];
@@ -1525,6 +1545,7 @@ function openDest(id){
         const dir=e.key==='ArrowRight'?1:-1; activateTab(dtabsBtns[(i+dir+dtabsBtns.length)%dtabsBtns.length],true);}
     });
   });
+  const _qs=document.getElementById('quizStart'); if(_qs) _qs.addEventListener('click',startQuiz);
   document.getElementById('addFromDetail').onclick=()=>{showView('trips');prefillForm(d.id);};
   showView('detail');
 }
@@ -1867,6 +1888,74 @@ function poppieLines(){
 }
 let poppieI=0;
 function poppieSpeak(){ const el=document.getElementById('globieSay'); if(!el) return; const l=poppieLines(); el.textContent=l[poppieI%l.length]; poppieI++; }
+
+/* =====================================================================
+   QUIZ — three questions auto-built from each destination's facts
+   ===================================================================== */
+const QUIZ_KEY='globie_atlas_quiz_v1';
+function loadQuizBest(){ try{return JSON.parse(localStorage.getItem(QUIZ_KEY))||{};}catch(e){return {};} }
+function saveQuizBest(o){ try{localStorage.setItem(QUIZ_KEY,JSON.stringify(o));}catch(e){} }
+let quizBest=loadQuizBest();
+let quizState=null;
+function qshuffle(arr,seed){ const a=[...arr]; let s=seed||1;
+  for(let i=a.length-1;i>0;i--){ s=(s*9301+49297)%233280; const j=Math.floor(s/233280*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildQuiz(d){
+  const ci=d.country_info, others=DESTS.filter(x=>x.id!==d.id);
+  const distract=picker=>{ const seen=new Set(), out=[];
+    qshuffle(others,d.id.length*7).forEach(o=>{ const v=picker(o); if(v && !seen.has(v)){ seen.add(v); out.push(v); } }); return out; };
+  const seed=d.id.length+d.name.length;
+  const mk=(q,correct,pool,note)=>{ const wrong=pool.filter(v=>v!==correct).slice(0,3);
+    const opts=qshuffle([correct,...wrong],seed+q.length).slice(0,Math.min(4,1+wrong.length)); return {q,opts,correct,note}; };
+  const candidates=[];
+  if(ci.capital)  candidates.push(mk(`What is the capital linked to ${d.name}?`, ci.capital, distract(o=>o.country_info.capital), ''));
+  if(ci.currency) candidates.push(mk(`What money do people use in ${d.country}?`, ci.currency, distract(o=>o.country_info.currency), ''));
+  if(ci.language) candidates.push(mk(`Which language would you hear in ${d.country}?`, ci.language, distract(o=>o.country_info.language), ''));
+  candidates.push(mk(`Poppie filed ${d.name} under which kind of adventure?`, d.region, ['Beach','City','Snow','Wildlife'], ''));
+  return qshuffle(candidates,seed).slice(0,3);
+}
+function quizPanelHTML(d){
+  const best=quizBest[d.id];
+  return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>
+    <p class="sub">Three quick questions about ${esc(d.name)}</p>
+    ${best!=null?`<div class="qbest">🏅 Your best: ${best} / 3</div>`:''}
+    <div id="quizBody"></div>
+    <button class="btn btn-teal" id="quizStart" type="button">▶️ Start the quiz</button></div>`;
+}
+function startQuiz(){ const d=currentDest; if(!d) return;
+  quizState={dest:d, qs:buildQuiz(d), answered:[]};
+  const b=document.getElementById('quizStart'); if(b) b.style.display='none'; renderQuizQuestions(); }
+function renderQuizQuestions(){
+  const body=document.getElementById('quizBody'); const st=quizState;
+  body.innerHTML=st.qs.map((q,qi)=>{ const done=st.answered[qi]!=null;
+    return `<div class="qcard"><div class="qn"><span class="qi">${qi+1}</span><span>${esc(q.q)}</span></div>
+      <div class="qopts">${q.opts.map((o,oi)=>{ let cls=''; if(done){ if(o===q.correct)cls='correct'; else if(st.answered[qi]===oi)cls='wrong'; }
+        return `<button class="qopt ${cls}" type="button" ${done?'disabled':''} data-q="${qi}" data-o="${oi}">
+          <span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div></div>`;
+  }).join('');
+  body.querySelectorAll('.qopt:not(:disabled)').forEach(btn=>btn.addEventListener('click',()=>{
+    const qi=+btn.dataset.q; if(quizState.answered[qi]!=null) return;
+    quizState.answered[qi]=+btn.dataset.o; renderQuizQuestions();
+    if(quizState.answered.filter(a=>a!=null).length===quizState.qs.length) setTimeout(finishQuiz,450);
+  }));
+}
+function finishQuiz(){
+  const st=quizState, d=st.dest; let score=0;
+  st.qs.forEach((q,qi)=>{ if(q.opts[st.answered[qi]]===q.correct) score++; });
+  if(quizBest[d.id]==null||score>quizBest[d.id]){ quizBest[d.id]=score; saveQuizBest(quizBest); }
+  const lines=['Keep exploring — you’ll get them next time! 🐱','Nice try, little explorer! 🌍',
+    'Great job — you really know your stuff! ⭐','WOW! A perfect score — you’re a true Globetrotter! 🏆'];
+  const body=document.getElementById('quizBody');
+  body.insertAdjacentHTML('beforeend',`<div class="quiz-result">
+    ${POPPIE.replace('class="globie"','class="globie'+(reduceMotion?'':' bob')+'"')}
+    <h4>${score===3?'Perfect!':'All done!'}</h4><div class="score">You scored ${score} / 3</div>
+    ${stars(score/3*5)}<p class="sub" style="margin:10px 0 16px">${lines[score]}</p>
+    <button class="btn btn-yellow" id="quizRetry" type="button">🔁 Play again</button></div>`);
+  const rb=document.getElementById('quizRetry');
+  if(rb) rb.addEventListener('click',()=>{ const host=document.getElementById('panel-quiz'); host.innerHTML=quizPanelHTML(d);
+    const qs=document.getElementById('quizStart'); if(qs) qs.addEventListener('click',startQuiz); });
+  if(score===3 && !reduceMotion) confetti();
+  const rr=body.querySelector('.quiz-result'); if(rr) rr.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'nearest'});
+}
 
 document.getElementById('heroGlobie').innerHTML=POPPIE.replace('class="globie"','class="globie bob"');
 renderFeatured();renderFilters();renderGrid();buildDestSelect();buildRatePick();renderPassport();
