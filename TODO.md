@@ -55,6 +55,20 @@ Last updated: 2026-06-01
 - [x] **Fix spot photo overlap** — reset the default `<figure>` margin that was pushing the What-to-see / Fun-stuff thumbnails over the text
 - [x] **Multiple cat stories for upcoming trips** — Coco (Maldives), Banjo (Sunshine Coast) & Zellij (Rabat) now each have **3 tales** (cover badges Tale 1/2/3); other places keep their single story
 - [x] **Added the missing Faro (Algarve), Portugal trip** — May 2026 ✈️🇵🇹
+- [x] **Quiz expanded** — 30–52 question pool per destination (capitals, money, flags, continents, sights, things-to-do, true-facts, phrases, world size/population comparisons); a fresh, varied **random 5** each play
+- [x] **Spot photos re-fixed** — bulletproof fixed-size square thumbnails (no more overlap/misalignment)
+- [x] **Splash screen** after PIN (branded, flying plane, personalised "Welcome back") + personalised countdown greeting
+- [x] **Destination search** on Explore (name/country, with clear button)
+- [x] **One-tap "I've been here!"** quick-add from a destination (+toast); CTA reflects visited state
+- [x] **Badge progress bars** on locked countable badges + **"closest badge to earn"** motivator
+- [x] **Map fixes** — correct home label (Sunshine Coast), **"fly to next trip"** button (shows city / hides when none)
+- [x] **Cat story "✓ Read" badges** on finished tales (per profile)
+- [x] **225 "Did you know?" facts** from every guide, day-seeded fact-of-the-day
+- [x] **Offline service worker** (`sw.js`, registers when hosted) + manifest polished to new palette
+- [x] **Explore hero spotlight** — rotating real destination (curated photo, tap to open)
+- [x] **Login backdrop** — drifting clouds + flying plane
+- [x] **Journal departure date** for upcoming trips → accurate countdowns
+- [x] **Visited years on Explore cards**; **continents-collected strip (X/7)** on the World page
 
 ---
 
