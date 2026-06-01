@@ -525,6 +525,13 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .ach .nm{font-family:var(--display);font-weight:800;font-size:.92rem;color:var(--ink);margin-top:7px;line-height:1.15}
 .ach .ds{font-size:.74rem;color:var(--ink-2);font-weight:700;margin-top:3px;line-height:1.3}
 .ach.locked .nm,.ach.locked .ds{color:var(--muted)}
+.next-badge{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#fff,var(--surface-2));border:2px solid var(--ac,var(--teal));border-radius:var(--r-lg);padding:16px 20px;margin:14px 0 22px;box-shadow:var(--shadow-sm)}
+.next-badge .nb-em{font-size:2.6rem;line-height:1;flex:none}
+.next-badge .nb-k{font-family:var(--display);font-weight:800;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ac,var(--teal-d))}
+.next-badge .nb-nm{font-family:var(--display);font-weight:800;font-size:1.25rem;color:var(--ink);margin:1px 0 7px}
+.next-badge .nb-bar{height:9px;background:var(--line);border-radius:9px;overflow:hidden;max-width:320px}
+.next-badge .nb-bar i{display:block;height:100%;background:var(--ac,var(--teal));border-radius:9px;transition:width .9s ease}
+.next-badge .nb-ds{color:var(--ink-2);font-weight:700;font-size:.86rem;margin-top:6px}
 .ach-prog{height:6px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}
 .ach-prog i{display:block;height:100%;background:var(--ac,var(--teal));border-radius:6px;transition:width .8s ease}
 .ach-progt{font-size:.66rem;font-weight:800;color:var(--muted);margin-top:4px;letter-spacing:.02em}
@@ -5645,7 +5652,19 @@ function renderAchievements(){
   const ctx=achContext();
   const got=ACHIEVEMENTS.filter(a=>unlockedAch.has(a.id)).length;
   const fmt=(v,u)=>v.toLocaleString()+(u?(' '+u):'');
+  /* find the locked badge that's closest to unlocking, to cheer the kids on */
+  let next=null;
+  ACHIEVEMENTS.forEach(a=>{ if(unlockedAch.has(a.id)) return; const pr=badgeProgress(a,ctx);
+    if(pr&&pr.have>0&&pr.have<pr.need){ const pct=pr.have/pr.need; if(!next||pct>next.pct) next={a,pr,pct}; } });
+  const nextHTML = next ? `<div class="next-badge" style="--ac:${next.a.ac}">
+      <div class="nb-em" aria-hidden="true">${next.a.em}</div>
+      <div class="nb-tx"><span class="nb-k">🔥 Closest badge to earn</span>
+        <div class="nb-nm">${esc(next.a.nm)}</div>
+        <div class="nb-bar"><i style="width:${Math.round(next.pct*100)}%"></i></div>
+        <div class="nb-ds">${esc(next.a.ds)} — ${fmt(next.pr.have,next.pr.unit)} of ${fmt(next.pr.need,next.pr.unit)}!</div></div>
+    </div>` : '';
   host.innerHTML=`<div class="head"><h3>🏅 Explorer Badges</h3><span class="count">${got} / ${ACHIEVEMENTS.length} collected</span></div>
+    ${nextHTML}
     <div class="ach-grid">${ACHIEVEMENTS.map(a=>{const on=unlockedAch.has(a.id); const pr=on?null:badgeProgress(a,ctx);
       const pct=pr?Math.min(100,Math.round(pr.have/pr.need*100)):0;
       return `<div class="ach ${on?'unlocked':'locked'}" style="--ac:${a.ac}" tabindex="0" role="group" aria-label="${esc(a.nm)}. ${on?'Unlocked':'Locked'}. ${esc(a.ds)}.${pr?(' Progress '+fmt(pr.have,pr.unit)+' of '+fmt(pr.need,pr.unit)+'.'):''}">
