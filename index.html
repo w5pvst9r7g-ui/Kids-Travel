@@ -5557,12 +5557,18 @@ document.getElementById('cancelEdit').addEventListener('click',resetForm);
 /* =====================================================================
    FUN FACTS
    ===================================================================== */
-const FACTS=['Penguins can’t fly — but they “fly” underwater super fast!','The Maldives is the flattest country on Earth.',
+const FACTS_BASE=['Penguins can’t fly — but they “fly” underwater super fast!','The Maldives is the flattest country on Earth.',
   'A giraffe’s tongue is about 50 cm long — and bluish!','Camels have three eyelids to keep out the sand.',
   'Iceland gets a little bigger every year as new lava cools.','Rovaniemi is the official hometown of Santa Claus.',
-  'Istanbul is the only city that sits on two continents.','Madagascar’s baobab trees can live over 1,000 years.'];
-let factI=0;
-function rotateFact(){document.getElementById('heroFact').textContent=FACTS[factI%FACTS.length];factI++;}
+  'Istanbul is the only city that sits on two continents.'];
+/* fold in every real "fun fact" from the destination guides for loads of variety */
+const FACTS=(function(){ const seen=new Set(), out=FACTS_BASE.slice();
+  try{ DESTS.forEach(d=>{ const ci=d.country_info||{}; (ci.fun||[]).concat(ci.kid||[]).forEach(f=>{
+    if(typeof f==='string' && f.length>=18 && f.length<=130 && !seen.has(f)){ seen.add(f); out.push(f); } }); }); }catch(e){}
+  return out; })();
+/* start on a "fact of the day" so it feels fresh daily, then gently rotates */
+let factI=Math.floor(Date.now()/86400000)%Math.max(1,FACTS.length);
+function rotateFact(){const el=document.getElementById('heroFact'); if(el) el.textContent=FACTS[factI%FACTS.length]; factI++;}
 
 /* =====================================================================
    PWA polish
