@@ -536,6 +536,19 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 /* —— Poppie the guide accents —— */
 @keyframes poppiebob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 .poppie-pic{display:inline-block;object-fit:contain}
+/* —— Poppie easter egg —— */
+.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie{cursor:pointer;pointer-events:auto}
+.egg{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;background:rgba(18,16,28,.88);backdrop-filter:blur(5px);cursor:pointer}
+.egg.hidden{display:none}
+.egg-card{text-align:center;max-width:480px}
+.egg-cat{width:min(72vw,360px);height:auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
+.egg-cat.pop{animation:eggpop .6s cubic-bezier(.2,1.35,.4,1) both}
+@keyframes eggpop{0%{transform:scale(.2) rotate(-14deg);opacity:0}55%{transform:scale(1.14) rotate(5deg)}72%{transform:scale(.95) rotate(-3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.egg-bubble{margin-top:18px;background:#fff;color:var(--ink);border-radius:20px;padding:16px 22px;font-family:var(--display);font-weight:800;font-size:clamp(1.1rem,3.8vw,1.55rem);line-height:1.3;box-shadow:var(--shadow);position:relative;animation:eggrise .4s .15s both}
+.egg-bubble:before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-bottom-color:#fff;border-top:0}
+@keyframes eggrise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.egg-tap{color:#fff;opacity:.7;margin-top:14px;font-weight:700;font-size:.85rem}
+@media(prefers-reduced-motion:reduce){.egg-cat.pop,.egg-bubble{animation:none}}
 .section-head{position:relative}
 .poppie-peek{position:absolute;right:4px;bottom:-6px;width:84px;height:84px;object-fit:contain;pointer-events:none;
   filter:drop-shadow(0 6px 8px rgba(40,32,20,.18));animation:poppiebob 4s ease-in-out infinite}
@@ -661,6 +674,14 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   <button class="lb-nav lb-prev" onclick="lbNav(-1)" aria-label="Previous photo">‹</button>
   <div class="lb-stage"><div id="lbImg"></div><div id="lbCap" class="lb-cap"></div></div>
   <button class="lb-nav lb-next" onclick="lbNav(1)" aria-label="Next photo">›</button>
+</div>
+
+<div id="eggOverlay" class="egg hidden" onclick="closeEgg()" role="dialog" aria-label="Poppie says">
+  <div class="egg-card">
+    <img class="egg-cat" src="poppie-hi.png" alt="Grumpy Poppie">
+    <div class="egg-bubble" id="eggLine"></div>
+    <div class="egg-tap">😼 (tap anywhere to close)</div>
+  </div>
 </div>
 
 <div id="avatarModal" class="amodal hidden">
@@ -3776,6 +3797,31 @@ const POPPIE = `<img class="globie" src="poppie.jpg" alt="Poppie the cat" onerro
 /* —— Poppie the guide: pose pack —— */
 const POPPIE_PICS={hi:'poppie-hi.png',yay:'poppie-yay.png',sit:'poppie-sit.png',play:'poppie-play.png',fish:'poppie-fish.png',walk:'poppie-walk.png',calm:'poppie-calm.png',stand:'poppie-stand.png',badge:'poppie-yay.png'};
 function poppiePic(name,cls,alt){return `<img class="poppie-pic ${cls||''}" loading="lazy" alt="${esc(alt||'Poppie')}" src="${POPPIE_PICS[name]||'poppie.jpg'}">`;}
+/* —— secret: poke a cat for a grumpy Poppie —— */
+const EGG_LINES=[
+  "Oh, it's YOU again. I was having a royal nap. 😾",
+  "Did you just BOOP the Queen? Bold move, tiny human.",
+  "You smell like... unfinished homework. 🤢",
+  "I've met goldfish with better taste in clicking.",
+  "Poke me again and your left sock disappears FOREVER. 🧦",
+  "Hooman, fetch me a snack. Chop chop! 🐟",
+  "I'm 12% fluff and 100% done with you.",
+  "That was your finger? I thought it was a sausage. Disappointing.",
+  "Purr-lease. Do NOT touch the crown. 👑",
+  "You're lucky you're cute. ...Barely.",
+  "Bleh! Go pack your bag instead of bothering royalty.",
+  "I shall allow ONE more boop. Choose wisely, peasant.",
+  "Wow. A whole click. Truly the height of your talents.",
+  "Silence! The royal whiskers require quiet. 😼"
+];
+function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) return;
+  document.getElementById('eggLine').textContent=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
+  o.classList.remove('hidden');
+  const cat=o.querySelector('.egg-cat'); if(cat){ cat.classList.remove('pop'); void cat.offsetWidth; cat.classList.add('pop'); } }
+function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
+document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
+  if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeEgg(); });
 
 /* =====================================================================
    STATE + STORAGE

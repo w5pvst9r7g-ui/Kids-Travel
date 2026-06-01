@@ -78,6 +78,7 @@ Last updated: 2026-06-01
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] Easter egg: poke any Poppie → full-screen grumpy Poppie with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page
 - [x] Replace Poppie poses with transparent versions + use her bigger (hero + every destination hero)
 - [x] **Rabat is a DIRECT flight from Dublin** — Getting there now shows nonstop ~3h45 ✈️
