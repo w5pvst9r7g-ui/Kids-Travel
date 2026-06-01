@@ -337,6 +337,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 
 .detail-cta{margin-top:32px;padding-top:24px;border-top:2px dashed var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .detail-cta .note{color:var(--muted);font-size:.9rem;font-weight:700}
+.cta-done{display:inline-flex;align-items:center;gap:7px;background:var(--green-d);color:#fff;font-family:var(--display);font-weight:800;font-size:1rem;padding:11px 18px;border-radius:999px;box-shadow:var(--shadow-sm)}
 
 /* ============ MAP ============ */
 #map{height:min(60vh,560px);height:min(60dvh,560px);border-radius:var(--r-xl);box-shadow:var(--shadow);border:4px solid #fff;
@@ -5025,8 +5026,41 @@ function openDest(id){
     });
   });
   const _qs=document.getElementById('quizStart'); if(_qs) _qs.addEventListener('click',startQuiz);
-  document.getElementById('addFromDetail').onclick=()=>{showView('trips');prefillForm(d.id);};
+  renderDetailCta(d);
   showView('detail');
+}
+function renderDetailCta(d){
+  const wrap=document.querySelector('#detail .detail-cta'); if(!wrap) return;
+  const visited=tripsForDest(d.id).some(t=>!t.planned);
+  const planned=tripsForDest(d.id).some(t=>t.planned);
+  wrap.innerHTML = visited
+    ? `<span class="cta-done">✓ You've been here!</span>
+       <button class="btn btn-ghost" onclick="showView('map')">🗺️ See on map</button>
+       <button class="btn-text" onclick="showView('trips');prefillForm('${d.id}')">✏️ Add another visit / details</button>`
+    : `<button class="btn btn-primary" onclick="quickVisit('${d.id}')">✓ I've been here!</button>
+       <button class="btn btn-teal" onclick="showView('trips');prefillForm('${d.id}')">⭐ Add with details</button>
+       ${planned?'<span class="note">Already on your upcoming list ✈️</span>':'<span class="note">One tap adds it to your journal & map!</span>'}`;
+}
+function quickVisit(id){
+  const d=DESTS.find(x=>x.id===id); if(!d) return;
+  const t={id:'q'+Date.now().toString(36), era:'ireland', destId:d.id, city:d.name, country:d.country,
+    flag:d.flag, emoji:d.emoji, lat:d.lat, lng:d.lng, year:new Date().getFullYear(), planned:false, rating:5, note:''};
+  trips.push(t); saveTrips();
+  renderPassport(); renderGrid(); renderUpcoming(); renderFeatured(); renderStats(); if(map) initMap();
+  renderDetailCta(d);
+  const vc=document.querySelector('#dhero .visited-chip'); /* refresh hero chip */
+  if(!vc){ openDest(id); }
+  toast('🎉 Added '+d.name+' to your journal!');
+  checkAchievements();
+}
+/* tiny toast (reuses the badge-toast styling) */
+function toast(msg){
+  let wrap=document.getElementById('achToastWrap');
+  if(!wrap){ wrap=document.createElement('div'); wrap.id='achToastWrap'; wrap.className='ach-toast-wrap'; wrap.setAttribute('aria-live','polite'); document.body.appendChild(wrap); }
+  const t=document.createElement('div'); t.className='ach-toast'; t.style.setProperty('--ac','var(--green-d)'); t.setAttribute('role','status');
+  t.innerHTML=`<div class="em" aria-hidden="true">✓</div><div class="tx"><b>Nice!</b><div class="nm">${esc(msg)}</div></div>`;
+  wrap.appendChild(t); requestAnimationFrame(()=>t.classList.add('in'));
+  setTimeout(()=>{ t.classList.remove('in'); setTimeout(()=>t.remove(),400); }, 3200);
 }
 
 /* =====================================================================
