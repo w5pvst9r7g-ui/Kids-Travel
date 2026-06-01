@@ -75,7 +75,7 @@ Last updated: 2026-06-01
 ## 📋 Backlog (prioritised)
 
 ### High value
-- [ ] **Offline / PWA** — service worker to cache the app + guides + map tiles so it works on the plane / abroad with no data *(needs hosting on GitHub Pages to take effect)*
+- [x] **Offline / PWA** — service worker (network-first HTML so deploys stay fresh, cache-first assets), web manifest, **Add-to-home-screen** button, favicon + Open Graph share previews. Live once GitHub Pages serves the branch ✅
 - [ ] **Cross-device cloud sync (Supabase)** — true multi-device persistence *(needs a free Supabase project + URL/key from Grant)*
 - [x] **Direct-to-Rabat** flight info update ✈️
 
