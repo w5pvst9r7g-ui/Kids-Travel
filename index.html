@@ -4868,7 +4868,8 @@ function cardHTML(d,tag){
         <div class="place"><div class="reg">${regionEmoji[d.region]||''} ${d.country}</div><h3>${d.name}</h3></div>
       </div>
       <div class="body"><p>${d.tagline}</p>
-        <div class="foot">✈️ ${d.gettingThere.flightTime}<span class="arrow">→</span></div>
+        <div class="foot">${(function(){const ys=[...new Set(tripsForDest(d.id).filter(t=>!t.planned).map(t=>t.year))].sort();
+          return ys.length?('✓ Been here · '+ys.join(', ')):('✈️ '+d.gettingThere.flightTime);})()}<span class="arrow">→</span></div>
       </div>
     </article>`;
 }
