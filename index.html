@@ -946,6 +946,38 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
   #printArea{display:block!important}
   @page{margin:14mm}
 }
+#themeBtn{background:none;border:2px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:1rem;cursor:pointer;flex:none;line-height:1}
+#themeBtn:hover{border-color:var(--teal);transform:translateY(-1px)}
+
+/* ===== Night mode (opt-in) — remap neutral tokens; most of the app is token-driven ===== */
+html.night{
+  --bg:#131A2C; --surface:#1E2740; --surface-2:#28324F;
+  --ink:#ECF1FB; --ink-2:#B7C3DC; --muted:#8A97B6; --line:#313D5C; --line-2:#3C4A6E;
+  --shadow:0 16px 36px -18px rgba(0,0,0,.7), 0 4px 12px -6px rgba(0,0,0,.5);
+  --shadow-sm:0 8px 20px -12px rgba(0,0,0,.6);
+}
+html.night body{
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 1.6px),
+    radial-gradient(900px 380px at 8% -8%, rgba(80,120,220,.20) 0, transparent 60%),
+    radial-gradient(720px 360px at 100% -4%, rgba(150,95,210,.16) 0, transparent 60%),
+    radial-gradient(760px 520px at 50% 120%, rgba(40,180,160,.13) 0, transparent 60%);
+  background-size:30px 30px, auto, auto, auto;
+}
+html.night .site{background:rgba(19,26,44,.9)}
+html.night .tabbar{background:rgba(19,26,44,.95)}
+html.night .snav{background:rgba(19,26,44,.92)}
+html.night .snav button,html.night .chip,html.night .qopt,html.night .back,html.night .jtool,
+html.night #themeBtn,html.night .av-edit,html.night .story-close,html.night .av-choice{background:var(--surface);color:var(--ink)}
+html.night .btn-ghost{background:var(--surface-2);color:var(--ink);box-shadow:0 5px 0 0 var(--line)}
+html.night .factnote{background:var(--surface);color:var(--ink)}
+html.night .factnote b{color:var(--coral)}
+html.night .cloud-sql{background:#0B1020}
+html.night .stat,html.night .wc-flag,html.night .wc-card,html.night .spot,html.night .phrase,
+html.night .qcard,html.night .factcard,html.night .formcard,html.night .badge-ribbon,html.night .next-badge,
+html.night .meta-item,html.night .pop,html.night .entry .body,html.night .pack-card{background:var(--surface)}
+html.night .factcard.kid{background:linear-gradient(180deg,var(--surface),#2c2a3e)}
+html.night .lb-cap,html.night .map-tools{color:var(--ink-2)}
 </style>
 </head>
 <body>
@@ -963,6 +995,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
       <button data-view="trips">Journal</button>
       <button data-view="badges">🏅 Badges</button>
     </nav>
+    <button id="themeBtn" type="button" onclick="toggleNight()" aria-label="Toggle night mode" title="Night mode">🌙</button>
     <button id="installBtn" type="button" hidden onclick="doInstall()" title="Add Poppy's Atlas to your home screen">📲 Install</button>
     <button id="profileChip" onclick="showLogin()" title="Switch explorer" aria-label="Switch explorer"></button>
   </div>
@@ -6387,6 +6420,15 @@ rotateFact();setInterval(rotateFact,6000);setHeroSpotlight();observeReveals();
 if(!reduceMotion) setInterval(()=>{ const el=document.getElementById('globieSay'); if(el) poppieSpeak(); },7200);
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
 addEventListener('resize',syncHeader); syncHeader();
+/* —— night mode (opt-in) —— */
+function applyNight(on){
+  document.documentElement.classList.toggle('night',!!on);
+  const b=document.getElementById('themeBtn'); if(b) b.textContent=on?'☀️':'🌙';
+  const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.setAttribute('content',on?'#131A2C':'#2FAEA2');
+  try{localStorage.setItem('globie_night',on?'1':'0');}catch(e){}
+}
+function toggleNight(){ applyNight(!document.documentElement.classList.contains('night')); }
+try{ if(localStorage.getItem('globie_night')==='1') applyNight(true); }catch(e){}
 setupLogin(); showLogin();
 </script>
 <div id="printArea" aria-hidden="true"></div>
