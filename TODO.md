@@ -74,6 +74,9 @@ Last updated: 2026-06-01
 - [x] **Extra visited trips** — Dublin (Ireland 🇮🇪), San Francisco + Washington DC (Dec 2022), Switzerland 🇨🇭 + Austria 🇦🇹 (Jan 2023)
 - [x] **💖 Dream list (wishlist)** — heart any place (cards, detail), collected on Explore, shown on the map as heart pins, with 2 new badges (Big Dreamer / Sky is the Limit)
 - [x] **Major UX upgrade — "Scrapbook Atlas" identity** (less templatey): atlas-paper graticule background; **postcard-style destination cards** (inset photo mat, rotated stamp tags, richer hover lift); **luggage-tag section eyebrows** + hand-drawn dashed title underlines (incl. detail panels); **gallery photos with white scrapbook borders** that lift on hover; **hero postcard frame**; hand-placed (rotated) brand logo; dashed flight-path header/tab-bar edges; lifted "stamp" active tab
+- [x] **Scrapbook pt2** — handwritten accent font (Caveat) for photo captions / fact notes / boarding-pass journey; **washi tape** on the feature photo
+- [x] **Plane visualisation** — replaced the direction-ambiguous ✈️ emoji (points different ways per platform) with a **paper-plane SVG** rotated to the **exact heading of travel** everywhere (map computes screen bearing; boarding pass / login / splash fly nose-forward) + **contrails**
+- [x] **Night mode** — opt-in header toggle (🌙), persisted; remaps the design tokens + key surfaces to a deep night-sky theme
 
 ---
 
