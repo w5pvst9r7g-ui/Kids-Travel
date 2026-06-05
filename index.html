@@ -5954,11 +5954,12 @@ function shareApp(){
    PWA polish
    ===================================================================== */
 (function(){
-  const uri='poppie.jpg';   // the real Poppy app icon (sits next to index.html)
-  document.getElementById('appicon').href=uri;
+  document.getElementById('appicon').href='icon-192.png';
   try{const m={name:"Poppy's Atlas",short_name:"Poppy",description:"A fun travel atlas for kids — countdowns, photos, quizzes, cat stories and a passport of every adventure.",
     start_url:".",scope:".",display:"standalone",orientation:"portrait",lang:"en",background_color:"#FAF6EF",theme_color:"#2FAEA2",
-    icons:[{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"any"},{src:uri,sizes:"740x749",type:"image/jpeg",purpose:"maskable"}]};
+    icons:[{src:"icon-192.png",sizes:"192x192",type:"image/png",purpose:"any"},
+           {src:"icon-512.png",sizes:"512x512",type:"image/png",purpose:"any"},
+           {src:"icon-maskable-512.png",sizes:"512x512",type:"image/png",purpose:"maskable"}]};
     document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));}catch(e){}
   /* register the offline service worker only when hosted (skips file://) */
   if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
