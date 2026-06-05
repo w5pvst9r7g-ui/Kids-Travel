@@ -81,6 +81,7 @@ Last updated: 2026-06-01
 - [x] **Opt-in sound effects** — generated tones (no assets) for badge unlocks, quiz answers, boops, story page-turns & wishlist; off by default
 - [x] **Settings sheet** — consolidated ⚙️ menu (night mode, sound, replay intro, cloud sync, version); declutters the header; responsive header on phones
 - [x] **PWA/SEO completeness** — manifest `id`/`categories`/`display_override`/maskable icons; `og:image:alt` + `og:site_name`; offline indicator; version banner; skip-to-content + `main` landmark
+- [x] **First-class design pass (verified with real headless-browser screenshots)** — self-hosted fonts (Baloo 2 + Nunito + Caveat woff2, offline, no FOUT, no third-party); fixed full-width "Open in Maps" bars → compact pills; replaced the repeated stale "Wishlist" card tag with **varied, colour-coded region tags**; elevated the login into a bespoke **"Explorer Pass"** (ticket border, hand-placed icon). Confirmed the boarding-pass / passport / countdown / badges / world pages read as custom, not templated.
 
 ---
 
