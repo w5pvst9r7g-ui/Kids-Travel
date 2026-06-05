@@ -981,6 +981,11 @@ html.night .lb-cap,html.night .map-tools{color:var(--ink-2)}
 </style>
 </head>
 <body>
+<noscript><div style="max-width:560px;margin:18vh auto;padding:28px;text-align:center;font-family:system-ui,sans-serif;color:#2B2D44">
+  <div style="font-size:3rem">🐱✈️</div>
+  <h1 style="font-family:'Baloo 2',system-ui">Poppy's Atlas needs JavaScript</h1>
+  <p style="color:#555">Please turn on JavaScript in your browser to explore the world with Poppy.</p>
+</div></noscript>
 
 <header class="site">
   <div class="wrap">
@@ -6430,7 +6435,23 @@ function applyNight(on){
 }
 function toggleNight(){ applyNight(!document.documentElement.classList.contains('night')); }
 try{ if(localStorage.getItem('globie_night')==='1') applyNight(true); }catch(e){}
-setupLogin(); showLogin();
+/* production safety-net: never white-screen if boot throws */
+try{ setupLogin(); showLogin(); }
+catch(bootErr){
+  try{ console.error('Poppy boot error:',bootErr);
+    var ls=document.getElementById('loginScreen');
+    if(ls){ ls.classList.remove('hidden');
+      var card=ls.querySelector('.login-card');
+      if(card) card.innerHTML='<div class="mark" id="loginMark"></div><h1>Poppy’s Atlas</h1>'+
+        '<p style="color:var(--ink-2);font-weight:700;margin:8px 0 16px">Oops — something hiccuped while loading. A quick refresh usually fixes it!</p>'+
+        '<button class="btn btn-primary" style="width:100%;justify-content:center" onclick="location.reload()">↻ Refresh</button>'; }
+  }catch(_){}
+}
+/* surface unexpected runtime errors gently (no white-screen, no nag loop) */
+(function(){ var shown=false; window.addEventListener('error',function(ev){
+  if(shown||!ev||!ev.message) return; shown=true;
+  try{ console.error('Poppy runtime error:',ev.message); }catch(_){}
+}); window.addEventListener('unhandledrejection',function(){}); })();
 </script>
 <div id="printArea" aria-hidden="true"></div>
 </body>
