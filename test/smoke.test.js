@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -97,6 +97,25 @@ if (API) {
   let minPool = Infinity, minId = '';
   API.DESTS.forEach(d => { const n = API.buildQuizPool(d).pool.length; if (n < minPool) { minPool = n; minId = d.id; } });
   check('quiz pool >= 30 for every destination', minPool >= 30, 'smallest: ' + minId + '=' + minPool);
+
+  /* ---------- 4b. settings + helpers don't throw / behave ---------- */
+  section('Settings + safety');
+  let toggleErr = null;
+  try { API.applyNight(true); } catch (e) { toggleErr = 'night on: ' + e.message; }
+  check('night mode adds html.night class', document.documentElement.classList.contains('night'), toggleErr);
+  try { API.applyNight(false); } catch (e) { toggleErr = e.message; }
+  check('night mode clears html.night class', !document.documentElement.classList.contains('night'));
+  let soundErr = null;
+  try { API.applySound(false); API.sfx('win'); API.applySound(true); API.sfx('pop'); API.applySound(false); } catch (e) { soundErr = e.message; }
+  check('sound toggle + sfx never throw', soundErr === null, soundErr);
+  // cloud sync must never leak the secret config or non-app keys
+  store['globie_cloud'] = '{"key":"SECRET"}';
+  store['globie_atlas_trips_v9_hailey'] = '[1]';
+  store['unrelated'] = 'x';
+  const gathered = API.cloudGather();
+  check('cloud backup includes app data', !!gathered['globie_atlas_trips_v9_hailey']);
+  check('cloud backup excludes secret config + foreign keys', !gathered['globie_cloud'] && !gathered['unrelated']);
+  check('paper-plane SVG defined (direction-safe)', typeof API.PLANE_SVG === 'string' && API.PLANE_SVG.indexOf('<svg') === 0);
 }
 
 /* ---------- 5. static / asset integrity ---------- */

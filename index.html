@@ -6449,7 +6449,7 @@ addEventListener('resize',syncHeader); syncHeader();
 /* —— night mode (opt-in) —— */
 function applyNight(on){
   document.documentElement.classList.toggle('night',!!on);
-  const b=document.getElementById('themeBtn'); if(b) b.textContent=on?'☀️':'🌙';
+  const b=document.getElementById('themeBtn'); if(b){ b.textContent=on?'☀️':'🌙'; b.setAttribute('aria-pressed',!!on); }
   const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.setAttribute('content',on?'#131A2C':'#2FAEA2');
   try{localStorage.setItem('globie_night',on?'1':'0');}catch(e){}
 }
