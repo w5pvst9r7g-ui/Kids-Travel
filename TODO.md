@@ -78,7 +78,9 @@ Last updated: 2026-06-01
 - [x] **Plane visualisation** — replaced the direction-ambiguous ✈️ emoji (points different ways per platform) with a **paper-plane SVG** rotated to the **exact heading of travel** everywhere (map computes screen bearing; boarding pass / login / splash fly nose-forward) + **contrails**
 - [x] **Night mode** — opt-in header toggle (🌙), persisted; remaps the design tokens + key surfaces to a deep night-sky theme
 - [x] **Production hardening** — optimised images (8.5 MB → 1 MB via sharp) + maskable PWA icons; committed **smoke-test suite** (`npm test`) + **GitHub Actions CI** (passing); rewritten README; `package.json`/`.gitignore`; `<noscript>` + boot safety-net (no white-screen) + global error guard; CDN preconnects; perf budget (no image > 600 KB, enforced in CI)
-- [x] **Opt-in sound effects** — generated tones (no assets) for badge unlocks, quiz answers, boops, story page-turns & wishlist; 🔇/🔊 header toggle, off by default
+- [x] **Opt-in sound effects** — generated tones (no assets) for badge unlocks, quiz answers, boops, story page-turns & wishlist; off by default
+- [x] **Settings sheet** — consolidated ⚙️ menu (night mode, sound, replay intro, cloud sync, version); declutters the header; responsive header on phones
+- [x] **PWA/SEO completeness** — manifest `id`/`categories`/`display_override`/maskable icons; `og:image:alt` + `og:site_name`; offline indicator; version banner; skip-to-content + `main` landmark
 
 ---
 
