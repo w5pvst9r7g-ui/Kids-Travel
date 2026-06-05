@@ -127,9 +127,13 @@ check('theme-color meta present', /name=["']theme-color["']/.test(html));
 check('manifest + apple-touch-icon links present', /rel=["']manifest["']/.test(html) && /rel=["']apple-touch-icon["']/.test(html));
 
 // every locally-referenced asset exists on disk
-const assetRe = /(?:src|href)=["'](?!https?:|data:|#|mailto:)([^"']+\.(?:png|jpg|jpeg|svg|webp|ico|css|js))["']/gi;
+const assetRe = /(?:src|href)=["'](?!https?:|data:|#|mailto:)([^"']+\.(?:png|jpg|jpeg|svg|webp|ico|css|js|woff2?))["']/gi;
 const missing = new Set();
 let a; while ((a = assetRe.exec(html))) { const f = a[1].replace(/^\.\//, '').split('?')[0]; if (f && !fs.existsSync(path.join(ROOT, f))) missing.add(f); }
+// @font-face url(...) references
+const fontRe = /url\((fonts\/[^)]+\.woff2)\)/g;
+while ((a = fontRe.exec(html))) { if (!fs.existsSync(path.join(ROOT, a[1]))) missing.add(a[1]); }
+check('self-hosted (no Google Fonts <link>)', !/fonts\.googleapis\.com/.test(html));
 // icons referenced by the (JS-built) manifest
 ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'sw.js'].forEach(f => { if (!fs.existsSync(path.join(ROOT, f))) missing.add(f); });
 check('all referenced local assets exist', missing.size === 0, [...missing].join(', '));
