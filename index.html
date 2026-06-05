@@ -962,6 +962,10 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .skip-link{position:fixed;left:12px;top:-60px;z-index:9000;background:var(--teal-d);color:#fff;font-weight:800;
   padding:10px 16px;border-radius:0 0 12px 12px;text-decoration:none;transition:top .15s}
 .skip-link:focus{top:0;outline:3px solid var(--yellow)}
+.offline-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:4200;
+  background:var(--ink);color:#fff;font-weight:800;font-size:.85rem;padding:9px 16px;border-radius:999px;box-shadow:var(--shadow);
+  animation:onbpop .35s both;max-width:92vw}
+@media(max-width:760px){.offline-bar{bottom:calc(74px + env(safe-area-inset-bottom))}}
 #themeBtn,#soundBtn{background:none;border:2px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:1rem;cursor:pointer;flex:none;line-height:1}
 #themeBtn:hover,#soundBtn:hover{border-color:var(--teal);transform:translateY(-1px)}
 
@@ -6503,6 +6507,16 @@ catch(bootErr){
   if(shown||!ev||!ev.message) return; shown=true;
   try{ console.error('Poppy runtime error:',ev.message); }catch(_){}
 }); window.addEventListener('unhandledrejection',function(){}); })();
+/* offline indicator — handy for a travel app used on planes / abroad */
+(function(){ var APP_VERSION='1.0.0';
+  function setOnline(){ var on=navigator.onLine!==false, el=document.getElementById('offlineBar');
+    if(on){ if(el) el.remove(); return; }
+    if(!el){ el=document.createElement('div'); el.id='offlineBar'; el.className='offline-bar'; el.setAttribute('role','status');
+      el.textContent="✈️ You're offline — Poppy's Atlas still works!"; document.body.appendChild(el); } }
+  window.addEventListener('online',setOnline); window.addEventListener('offline',setOnline);
+  try{ setOnline(); }catch(_){}
+  try{ console.log("%c🐱 Poppy's Atlas v"+APP_VERSION,'font-weight:bold;color:#0F7D74'); }catch(_){}
+})();
 </script>
 <div id="printArea" aria-hidden="true"></div>
 </body>
