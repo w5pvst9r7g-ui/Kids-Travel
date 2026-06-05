@@ -1,0 +1,15 @@
+{
+  "name": "poppys-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Poppy's Atlas — a fun, offline-capable travel atlas web app for kids.",
+  "homepage": "https://w5pvst9r7g-ui.github.io/kids-travel/",
+  "scripts": {
+    "test": "node test/smoke.test.js",
+    "check": "node --check sw.js && node test/smoke.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}
