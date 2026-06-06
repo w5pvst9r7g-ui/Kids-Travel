@@ -152,6 +152,15 @@ nav.top button:hover{color:var(--ink);background:var(--surface-2)}
 nav.top button.active{color:#fff;background:var(--teal-d)}
 
 .tabbar{display:none}
+.to-top{position:fixed;right:18px;bottom:24px;z-index:1200;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);
+  background:var(--surface);color:var(--teal-d);box-shadow:var(--shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(10px) scale(.9);transition:opacity .22s,transform .22s}
+.to-top svg{width:22px;height:22px}
+.to-top.show{opacity:1;transform:none}
+.to-top:hover{color:#fff;background:var(--teal-d);border-color:var(--teal-d)}
+@media(max-width:760px){.to-top{bottom:calc(78px + env(safe-area-inset-bottom));right:14px}}
+html.night .to-top{background:var(--surface-2);border-color:var(--line-2);color:var(--teal)}
+@media(prefers-reduced-motion:reduce){.to-top{transition:none}}
 @media(max-width:760px){
   nav.top{display:none}
   .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1300;background:rgba(255,255,255,.95);
@@ -1448,6 +1457,10 @@ create policy "atlas all" on atlas_sync
   <button data-view="trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg>Journal</button>
   <button data-view="badges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>Badges</button>
 </nav>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" hidden onclick="scrollToTop()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+</button>
 
 <script>
 /* =====================================================================
@@ -5365,6 +5378,16 @@ function ktOpen(hideFn){ _kt.push(hideFn); try{ history.pushState({kt:_kt.length
 function ktBack(fallback){ if(_kt.length){ if(_ktBacking) return; _ktBacking=true; history.back(); } else if(typeof fallback==='function'){ fallback(); } }
 function detailBack(){ ktBack(()=>showView(_detailReturn)); }
 addEventListener('popstate',()=>{ _ktBacking=false; const fn=_kt.pop(); if(typeof fn==='function'){ try{ fn(); }catch(e){} } });
+
+/* ---- floating "back to top" button on long pages ---- */
+function scrollToTop(){ window.scrollTo({top:0,behavior:(typeof reduceMotion!=='undefined'&&reduceMotion)?'auto':'smooth'}); }
+(function(){ const btn=document.getElementById('toTop'); if(!btn) return; let shown=false;
+  const upd=()=>{ const y=window.scrollY||document.documentElement.scrollTop||0; const should=y>620;
+    if(should===shown) return; shown=should;
+    if(should){ btn.hidden=false; requestAnimationFrame(()=>btn.classList.add('show')); }
+    else { btn.classList.remove('show'); setTimeout(()=>{ if(!shown) btn.hidden=true; },240); } };
+  window.addEventListener('scroll',upd,{passive:true}); window.addEventListener('resize',upd); upd();
+})();
 
 /* =====================================================================
    FEATURED (upcoming Kandima trip)
