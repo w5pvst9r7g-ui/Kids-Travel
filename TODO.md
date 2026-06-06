@@ -136,6 +136,8 @@ Last updated: 2026-06-06
 - [x] **Pack for any upcoming trip** — the Packing screen previously only showed the *next* trip; it now has a trip-picker row (each chip shows the city + live x/y progress, "✓ packed" when done) so kids can switch between all upcoming adventures, each with its own region-aware checklist
 - [x] **Back-to-top button** — a floating ↑ button fades in after you scroll down a long page (destination guides, Explore, World, Journal) and whisks you back to the top; sits above the mobile tab bar, night-mode styled, reduced-motion aware
 - [x] **Night-mode audit** — confirmed all of this session's new components (boarding-pass fun fact, journey timeline, packing trip-picker, quiz reveal, search count) render correctly in dark theme
+- [x] **Faster hero loads (LCP)** — the big above-the-fold hero photos (Explore spotlight + destination detail) now load `eager` with `fetchpriority="high"`, while the dozens of card/gallery thumbnails stay lazy — so the largest image paints sooner without eagerly pulling everything
+- [x] **Content + a11y audit** — confirmed all 37 destinations have ≥4 attractions / kids spots / photos plus highlights, tips, phrases and a local-cat tale; badge unlocks already celebrate (confetti + toast + sound); "Surprise me" slot-machine reel is delightful
 - [ ] *(next)* more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
