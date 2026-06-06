@@ -335,10 +335,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .flightroute .ap .nm{font-size:.78rem;color:var(--muted);font-weight:800;letter-spacing:.04em}
 .flightroute .path{flex:1;min-width:130px;position:relative;height:34px;display:flex;align-items:center;justify-content:center}
 .flightroute .path svg{width:100%;height:34px;overflow:visible}
-.flightroute .path .plane{position:absolute;top:2px;animation:planeMove 4.2s linear infinite}
-.flightroute .path .plane .psvg{width:26px;height:13px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
-.flightroute .path .plane .ptrail{width:34px;height:4px}
-@keyframes planeMove{0%{left:0;opacity:0;transform:translateY(6px)}14%{opacity:1}50%{transform:translateY(-4px)}86%{opacity:1}100%{left:88%;opacity:0;transform:translateY(2px)}}
+.flightroute .path .plane{position:absolute;top:-6px;animation:planeMove 4.6s linear infinite}
+.flightroute .path .plane .psvg{width:62px;height:24px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+@keyframes planeMove{0%{left:-18%;opacity:0;transform:translateY(6px)}14%{opacity:1}50%{transform:translateY(-3px)}86%{opacity:1}100%{left:84%;opacity:0;transform:translateY(2px)}}
 @media(prefers-reduced-motion:reduce){.flightroute .path .plane{animation:none;left:44%;opacity:1}}
 .bp-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));margin-top:18px;border-top:2px dashed var(--line)}
 .bp-field{padding:13px 16px 4px;border-right:2px dashed var(--line)}
@@ -495,11 +494,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 /* —— flying paper-plane + contrail (shared) —— */
 .flyplane{position:relative;display:inline-block;line-height:0}
 .psvg{display:block}
-.ptrail{position:absolute;top:50%;right:48%;height:5px;width:42px;transform:translateY(-50%);border-radius:5px;pointer-events:none;
-  background:linear-gradient(270deg,rgba(255,255,255,.92),rgba(255,255,255,0));filter:blur(.5px)}
-.plane-fly .pw{position:relative;display:block;width:32px;height:16px;transform-origin:50% 50%;transition:transform .1s linear;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
-.plane-fly .pw .psvg{width:32px;height:16px}
-.plane-fly .pw .ptrail{width:46px;height:6px}
+.plane-fly .pw{position:relative;display:block;width:80px;height:31px;transform-origin:70% 50%;transition:transform .1s linear;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.plane-fly .pw .psvg{width:80px;height:31px}
 .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:var(--shadow);padding:4px}
 .leaflet-popup-content{margin:10px 12px;font-family:var(--sans)}
 .pop{width:200px}
@@ -717,14 +713,13 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .dgroup-head h3 .cnt{font-size:.72rem;font-weight:800;color:var(--muted);background:var(--surface-2);border:2px solid var(--line);border-radius:999px;padding:3px 11px}
 /* ===== login / profiles ===== */
 .login{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;
-  background:radial-gradient(120% 80% at 50% -10%, #FFD86B 0, transparent 45%), linear-gradient(155deg,#13B5AC,#46B3F0 55%,#7C6CF4)}
+  background:radial-gradient(120% 70% at 50% -18%, #FFE6A0 0, transparent 46%), linear-gradient(180deg,#c4e4ff 0,#83bbf0 52%,#5f9fe6 100%)}
 .login.hidden{display:none}
 .login:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(62px 26px at 20% 26%,rgba(255,255,255,.5),transparent 70%),radial-gradient(86px 32px at 80% 18%,rgba(255,255,255,.42),transparent 70%),radial-gradient(54px 24px at 64% 74%,rgba(255,255,255,.35),transparent 70%),radial-gradient(70px 28px at 32% 82%,rgba(255,255,255,.3),transparent 70%);
-  animation:loginDrift 15s ease-in-out infinite alternate}
-.login-plane{position:absolute;top:16%;left:-12%;z-index:0;opacity:.92;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.28));animation:loginFly 17s linear infinite}
-.login-plane .psvg{width:46px;height:23px}
-.login-plane .ptrail{width:60px;height:7px;background:linear-gradient(270deg,rgba(255,255,255,.85),rgba(255,255,255,0))}
+  background:radial-gradient(120px 48px at 18% 24%,rgba(255,255,255,.78),transparent 72%),radial-gradient(150px 58px at 26% 30%,rgba(255,255,255,.6),transparent 72%),radial-gradient(110px 46px at 82% 20%,rgba(255,255,255,.62),transparent 72%),radial-gradient(130px 52px at 70% 80%,rgba(255,255,255,.55),transparent 72%),radial-gradient(90px 40px at 30% 84%,rgba(255,255,255,.5),transparent 72%);
+  animation:loginDrift 16s ease-in-out infinite alternate}
+.login-plane{position:absolute;top:16%;left:-16%;z-index:0;opacity:.96;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.22));animation:loginFly 19s linear infinite}
+.login-plane .psvg{width:148px;height:58px}
 @keyframes loginDrift{from{transform:translateX(-10px)}to{transform:translateX(10px)}}
 @keyframes loginFly{0%{left:-12%;top:22%;transform:rotate(-7deg)}100%{left:112%;top:10%;transform:rotate(-7deg)}}
 .login-card{position:relative;z-index:1}
@@ -814,19 +809,26 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .onb-tips .oe{font-size:1.5rem;line-height:1;flex:none}
 @media(prefers-reduced-motion:reduce){.onb-card{animation:none}}
 /* splash screen (after PIN) */
-.splash{position:fixed;inset:0;z-index:7000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  background:radial-gradient(125% 90% at 50% -10%,#22D3C4 0,#0FA7AF 36%,#2A6DF0 100%);color:#fff;overflow:hidden;animation:splashIn .3s ease both}
+.splash{position:fixed;inset:0;z-index:7000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;overflow:hidden;animation:splashIn .3s ease both;
+  background:
+    radial-gradient(150px 60px at 14% 24%, rgba(255,255,255,.9), rgba(255,255,255,0) 70%),
+    radial-gradient(200px 76px at 24% 30%, rgba(255,255,255,.82), rgba(255,255,255,0) 72%),
+    radial-gradient(150px 60px at 33% 20%, rgba(255,255,255,.78), rgba(255,255,255,0) 70%),
+    radial-gradient(180px 72px at 78% 70%, rgba(255,255,255,.8), rgba(255,255,255,0) 72%),
+    radial-gradient(240px 92px at 90% 78%, rgba(255,255,255,.72), rgba(255,255,255,0) 72%),
+    linear-gradient(180deg,#bfe2ff 0,#7db8f0 52%,#5aa0ea 100%)}
 .splash.hidden{display:none}
 .splash.out{animation:splashOut .45s ease forwards}
 @keyframes splashIn{from{opacity:0}to{opacity:1}}
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
-.splash:before{content:"";position:absolute;inset:0;background:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.7),transparent),radial-gradient(2px 2px at 70% 20%,rgba(255,255,255,.5),transparent),radial-gradient(2px 2px at 85% 60%,rgba(255,255,255,.6),transparent),radial-gradient(1.5px 1.5px at 35% 75%,rgba(255,255,255,.5),transparent);opacity:.7}
+.splash:before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(120px 48px at 60% 46%, rgba(255,255,255,.55), rgba(255,255,255,0) 72%),
+  radial-gradient(90px 40px at 46% 84%, rgba(255,255,255,.5), rgba(255,255,255,0) 72%)}
 .splash-sky{position:absolute;top:14%;left:0;right:0;height:130px;pointer-events:none}
 .splash-arc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .splash-arc path{stroke:rgba(255,255,255,.55);stroke-width:2.5;stroke-dasharray:3 9;fill:none;stroke-linecap:round}
-.splash-plane{position:absolute;left:4%;top:60%;filter:drop-shadow(0 5px 7px rgba(0,0,0,.3));animation:splashFly 1.7s ease-in-out both}
-.splash-plane .psvg{width:42px;height:21px}
-.splash-plane .ptrail{width:56px;height:7px;background:linear-gradient(270deg,rgba(255,255,255,.9),rgba(255,255,255,0))}
+.splash-plane{position:absolute;left:4%;top:60%;filter:drop-shadow(0 5px 7px rgba(0,0,0,.25));animation:splashFly 1.8s ease-in-out both}
+.splash-plane .psvg{width:150px;height:59px}
 @keyframes splashFly{0%{left:0;top:70%;transform:rotate(-26deg)}55%{transform:rotate(-14deg)}100%{left:84%;top:40%;transform:rotate(-8deg)}}
 .splash-logo{width:118px;height:118px;border-radius:30px;object-fit:cover;border:4px solid rgba(255,255,255,.92);
   box-shadow:0 18px 42px rgba(0,0,0,.42);z-index:2;animation:splashPop .6s cubic-bezier(.2,.9,.3,1.35) both}
@@ -1083,7 +1085,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
 </header>
 
 <div id="loginScreen" class="login">
-  <span class="login-plane flyplane" aria-hidden="true"><span class="ptrail"></span><svg class="psvg" viewBox="0 0 64 32"><path d="M62 16 L4 2 L27 15 Z" fill="#ffffff"/><path d="M62 16 L27 17 L4 30 Z" fill="#d8e2ef"/><path d="M62 16 L4 2 L27 16 L4 30 Z" fill="none" stroke="rgba(20,32,56,.34)" stroke-width="2.2" stroke-linejoin="round"/></svg></span>
+  <span class="login-plane flyplane" aria-hidden="true"></span>
   <div class="login-card">
     <div class="lc-kick">★ &nbsp;EXPLORER&nbsp;PASS&nbsp; ★</div>
     <div class="mark" id="loginMark" aria-hidden="true"></div>
@@ -1149,7 +1151,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
 <div id="splash" class="splash hidden" aria-hidden="true">
   <div class="splash-sky" aria-hidden="true">
     <svg class="splash-arc" viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M8 104 Q200 -16 392 96"/></svg>
-    <span class="splash-plane flyplane"><span class="ptrail"></span><svg class="psvg" viewBox="0 0 64 32"><path d="M62 16 L4 2 L27 15 Z" fill="#ffffff"/><path d="M62 16 L27 17 L4 30 Z" fill="#d8e2ef"/><path d="M62 16 L4 2 L27 16 L4 30 Z" fill="none" stroke="rgba(20,32,56,.34)" stroke-width="2.2" stroke-linejoin="round"/></svg></span>
+    <span class="splash-plane flyplane"></span>
   </div>
   <img class="splash-logo" src="poppie.jpg" alt="" onerror="this.style.display='none'">
   <div class="splash-title">Poppy's Atlas</div>
@@ -1406,8 +1408,8 @@ const gmap  = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeUR
 /* paper-plane SVG, nose pointing RIGHT (east) — known orientation so we can rotate
    it exactly to the direction of travel on every platform (the ✈️ emoji points
    different ways on Apple vs Android). Reused for the map, boarding pass, login & splash. */
-const PLANE_SVG='<svg class="psvg" viewBox="0 0 64 32" aria-hidden="true"><path d="M62 16 L4 2 L27 15 Z" fill="#ffffff"/><path d="M62 16 L27 17 L4 30 Z" fill="#d8e2ef"/><path d="M62 16 L4 2 L27 16 L4 30 Z" fill="none" stroke="rgba(20,32,56,.34)" stroke-width="2.2" stroke-linejoin="round"/></svg>';
-const flyPlane=()=>'<span class="ptrail"></span>'+PLANE_SVG;
+const PLANE_SVG='<svg class="psvg" viewBox="0 0 230 90" aria-hidden="true"><defs><filter id="plf" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="2.8"/></filter><linearGradient id="plc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".72"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs><g filter="url(#plf)"><path d="M158 40 C115 39 65 35 6 24 C65 45 115 43 158 42 Z" fill="url(#plc)"/><path d="M158 50 C115 51 65 55 6 66 C65 45 115 47 158 48 Z" fill="url(#plc)"/><circle cx="40" cy="29" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="33" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="36" r="8.5" fill="#fff" opacity=".5"/><circle cx="40" cy="61" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="57" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="54" r="8.5" fill="#fff" opacity=".5"/></g><g stroke="rgba(20,32,56,.4)" stroke-width="1.4" stroke-linejoin="round"><path d="M168 42 L132 14 L124 17 L150 44 Z" fill="#c8d5e8"/><path d="M168 48 L132 76 L124 73 L150 46 Z" fill="#b4c3db"/><path d="M138 43 L120 31 L114 34 L130 45 Z" fill="#c8d5e8"/><path d="M138 47 L120 59 L114 56 L130 45 Z" fill="#b4c3db"/><path d="M120 45 L108 43 L108 47 Z" fill="#aebfd6"/><path d="M123 38 L198 41 Q214 45 198 49 L123 52 Q114 52 114 45 Q114 38 123 38 Z" fill="#ffffff"/><rect x="150" y="36.5" width="13" height="5" rx="2.5" fill="#93a4be" stroke="none"/><rect x="150" y="48.5" width="13" height="5" rx="2.5" fill="#8294b0" stroke="none"/><path d="M201 45 q5 -3 9 0 q-5 3 -9 0Z" fill="#6aa6dd" stroke="none"/></g></svg>';
+const flyPlane=()=>PLANE_SVG;
 const flick = (kw, lock, w=800, h=600) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
 const esc   = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 /* trips that visited a given destination guide (links Map/Journal <-> Explore) */
@@ -5730,7 +5732,7 @@ function buildMap(){
     const pts=arc(originFor(np),{lat:np.lat,lng:np.lng});
     L.polyline(pts,{color:'#FFD86B',weight:12,opacity:.16,lineCap:'round',interactive:false}).addTo(layer);  /* soft glow */
     L.polyline(pts,{color:'#FFC23C',weight:3.5,opacity:.95,lineCap:'round',interactive:false}).addTo(layer); /* bright route */
-    const pm=L.marker(pts[0],{icon:L.divIcon({className:'plane-fly',html:'<span class="pw flyplane">'+flyPlane()+'</span>',iconSize:[32,16],iconAnchor:[16,8]}),zIndexOffset:1500,interactive:false}).addTo(layer);
+    const pm=L.marker(pts[0],{icon:L.divIcon({className:'plane-fly',html:'<span class="pw flyplane">'+flyPlane()+'</span>',iconSize:[80,31],iconAnchor:[56,16]}),zIndexOffset:1500,interactive:false}).addTo(layer);
     let k=0;
     planeTimer=setInterval(()=>{
       const a=pts[k], b=pts[(k+2)%pts.length];
@@ -6628,6 +6630,7 @@ renderStats();checkAchievements({silent:true});
 const _sb=document.getElementById('surpriseBtn'); if(_sb) _sb.addEventListener('click',surpriseMe);
 poppieSpeak(); setInterval(poppieSpeak,7000);
 document.getElementById('fYear').value=new Date().getFullYear();
+['.login-plane','.splash-plane'].forEach(s=>{const el=document.querySelector(s); if(el) el.innerHTML=PLANE_SVG;});
 rotateFact();setInterval(rotateFact,6000);setHeroSpotlight();observeReveals();
 if(!reduceMotion) setInterval(()=>{ const el=document.getElementById('globieSay'); if(el) poppieSpeak(); },7200);
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
