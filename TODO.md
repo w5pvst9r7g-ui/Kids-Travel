@@ -2,7 +2,7 @@
 
 A living checklist so nothing gets lost. **When we get sidetracked by a new request, add it here and tick things off as they ship.**
 
-Last updated: 2026-06-01
+Last updated: 2026-06-06
 
 ---
 
@@ -108,7 +108,7 @@ Last updated: 2026-06-01
 - [x] ~~Fun fact of the day~~ — already covered by the rotating "Did you know?" facts on the Explore hero
 - [ ] Map: tap a country to filter guides to it *(needs country polygons / GeoJSON — heavier)*
 - [ ] Remove unused Madagascar/Antarctica photo entries *(low value; they sit harmlessly inside a minified blob)*
-- [ ] Sound effects / haptics (subtle, toggleable)
+- [x] Sound effects / haptics (subtle, toggleable) — generated tones + `navigator.vibrate` buzz on taps/quiz/badges (off by default)
 
 ### Needs Grant's input / accounts
 - [ ] Supabase project (cloud sync) — create free project, share URL + anon key
@@ -119,6 +119,12 @@ Last updated: 2026-06-01
 ## 🆕 New tasks (added as they come up)
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
+
+### 🔁 Continuous-improvement loop (10-min ticks)
+- [x] **Realistic airliner** replaces the paper plane everywhere (swept wings, engines, twin contrails puffing into clouds); cloudy-sky splash/login backdrops; map plane aligned to the flight arc heading
+- [x] **Tap feedback on nav** — every bottom-tab press now gives a gentle tap chime + haptic buzz
+- [x] **Mobile "Did you know?"** — the hero fun-fact (hidden <620px) now surfaces below the hero in the handwritten font on phones
+- [ ] *(next)* quiz answer reveal · journey timeline · more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page
