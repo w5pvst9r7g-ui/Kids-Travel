@@ -130,6 +130,7 @@ Last updated: 2026-06-06
 - [x] **Smooth photo fade-in** — every framed photo (heroes, cards, galleries, spot thumbnails, cat covers) now gently fades in as it decodes instead of popping, with a graceful fallback to the on-brand gradient if it never loads (reduced-motion users skip the fade)
 - [x] **Section-tab scroll affordance** — the 8 guide tabs no longer look "cut off": replaced an always-on right-edge fade with smart left/right fade hints that appear only when there are more tabs to scroll to in that direction (toggled on scroll/resize)
 - [x] **Swipe gestures** — the photo lightbox and the cat-story reader now respond to left/right swipes on touch devices (kids swipe naturally), alongside the existing arrows/buttons; vertical scrolls are ignored so it never hijacks scrolling
+- [x] **Tappable "Did you know?"** — the hero fact card (desktop & mobile) is now a button: tap it for a fresh random fact (with a soft pop + pop sound), and it restarts the gentle auto-rotate; labelled "tap! 🔀" with a hover lift and full keyboard/ARIA support
 - [ ] *(next)* more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)

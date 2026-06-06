@@ -219,12 +219,16 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .hero .cta{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
 .hero .factnote{position:absolute;top:16px;right:16px;z-index:4;background:#fff;color:var(--ink);
   border-radius:16px;padding:11px 15px;max-width:235px;box-shadow:var(--shadow);font-family:var(--hand);font-size:1.18rem;
-  line-height:1.15;font-weight:700;display:flex;gap:9px;align-items:flex-start;transform:rotate(2deg)}
+  line-height:1.15;font-weight:700;display:flex;gap:9px;align-items:flex-start;transform:rotate(2deg);cursor:pointer;transition:transform .18s,box-shadow .18s;border:none;text-align:left}
+.hero .factnote:hover{transform:rotate(2deg) translateY(-2px) scale(1.02);box-shadow:var(--shadow-lg,0 12px 28px rgba(0,0,0,.18))}
+@keyframes factPop{from{opacity:.3}to{opacity:1}}
+.fact-pop{animation:factPop .32s ease}
 .hero .factnote b{color:var(--coral-d);font-family:var(--display);display:block;font-size:.72rem;
   letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
 @media(max-width:620px){.hero .factnote{display:none}}
 .hero-fact{display:none}
-@media(max-width:620px){.hero-fact{display:flex;gap:9px;align-items:flex-start;background:var(--surface);border:2px dashed var(--line-2);border-radius:14px;padding:12px 14px;margin:14px 0 0;font-family:var(--hand);font-size:1.15rem;font-weight:700;line-height:1.15;color:var(--ink);box-shadow:var(--shadow-sm)}
+@media(max-width:620px){.hero-fact{display:flex;gap:9px;align-items:flex-start;background:var(--surface);border:2px dashed var(--line-2);border-radius:14px;padding:12px 14px;margin:14px 0 0;font-family:var(--hand);font-size:1.15rem;font-weight:700;line-height:1.15;color:var(--ink);box-shadow:var(--shadow-sm);cursor:pointer;width:100%;text-align:left}
+  .hero-fact:active{transform:scale(.99)}
   .hero-fact b{font-family:var(--display);color:var(--coral-d);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px}}
 .hero .hero-spot{position:absolute;left:16px;top:16px;z-index:3;background:rgba(0,0,0,.42);color:#fff;border:1.5px solid rgba(255,255,255,.55);
   backdrop-filter:blur(3px);border-radius:999px;padding:8px 15px;font-family:var(--display);font-weight:800;font-size:.84rem;cursor:pointer;transition:.15s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
@@ -1283,9 +1287,9 @@ create policy "atlas all" on atlas_sync
           <button class="btn btn-surprise" id="surpriseBtn" type="button"><span class="reel" aria-hidden="true">🎲</span> Surprise me!</button>
         </div>
       </div>
-      <div class="factnote"><span>💡</span><span><b>Did you know?</b><span id="heroFact">Loading a fun fact…</span></span></div>
+      <button type="button" class="factnote" onclick="shuffleFact()" title="Tap for another fun fact!" aria-label="Did you know? Tap for another fun fact"><span aria-hidden="true">💡</span><span><b>Did you know? <span aria-hidden="true" style="opacity:.6">· tap! 🔀</span></b><span id="heroFact">Loading a fun fact…</span></span></button>
     </div>
-    <div class="hero-fact"><span aria-hidden="true">💡</span><span><b>Did you know?</b><span id="heroFactM">Loading a fun fact…</span></span></div>
+    <button type="button" class="hero-fact" onclick="shuffleFact()" aria-label="Did you know? Tap for another fun fact"><span aria-hidden="true">💡</span><span><b>Did you know? <span aria-hidden="true" style="opacity:.6">· tap! 🔀</span></b><span id="heroFactM">Loading a fun fact…</span></span></button>
 
     <svg class="route-divider" viewBox="0 0 600 34" preserveAspectRatio="none" fill="none" aria-hidden="true">
       <path d="M14 17 Q300 -10 586 17" stroke="var(--yellow)" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
@@ -6243,8 +6247,14 @@ const FACTS=(function(){ const seen=new Set(), out=FACTS_BASE.slice();
     if(typeof f==='string' && f.length>=18 && f.length<=130 && !seen.has(f)){ seen.add(f); out.push(f); } }); }); }catch(e){}
   return out; })();
 /* start on a "fact of the day" so it feels fresh daily, then gently rotates */
-let factI=Math.floor(Date.now()/86400000)%Math.max(1,FACTS.length);
-function rotateFact(){const f=FACTS[factI%FACTS.length]; const el=document.getElementById('heroFact'); if(el) el.textContent=f; const em=document.getElementById('heroFactM'); if(em) em.textContent=f; factI++;}
+let factI=Math.floor(Date.now()/86400000)%Math.max(1,FACTS.length), factShown=-1, factTimer=null;
+function showFact(){ const idx=((factI%FACTS.length)+FACTS.length)%FACTS.length; factShown=idx; const f=FACTS[idx];
+  ['heroFact','heroFactM'].forEach(id=>{ const el=document.getElementById(id); if(!el) return; el.textContent=f;
+    const card=el.closest('.factnote,.hero-fact'); if(card){ card.classList.remove('fact-pop'); void card.offsetWidth; card.classList.add('fact-pop'); } }); }
+function rotateFact(){ showFact(); factI++; }
+function restartFactTimer(){ if(factTimer) clearInterval(factTimer); factTimer=setInterval(rotateFact,6000); }
+/* tap the "Did you know?" card to jump to a fresh random fact */
+function shuffleFact(){ if(FACTS.length>1){ let n=factShown,g=0; do{ n=Math.floor(Math.random()*FACTS.length); }while(n===factShown && ++g<8); factI=n; } showFact(); factI++; try{sfx('pop');}catch(e){} restartFactTimer(); }
 /* showcase a random real destination on the Explore hero (rotates the spotlight) */
 let heroSpotId=null;
 function setHeroSpotlight(){
@@ -6738,7 +6748,7 @@ const _sb=document.getElementById('surpriseBtn'); if(_sb) _sb.addEventListener('
 poppieSpeak(); setInterval(poppieSpeak,7000);
 document.getElementById('fYear').value=new Date().getFullYear();
 ['.login-plane','.splash-plane'].forEach(s=>{const el=document.querySelector(s); if(el) el.innerHTML=PLANE_SVG;});
-rotateFact();setInterval(rotateFact,6000);setHeroSpotlight();observeReveals();
+rotateFact();restartFactTimer();setHeroSpotlight();observeReveals();
 if(!reduceMotion) setInterval(()=>{ const el=document.getElementById('globieSay'); if(el) poppieSpeak(); },7200);
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
 addEventListener('resize',syncHeader); syncHeader();
