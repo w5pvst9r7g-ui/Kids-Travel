@@ -5243,7 +5243,9 @@ function openStory(id,si){
     img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(kw,77,520,520);
   }
   renderStoryPage();
-  document.getElementById('storyReader').classList.remove('hidden');
+  const sr=document.getElementById('storyReader'); const wasHidden=sr.classList.contains('hidden');
+  sr.classList.remove('hidden');
+  if(wasHidden) ktOpen(_hideStory);
   if(currentDest) markCatRead(currentDest.id);
 }
 function renderStoryPage(){
@@ -5259,21 +5261,23 @@ function renderStoryPage(){
   if(last&&storyId!=null) markStoryRead(storyId,storyIndex);  /* finished this tale */
 }
 function storyGo(d){ storyPage+=d; sfx("page"); renderStoryPage(); }
-function closeStory(){ const o=document.getElementById('storyReader'); if(o) o.classList.add('hidden');
+function _hideStory(){ const o=document.getElementById('storyReader'); if(o) o.classList.add('hidden');
   /* if the tale was finished, mark its cover with a ✓ Read badge (in place) */
   if(storyId!=null && storiesRead.has(storyId+':'+storyIndex)){
     const panel=document.getElementById('panel-cat');
     const covers=panel?panel.querySelectorAll('.catcover'):[];
     const cov=covers[storyIndex], pic=cov&&cov.querySelector('.catcover-pic');
     if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
+function closeStory(){ ktBack(_hideStory); }
 /* —— photo lightbox —— */
-function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); const lb=document.getElementById('lightbox'); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); }
+function openLightbox(i){ if(!currentDest) return; const lb=document.getElementById('lightbox'); const wasHidden=lb.classList.contains('hidden'); lbIndex=i; renderLightbox(); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); if(wasHidden) ktOpen(_hideLightbox); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=galleryLen(d); if(!n) return; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex]||[];
   const cap=photoCaption(d.id,lbIndex,p[1]);
   document.getElementById('lbImg').innerHTML='<div class="frame" style="'+frameStyle(themeFor(d))+'">'+sticker(d.emoji)+dpic(d.id,lbIndex,p[2]||(lbIndex+1),1000,750,cap,p[0]||'')+'</div>';
   document.getElementById('lbCap').textContent=cap+' · '+(lbIndex+1)+' / '+n; }
 function lbNav(dir){ lbIndex+=dir; renderLightbox(); }
-function closeLightbox(){ const l=document.getElementById('lightbox'); if(l) l.classList.add('hidden'); }
+function _hideLightbox(){ const l=document.getElementById('lightbox'); if(l) l.classList.add('hidden'); }
+function closeLightbox(){ ktBack(_hideLightbox); }
 addEventListener('keydown',e=>{ const l=document.getElementById('lightbox'); if(!l||l.classList.contains('hidden'))return;
   if(e.key==='Escape')closeLightbox(); else if(e.key==='ArrowRight')lbNav(1); else if(e.key==='ArrowLeft')lbNav(-1); });
 /* swipe-to-navigate (touch) for the photo lightbox and the cat-story reader */
@@ -5335,6 +5339,14 @@ function showView(v){
 }
 document.querySelectorAll('nav.top button[data-view], .tabbar button[data-view]').forEach(b=>
   b.addEventListener('click',()=>{ sfx('tap'); showView(b.dataset.view); }));
+
+/* ---- back-button support for full-screen layers (lightbox, story) ----
+   So the Android / PWA back gesture closes the open layer instead of leaving
+   the app. Each layer registers an internal "hide" fn; the OS back pops it. */
+const _kt=[];
+function ktOpen(hideFn){ _kt.push(hideFn); try{ history.pushState({kt:_kt.length},''); }catch(e){} }
+function ktBack(fallback){ if(_kt.length){ history.back(); } else if(typeof fallback==='function'){ fallback(); } }
+addEventListener('popstate',()=>{ const fn=_kt.pop(); if(typeof fn==='function'){ try{ fn(); }catch(e){} } });
 
 /* =====================================================================
    FEATURED (upcoming Kandima trip)
