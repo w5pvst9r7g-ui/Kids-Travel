@@ -125,7 +125,8 @@ Last updated: 2026-06-06
 - [x] **Tap feedback on nav** — every bottom-tab press now gives a gentle tap chime + haptic buzz
 - [x] **Mobile "Did you know?"** — the hero fun-fact (hidden <620px) now surfaces below the hero in the handwritten font on phones
 - [x] **Quiz answer reveal** — after each question, an inline feedback line: green "Nailed it!" praise when right, coral "Not quite — the answer is **X**" when wrong (both the destination quiz and the language mini-quiz) so kids learn from every answer
-- [ ] *(next)* journey timeline · more polish
+- [x] **Journey timeline** — the Journal now has a 🗂️ Cards / 🧭 Timeline toggle; Timeline lays every trip on a dashed flight-path line grouped by year (newest first, "Still to come" up top), each stop showing the flag, city, the explorer's age that year ("Jean-Luc was 7"), star rating & an Upcoming badge — tap any stop to open its guide
+- [ ] *(next)* more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page

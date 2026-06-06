@@ -548,6 +548,27 @@ textarea{resize:vertical}
 .formcard .btn-text{width:100%;justify-content:center;margin-top:6px}
 
 .passport{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:20px}
+.passport.tl{display:block}
+.jview{display:inline-flex;background:var(--surface-2);border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.jview button{border:none;background:transparent;color:var(--muted);font-family:var(--sans);font-weight:800;font-size:.86rem;padding:6px 13px;border-radius:999px;cursor:pointer;min-height:34px;transition:.15s}
+.jview button.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+.timeline{position:relative;margin:6px 0 4px;padding-left:34px}
+.timeline:before{content:"";position:absolute;left:11px;top:6px;bottom:14px;width:3px;border-radius:3px;background:repeating-linear-gradient(180deg,var(--teal) 0 9px,transparent 9px 16px)}
+.tl-year{position:relative;font-family:var(--display);font-weight:800;color:var(--coral-d);font-size:1.04rem;margin:18px 0 10px}
+.tl-year:first-child{margin-top:2px}
+.tl-year:before{content:"";position:absolute;left:-27px;top:50%;transform:translateY(-50%);width:15px;height:15px;border-radius:50%;background:var(--coral);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--coral)}
+.tl-item{position:relative;display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;margin-bottom:9px;box-shadow:var(--shadow-sm);transition:.16s;width:100%;text-align:left;cursor:pointer}
+.tl-item:hover{transform:translateX(3px);box-shadow:var(--shadow);border-color:var(--teal)}
+.tl-item:before{content:"";position:absolute;left:-24px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:var(--teal);border:2.5px solid var(--bg);box-shadow:0 0 0 1.5px var(--teal)}
+.tl-item .tlf{flex:none;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;background:var(--surface-2);border:1.5px solid var(--line)}
+.tl-item .tlb{flex:1;min-width:0}
+.tl-item .tlb .tlc{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1rem;line-height:1.2}
+.tl-item .tlb .tlm{color:var(--muted);font-size:.82rem;font-weight:700;display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.tl-item .tlb .tlm .age{background:var(--grape);color:var(--grape-d);border-radius:999px;padding:1px 8px;font-size:.76rem}
+.tl-item .tlsoon{background:var(--coral);color:#fff;border-radius:999px;padding:1px 9px;font-size:.74rem;font-weight:800}
+.tl-item .tlr{flex:none;display:flex;gap:1px}
+.tl-item .tlr svg{width:15px;height:15px}
+html.night .jview,html.night .tl-item,html.night .tl-item .tlf{background:var(--surface);border-color:var(--line-2)}
 .entry{background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
   box-shadow:var(--shadow-sm);transition:.2s;position:relative}
 .entry:hover{box-shadow:var(--shadow);transform:translateY(-4px) rotate(-.5deg)}
@@ -5954,11 +5975,13 @@ function setRating(n){formRating=n;document.querySelectorAll('#ratepick span').f
   s.setAttribute('aria-checked',v===n?'true':'false');
   s.tabIndex=(v===n||(n===0&&v===1))?0:-1;
 });}
-let journalFilter='all';
+let journalFilter='all', journalView='cards';
 function renderJournalFilters(){
   const f=document.getElementById('journalFilters'); if(!f) return;
   const opts=[['all','📋 All'],['upcoming','🔜 Upcoming'],['past','✅ Visited']];
-  f.innerHTML=opts.map(o=>`<button class="chip ${o[0]===journalFilter?'active':''}" onclick="journalFilter='${o[0]}';renderJournalFilters();renderPassport()">${o[1]}</button>`).join('');
+  const views=[['cards','🗂️ Cards'],['timeline','🧭 Timeline']];
+  f.innerHTML=opts.map(o=>`<button class="chip ${o[0]===journalFilter?'active':''}" onclick="journalFilter='${o[0]}';renderJournalFilters();renderPassport()">${o[1]}</button>`).join('')
+    +`<span class="jview" role="group" aria-label="Journal layout">${views.map(v=>`<button class="${v[0]===journalView?'active':''}" aria-pressed="${v[0]===journalView}" onclick="journalView='${v[0]}';renderJournalFilters();renderPassport()">${v[1]}</button>`).join('')}</span>`;
 }
 /* =====================================================================
    CLOUD SYNC (optional) — back up / restore all explorers' data to the
@@ -6054,11 +6077,14 @@ function printPassport(){
 function renderPassport(){
   const p=document.getElementById('passport');
   if(!trips.length){
+    p.classList.remove('tl');
     p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppy waiting')}<h3>No adventures yet!</h3><p>Add your first trip on the left — it'll appear here and on your atlas map.</p></div>`;
     return;
   }
   let list=trips.filter(t=>journalFilter==='all'||(journalFilter==='upcoming'?t.planned:!t.planned));
-  if(!list.length){ p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppy')}<h3>Nothing here yet!</h3><p>No ${journalFilter==='upcoming'?'upcoming':'visited'} trips — try another filter.</p></div>`; return; }
+  if(!list.length){ p.classList.remove('tl'); p.innerHTML=`<div class="empty">${poppiePic('calm','','Poppy')}<h3>Nothing here yet!</h3><p>No ${journalFilter==='upcoming'?'upcoming':'visited'} trips — try another filter.</p></div>`; return; }
+  if(journalView==='timeline'){ p.classList.add('tl'); renderTimeline(p,list); return; }
+  p.classList.remove('tl');
   const sorted=list.sort((a,b)=>(a.planned-b.planned)||(b.year-a.year));
   p.innerHTML=sorted.map(t=>{
     const d=DESTS.find(x=>x.id===t.destId),th=themeFor(d),kw=d?d.photos[0][0]:(t.city||'travel'),lk=d?d.photos[0][2]:(t.year||1);
@@ -6077,6 +6103,25 @@ function renderPassport(){
         </div>
       </div></article>`;
   }).join('');
+}
+function renderTimeline(p,list){
+  const prof=PROFILES.find(x=>x.id===currentProfile), dob=(prof&&prof.dob)||0;
+  const upcoming=list.filter(t=>t.planned).sort((a,b)=>(a.year||9999)-(b.year||9999));
+  const past=list.filter(t=>!t.planned).sort((a,b)=>(b.year||0)-(a.year||0));
+  const star=`<svg viewBox="0 0 24 24" fill="var(--butter-d,#F2B705)" stroke="none"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.6L12 18.5 6.1 21.6l1.2-6.6L2.5 9.4l6.6-.9z"/></svg>`;
+  const item=t=>{ const d=DESTS.find(x=>x.id===t.destId); const age=(dob&&t.year&&t.year>=dob)?(t.year-dob):null;
+    const meta=[t.flag?`${esc(t.flag)} ${esc(t.country||'')}`:esc(t.country||'')];
+    return `<button class="tl-item" type="button" ${d?`onclick="openDest('${d.id}')"`:''}>
+      <span class="tlf" aria-hidden="true">${esc(t.emoji||(d&&d.emoji)||'📍')}</span>
+      <span class="tlb"><span class="tlc">${esc(t.city||'')}</span>
+        <span class="tlm"><span>${meta[0]}</span>${age!=null?`<span class="age">${prof?esc(prof.name.split(/[ -]/)[0]):'You'} ${t.planned?'will be':'was'} ${age}</span>`:''}${t.planned?'<span class="tlsoon">Upcoming</span>':''}</span></span>
+      ${(!t.planned&&t.rating)?`<span class="tlr" aria-label="${t.rating} out of 5">${star.repeat(t.rating)}</span>`:''}
+    </button>`; };
+  let inner='';
+  if(upcoming.length){ inner+=`<div class="tl-year">🔜 Still to come</div>`+upcoming.map(item).join(''); }
+  let lastYr=null;
+  inner+=past.map(t=>{ let head=''; if(t.year!==lastYr){ lastYr=t.year; head=`<div class="tl-year">${t.year||'Sometime'}</div>`; } return head+item(t); }).join('');
+  p.innerHTML=`<div class="timeline">${inner}</div>`;
 }
 function prefillForm(destId){resetForm();document.getElementById('fDest').value=destId;
   document.getElementById('customWrap').style.display='none';document.getElementById('fNote').focus();}
