@@ -4366,6 +4366,31 @@ const POPULAR_EXPAND2 = {
 if (typeof module !== 'undefined' && module.exports) { module.exports = POPULAR_EXPAND2; }
 DESTS.forEach(d=>{ if(POPULAR_EXPAND2[d.id]) Object.assign(d,POPULAR_EXPAND2[d.id]); });
 
+/* "⭐ Don't miss" highlights + "💡 Family tips" for the remaining guides */
+const THIN_EXPAND={
+  lapland:{highlights:["Meet Santa Claus at his village on the Arctic Circle 🎅","Hunt for the dancing green Northern Lights","Ride a husky or reindeer sled across the snow"],tips:["Wrap up VERY warm — thermals, snow boots, hats and gloves ❄️","Clear, dark nights away from town give the best aurora views"]},
+  athens:{highlights:["Climb up to the Acropolis and the mighty Parthenon","See ancient treasures at the Acropolis Museum","Watch the pom-pom-shoe guards change at Syntagma"],tips:["Wear comfy shoes — the marble paths are steep and slippery","Go early to beat the midday heat and crowds ☀️"]},
+  rhodes:{highlights:["Wander the walled medieval Old Town like a knight 🏰","Climb to the clifftop Acropolis of Lindos","Splash at Tsambika or Anthony Quinn Bay"],tips:["Bring water shoes — many beaches are pebbly","Pack a sun hat and reef-safe sunscreen 🧴"]},
+  tenerife:{highlights:["Ride the cable car up Mount Teide, Spain's tallest volcano 🌋","Spot whales and dolphins on a boat trip","Meet penguins and parrots at Loro Parque"],tips:["Hot at the coast but cold up Teide — bring a jacket","The Canary sun is strong all year — hat and sunscreen"]},
+  porto:{highlights:["Cross the double-decker Dom Luís I iron bridge","Float down the Douro in a colourful rabelo boat ⛵","Ride the old wooden tram through the city"],tips:["Steep hills everywhere — wear comfy walking shoes","Try a warm custard tart, a pastel de nata 🥧"]},
+  istanbul:{highlights:["Gaze up inside the giant Hagia Sophia and Blue Mosque","Get happily lost in the Grand Bazaar's thousands of shops","Cruise the Bosphorus between Europe and Asia 🚢"],tips:["Cover shoulders and knees to enter the mosques","Carry small change for the markets and ferries"]},
+  antalya:{highlights:["Explore the old harbour town of Kaleiçi","See the Düden Waterfalls tumble into the sea","Splash at pebbly Konyaaltı and Lara beaches"],tips:["Water shoes help on the pebbly beaches","Loads of sun — hats, sunscreen and water ☀️"]},
+  split:{highlights:["Walk inside a 1,700-year-old Roman palace 🏛️","Climb the bell tower for views over the red rooftops","Swim in the sparkling Adriatic at Bačvice beach"],tips:["Comfy shoes for the smooth, slippery old-town stones","Bring water shoes for the pebbly beaches"]},
+  algarve:{highlights:["Take a boat into the golden Benagil sea cave","Paddle the calm Ria Formosa lagoon","Build castles on the soft Algarve sand 🏖️"],tips:["Reef-safe sunscreen and a sun hat are a must","Mornings are calmest for boat trips to the caves"]},
+  fez:{highlights:["Get lost in the maze of the ancient walled medina","Peer over the colourful leather tanneries","See one of the world's oldest universities"],tips:["Wear comfy shoes — the medina lanes are bumpy and busy","A scarf for your nose helps near the tanneries 👃"]},
+  tirana:{highlights:["Spot the rainbow-painted buildings around the city","Ride the Dajti Express cable car up the mountain 🚠","Explore the secret Bunk'Art tunnels"],tips:["Comfy shoes for exploring the lively squares","Bring a light layer — the mountain is cooler than town"]},
+  iceland:{highlights:["Watch the Strokkur geyser blast water high in the air","Stand by the thundering Gullfoss waterfall 💦","Float in the milky-blue warm lagoons"],tips:["Weather changes fast — pack waterproofs and warm layers","Look for puffins along the cliffs in summer 🐧"]},
+  vanuatu:{highlights:["Swim in the glowing Blue Lagoon's turquoise water","Snorkel over coral reefs and shipwrecks 🐠","See a real bubbling volcano on Tanna Island 🌋"],tips:["Reef-safe sunscreen protects you and the coral","Bring water shoes and a rashie for snorkelling"]},
+  johannesburg:{highlights:["Spot the Big Five on a safari near the city 🦁","Hand-feed creatures at the Lion & Safari Park","Ride the rides at Gold Reef City"],tips:["Mornings and evenings are best for spotting animals","Bring a hat, water and binoculars for safari 🔭"]},
+  adelaide:{highlights:["Cuddle koalas at Cleland Wildlife Park 🐨","Ride the old tram to Glenelg Beach","Catch a game at the famous Adelaide Oval"],tips:["The sun is strong — slip, slop, slap with sunscreen ☀️","The seaside is breezy; bring a light layer"]},
+  darwin:{highlights:["Get nose-to-nose with crocs at Crocosaurus Cove 🐊","Watch the sunset over the Mindil Beach markets","Cool off under Litchfield's waterfalls"],tips:["It's hot and humid — drink lots of water 💧","Never swim where crocodile signs are posted!"]},
+  agneswater:{highlights:["Surf gentle waves at Queensland's most northerly surf beach 🏄","Watch baby turtles hatch near the Town of 1770","Spot kangaroos on the beach at dawn"],tips:["Reef-safe sunscreen and a rashie for the sun","Always swim between the red and yellow flags"]},
+  herveybay:{highlights:["Watch humpback whales breach on a boat trip 🐋","Ferry across to giant sandy K'gari (Fraser Island)","Stroll the long calm beach and pier"],tips:["Bring a jacket — it's breezy out on the whale boats","Sea-sickness bands help on bumpy days"]},
+  christchurch:{highlights:["Glide down the Avon River on a punt 🚣","Explore the colourful Botanic Gardens","Feel the cold at the International Antarctic Centre 🐧"],tips:["Pack layers — the weather can change quickly","Hop on the historic tram to see the sights"]},
+  kentroma:{highlights:["Swim in the famous turquoise Blue Lagoon 🏝️","Hop between hidden coves on a boat trip","Snorkel in crystal-clear, calm water"],tips:["Water shoes help on the pebbly shores","Bring a mask and snorkel — the water is super clear"]}
+};
+DESTS.forEach(d=>{ const e=THIN_EXPAND[d.id]; if(e){ if(!(d.highlights&&d.highlights.length)) d.highlights=e.highlights; if(!(d.tips&&d.tips.length)) d.tips=e.tips; } });
+
 /* ---- local cat tales (paginated arc stories) ---- */
 /* Poppy's Atlas — Local Cat Tales.
    One cohesive story per destination, told over pages (story-arc).
