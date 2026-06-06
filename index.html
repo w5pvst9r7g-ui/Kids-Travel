@@ -1173,7 +1173,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
     <h3>⚙️ Settings</h3>
     <div class="set-row"><div class="set-tx"><b>🌙 Night mode</b><span>Dark, night-sky theme</span></div>
       <button class="tgl" id="setNight" role="switch" aria-label="Night mode" onclick="toggleNight();syncSettings()"><span class="knob"></span></button></div>
-    <div class="set-row"><div class="set-tx"><b>🔊 Sound effects</b><span>Little chimes &amp; pops</span></div>
+    <div class="set-row"><div class="set-tx"><b>🔊 Sound &amp; haptics</b><span>Chimes, pops &amp; a gentle buzz</span></div>
       <button class="tgl" id="setSound" role="switch" aria-label="Sound effects" onclick="toggleSound();syncSettings()"><span class="knob"></span></button></div>
     <div class="set-row"><div class="set-tx"><b>❔ How it works</b><span>Replay Poppy's intro</span></div>
       <button class="btn btn-ghost" onclick="closeSettings();forceOnboard()">Show</button></div>
@@ -5277,7 +5277,7 @@ function showView(v){
   observeReveals();
 }
 document.querySelectorAll('nav.top button[data-view], .tabbar button[data-view]').forEach(b=>
-  b.addEventListener('click',()=>showView(b.dataset.view)));
+  b.addEventListener('click',()=>{ sfx('tap'); showView(b.dataset.view); }));
 
 /* =====================================================================
    FEATURED (upcoming Kandima trip)
@@ -6658,6 +6658,8 @@ function syncSettings(){
 }
 function sfx(name){
   if(!soundOn||reduceMotion) return;
+  /* gentle haptic to match the sound on devices that support it (no-op on desktop) */
+  try{ if(navigator.vibrate){ const v={pop:12,good:[10],bad:[26],win:[10,28,10],page:6,tap:5}[name]; if(v!=null) navigator.vibrate(v); } }catch(e){}
   try{ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); const c=_actx, t=c.currentTime;
     const seq={pop:[[660,0,.08],[990,.06,.1]],good:[[523,0,.09],[784,.08,.12]],bad:[[300,0,.16]],
       win:[[523,0,.1],[659,.09,.1],[784,.18,.16]],page:[[480,0,.05]],tap:[[700,0,.04]]}[name]||[[600,0,.07]];
