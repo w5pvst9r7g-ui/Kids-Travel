@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -116,6 +116,20 @@ if (API) {
   check('cloud backup includes app data', !!gathered['globie_atlas_trips_v9_hailey']);
   check('cloud backup excludes secret config + foreign keys', !gathered['globie_cloud'] && !gathered['unrelated']);
   check('paper-plane SVG defined (direction-safe)', typeof API.PLANE_SVG === 'string' && API.PLANE_SVG.indexOf('<svg') === 0);
+
+  /* ---------- 4c. photos: no generic placeholders ---------- */
+  section('Photos — no generic placeholders');
+  check('no random picsum stock anywhere', html.indexOf('picsum.photos') === -1);
+  const lorem = (html.match(/loremflickr\.com/g) || []).length;
+  check('LoremFlickr only for cat covers (<=3 refs: dns-prefetch, flick(), comment)', lorem <= 3, lorem + ' refs');
+  const customCities = [...new Set(API.trips.filter(t => !t.destId).map(t => t.city))];
+  const pp = API.PLACE_PHOTOS || {};
+  check('every guide-less journal trip has a curated photo', customCities.every(c => pp[c] && pp[c].length), 'missing: ' + customCities.filter(c => !(pp[c] && pp[c].length)).join(', '));
+  // attraction→gallery matching actually fires for landmark-rich guides
+  const paris = API.DESTS.find(d => d.id === 'paris');
+  if (paris) { paris.__usedPics = new Set();
+    const m = API.matchGalleryIndex(paris, 'Eiffel Tower', paris.__usedPics);
+    check('attraction photos match by name (Eiffel Tower → a gallery photo)', m >= 0); }
 }
 
 /* ---------- 5. static / asset integrity ---------- */
