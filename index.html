@@ -317,6 +317,10 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
   font-weight:800;font-size:.92rem;color:var(--ink-2);transition:.15s;flex:none}
 .snav button:hover{color:var(--ink);transform:translateY(-2px)}
 .snav button.active{background:var(--coral-d);color:#fff;border-color:var(--coral-d)}
+/* fade hints appear only when there are more tabs to scroll to (toggled in JS) */
+.snav.ov-r{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.snav.ov-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%);mask-image:linear-gradient(90deg,transparent,#000 12%)}
+.snav.ov-l.ov-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 
 .panel{display:none;padding:28px 0 6px}
 .panel.active{display:block;animation:fadeup .4s ease}
@@ -626,7 +630,7 @@ body{overscroll-behavior-y:none}
 nav.top button,.snav button,.chip,.back{min-height:44px}
 .entry .acts button{min-height:44px}
 .ratepick svg{width:38px;height:38px;padding:3px}
-.snav{top:calc(var(--header-h) + env(safe-area-inset-top));-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}
+.snav{top:calc(var(--header-h) + env(safe-area-inset-top))}
 @media(max-width:760px){
   .tabbar button{min-height:50px}
   body{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
@@ -5603,8 +5607,18 @@ function openDest(id){
     });
   });
   const _qs=document.getElementById('quizStart'); if(_qs) _qs.addEventListener('click',startQuiz);
+  const dt2=document.getElementById('dtabs');
+  if(dt2 && !dt2.__fadeWired){ dt2.__fadeWired=true; dt2.addEventListener('scroll',()=>updateSnavFade(dt2),{passive:true}); window.addEventListener('resize',()=>updateSnavFade(dt2)); }
+  updateSnavFade(dt2); requestAnimationFrame(()=>updateSnavFade(dt2));
   renderDetailCta(d);
   showView('detail');
+}
+/* show a soft edge-fade on the section tabs only when more tabs lie off-screen */
+function updateSnavFade(el){
+  if(!el) return;
+  const max=el.scrollWidth-el.clientWidth;
+  el.classList.toggle('ov-l', el.scrollLeft>4);
+  el.classList.toggle('ov-r', el.scrollLeft < max-4);
 }
 function renderDetailCta(d){
   const wrap=document.querySelector('#detail .detail-cta'); if(!wrap) return;

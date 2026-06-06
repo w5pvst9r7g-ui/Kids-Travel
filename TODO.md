@@ -128,6 +128,7 @@ Last updated: 2026-06-06
 - [x] **Journey timeline** — the Journal now has a 🗂️ Cards / 🧭 Timeline toggle; Timeline lays every trip on a dashed flight-path line grouped by year (newest first, "Still to come" up top), each stop showing the flag, city, the explorer's age that year ("Jean-Luc was 7"), star rating & an Upcoming badge — tap any stop to open its guide
 - [x] **Boarding-pass fun fact** — each "Getting there" pass now adds a handwritten kid-friendly line derived from the real flight time + distance: "long enough to watch about 10 movies 🍿, and you'll fly 8,800 km — about 22% of the way around the whole planet 🌍"
 - [x] **Smooth photo fade-in** — every framed photo (heroes, cards, galleries, spot thumbnails, cat covers) now gently fades in as it decodes instead of popping, with a graceful fallback to the on-brand gradient if it never loads (reduced-motion users skip the fade)
+- [x] **Section-tab scroll affordance** — the 8 guide tabs no longer look "cut off": replaced an always-on right-edge fade with smart left/right fade hints that appear only when there are more tabs to scroll to in that direction (toggled on scroll/resize)
 - [ ] *(next)* more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
