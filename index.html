@@ -166,7 +166,11 @@ nav.top button.active{color:#fff;background:var(--teal-d)}
 }
 
 main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
-.view{display:none}.view.active{display:block}
+.view{display:none}.view.active{display:block;animation:viewIn .34s cubic-bezier(.2,.7,.2,1) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#map-view.active{animation:viewFade .34s ease both}
+@keyframes viewFade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.view.active,#map-view.active{animation:none}}
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:44px 0 18px;flex-wrap:wrap}
 .section-head h2{font-size:clamp(1.6rem,4.4vw,2.2rem)}
 .section-head .eyebrow{margin-bottom:9px}
