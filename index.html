@@ -1419,7 +1419,38 @@ const pimg  = (kw, lock, w, h, alt='') => {
   return `<img loading="lazy" decoding="async" width="${w}" height="${h}" alt="${esc(alt)}" src="${flick(k,lock,w,h)}" data-fallbacks="${esc(JSON.stringify(fb))}" onerror="imgFail(this)">`;
 };
 /* caption that matches the curated gallery image for a slot (keeps labels in step) */
-function photoCaption(id,i,fb){ var P=(typeof PHOTOS!=='undefined')&&PHOTOS[id], g=P&&P.gallery&&P.gallery[i]; return (g&&g.caption)||fb; }
+/* turn a Wikimedia filename into a tidy, accurate caption */
+function captionFromFile(url){
+  if(!url) return '';
+  var f=decodeURIComponent((url.split('FilePath/')[1]||'').split('?')[0]);
+  f=f.replace(/\.[a-z0-9]+$/i,'');
+  f=f.replace(/([a-z])([A-Z])/g,'$1 $2');                 /* split camelCase */
+  f=f.replace(/[_]+/g,' ');
+  f=f.replace(/\b[A-Z]{1,4}\d{2,}[A-Z0-9]*\b/g,' ');       /* camera codes: P1060348, DSC04580, IMG2259 */
+  f=f.replace(/\b(jan|feb|mar|apr|may|jun|jul|aug|sept?|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\b/gi,' ');
+  f=f.replace(/\b(jpg|jpeg|png|cropped|edit(ed)?|retouched|unsplash|wikimedia|commons|panoramio|banner|geograph|org uk|dsc|img)\b/gi,' ');
+  f=f.replace(/\bby\s+[A-Z][a-z]+(\s+[A-Z][a-z]+)?/g,' ');
+  f=f.replace(/[()\[\],.\-]/g,' ');
+  f=f.replace(/([A-Za-z])\d+\b/g,'$1');                    /* digits stuck to a word: Bosphorus1 */
+  f=f.replace(/\b\d{2,}\b/g,' ').replace(/\s+\d+\s*$/,'');  /* stray numbers */
+  f=f.replace(/\s+/g,' ').trim();
+  if(f.length<3) return '';
+  if(f.length>56) f=f.slice(0,56).replace(/\s\S*$/,'')+'…';
+  return f.charAt(0).toUpperCase()+f.slice(1);
+}
+/* number of real (curated) gallery photos to show — never more than we have images for */
+function galleryLen(d){
+  var P=(typeof PHOTOS!=='undefined')&&PHOTOS[d.id], g=P&&P.gallery;
+  if(g&&g.length) return Math.min(g.length,(d.photos&&d.photos.length)||g.length);
+  return (d.photos&&d.photos.length)||0;
+}
+/* caption that matches the curated image shown for slot i */
+function photoCaption(id,i,fb){
+  var P=(typeof PHOTOS!=='undefined')&&PHOTOS[id], g=P&&P.gallery&&P.gallery[i];
+  if(g&&g.caption) return g.caption;
+  if(g&&g.candidates&&g.candidates[0]){ var c=captionFromFile(g.candidates[0]); if(c) return c; }
+  return fb||'';
+}
 /* thumbnail for a "what to see / fun to do" card: use the destination's CURATED
    gallery photos (real, on-theme) instead of random keyword stock images */
 /* haystack of words describing gallery photo gi (caption + filename + keywords) */
@@ -5147,9 +5178,9 @@ function closeStory(){ const o=document.getElementById('storyReader'); if(o) o.c
     if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
 /* —— photo lightbox —— */
 function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
-function renderLightbox(){ const d=currentDest; if(!d) return; const n=d.photos.length; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex];
+function renderLightbox(){ const d=currentDest; if(!d) return; const n=galleryLen(d); if(!n) return; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex]||[];
   const cap=photoCaption(d.id,lbIndex,p[1]);
-  document.getElementById('lbImg').innerHTML='<div class="frame" style="'+frameStyle(themeFor(d))+'">'+sticker(d.emoji)+dpic(d.id,lbIndex,p[2],1000,750,cap,p[0])+'</div>';
+  document.getElementById('lbImg').innerHTML='<div class="frame" style="'+frameStyle(themeFor(d))+'">'+sticker(d.emoji)+dpic(d.id,lbIndex,p[2]||(lbIndex+1),1000,750,cap,p[0]||'')+'</div>';
   document.getElementById('lbCap').textContent=cap+' · '+(lbIndex+1)+' / '+n; }
 function lbNav(dir){ lbIndex+=dir; renderLightbox(); }
 function closeLightbox(){ const l=document.getElementById('lightbox'); if(l) l.classList.add('hidden'); }
@@ -5375,7 +5406,7 @@ function openDest(id){
   const gt=d.gettingThere,ci=d.country_info;
   const bpf=(k,v)=>`<div class="bp-field"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`;
   const ppf=(k,v)=>`<div class="pp-field"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`;
-  const gallery=d.photos.map((p,i)=>{const cap=photoCaption(d.id,i,p[1]);return `<figure class="${i===0?'big':(i===3?'wide':'')}" role="button" tabindex="0" aria-label="Enlarge photo: ${esc(cap)}" onclick="openLightbox(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLightbox(${i})}"><div class="frame" style="${frameStyle(th)}">${sticker(d.emoji)}${dpic(d.id,i,p[2],700,560,'',p[0])}</div><figcaption>${esc(cap)} <span aria-hidden="true">🔍</span></figcaption></figure>`;}).join('');
+  const gallery=Array.from({length:galleryLen(d)},(_,i)=>{const p=d.photos[i]||[];const cap=photoCaption(d.id,i,p[1]);return `<figure class="${i===0?'big':(i===3?'wide':'')}" role="button" tabindex="0" aria-label="Enlarge photo: ${esc(cap)}" onclick="openLightbox(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLightbox(${i})}"><div class="frame" style="${frameStyle(th)}">${sticker(d.emoji)}${dpic(d.id,i,p[2]||(i+1),700,560,'',p[0]||'')}</div><figcaption>${esc(cap)} <span aria-hidden="true">🔍</span></figcaption></figure>`;}).join('');
   const hiBox = (d.highlights&&d.highlights.length)?`<div class="hibox"><h4>⭐ Don't miss!</h4><ul>${d.highlights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
   const tipsBox = (d.tips&&d.tips.length)?`<div class="hibox tips"><h4>💡 Family tips</h4><ul>${d.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
   const langPanel=(function(){
