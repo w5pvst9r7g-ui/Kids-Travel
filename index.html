@@ -1123,7 +1123,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
   </div>
 </div>
 
-<div id="eggOverlay" class="egg hidden" onclick="closeEgg()" role="dialog" aria-label="Poppy says">
+<div id="eggOverlay" class="egg hidden" onclick="closeEgg()" role="dialog" aria-modal="true" aria-label="Poppy says" tabindex="-1">
   <div class="egg-card">
     <img class="egg-cat" src="poppie-hi.png" alt="Grumpy Poppy">
     <div class="egg-bubble" id="eggLine"></div>
@@ -5097,13 +5097,25 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
-  o.classList.remove('hidden'); sfx('pop');
+  o.classList.remove('hidden'); sfx('pop'); setTimeout(()=>o.focus(),30);
   img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
+/* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
+const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay';
+function topOpenModal(){ const open=[...document.querySelectorAll(MODAL_SEL)].filter(m=>!m.classList.contains('hidden')); return open[open.length-1]||null; }
+function focusablesIn(m){ return [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null||el===document.activeElement); }
+document.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
+  const m=topOpenModal(); if(!m) return;
+  const f=focusablesIn(m); if(!f.length) return;
+  const first=f[0], last=f[f.length-1], a=document.activeElement;
+  if(!m.contains(a)){ e.preventDefault(); (e.shiftKey?last:first).focus(); return; }
+  if(e.shiftKey && a===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && a===last){ e.preventDefault(); first.focus(); }
+}, true);
 
 /* =====================================================================
    STATE + STORAGE
@@ -5182,7 +5194,7 @@ function closeStory(){ const o=document.getElementById('storyReader'); if(o) o.c
     const cov=covers[storyIndex], pic=cov&&cov.querySelector('.catcover-pic');
     if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
 /* —— photo lightbox —— */
-function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); document.getElementById('lightbox').classList.remove('hidden'); }
+function openLightbox(i){ if(!currentDest) return; lbIndex=i; renderLightbox(); const lb=document.getElementById('lightbox'); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); }
 function renderLightbox(){ const d=currentDest; if(!d) return; const n=galleryLen(d); if(!n) return; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex]||[];
   const cap=photoCaption(d.id,lbIndex,p[1]);
   document.getElementById('lbImg').innerHTML='<div class="frame" style="'+frameStyle(themeFor(d))+'">'+sticker(d.emoji)+dpic(d.id,lbIndex,p[2]||(lbIndex+1),1000,750,cap,p[0]||'')+'</div>';
