@@ -1329,7 +1329,7 @@ create policy "atlas all" on atlas_sync
 
   <!-- ===================== DETAIL ===================== -->
   <section id="detail" class="view">
-    <button class="back" onclick="showView('explore')">
+    <button class="back" onclick="detailBack()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       All places
     </button>
@@ -5170,9 +5170,12 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
+  const wasHidden=o.classList.contains('hidden');
   o.classList.remove('hidden'); sfx('pop'); setTimeout(()=>o.focus(),30);
+  if(wasHidden) ktOpen(_hideEgg);
   img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
-function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
+function _hideEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
+function closeEgg(){ ktBack(_hideEgg); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); }
@@ -5324,8 +5327,10 @@ function confetti(){
 /* =====================================================================
    VIEW SWITCHING
    ===================================================================== */
+let activeView='explore';
 function showView(v){
   const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail',world:'world-view'};
+  activeView=v;
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   (document.getElementById(ids[v])||document.getElementById('explore')).classList.add('active');
   document.querySelectorAll('nav.top button, .tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
@@ -5343,10 +5348,13 @@ document.querySelectorAll('nav.top button[data-view], .tabbar button[data-view]'
 /* ---- back-button support for full-screen layers (lightbox, story) ----
    So the Android / PWA back gesture closes the open layer instead of leaving
    the app. Each layer registers an internal "hide" fn; the OS back pops it. */
-const _kt=[];
+const _kt=[]; let _detailReturn='explore', _ktBacking=false;
 function ktOpen(hideFn){ _kt.push(hideFn); try{ history.pushState({kt:_kt.length},''); }catch(e){} }
-function ktBack(fallback){ if(_kt.length){ history.back(); } else if(typeof fallback==='function'){ fallback(); } }
-addEventListener('popstate',()=>{ const fn=_kt.pop(); if(typeof fn==='function'){ try{ fn(); }catch(e){} } });
+/* guard: several close fns may fire on one Escape / two keydown listeners — only
+   issue a single history.back() until the resulting popstate lands. */
+function ktBack(fallback){ if(_kt.length){ if(_ktBacking) return; _ktBacking=true; history.back(); } else if(typeof fallback==='function'){ fallback(); } }
+function detailBack(){ ktBack(()=>showView(_detailReturn)); }
+addEventListener('popstate',()=>{ _ktBacking=false; const fn=_kt.pop(); if(typeof fn==='function'){ try{ fn(); }catch(e){} } });
 
 /* =====================================================================
    FEATURED (upcoming Kandima trip)
@@ -5638,7 +5646,11 @@ function openDest(id){
   if(dt2 && !dt2.__fadeWired){ dt2.__fadeWired=true; dt2.addEventListener('scroll',()=>updateSnavFade(dt2),{passive:true}); window.addEventListener('resize',()=>updateSnavFade(dt2)); }
   updateSnavFade(dt2); requestAnimationFrame(()=>updateSnavFade(dt2));
   renderDetailCta(d);
+  const _ret=(activeView&&activeView!=='detail')?activeView:'explore';
+  const _wasDetail=activeView==='detail';
   showView('detail');
+  /* back button (and the in-app "All places" button) returns to the list, not out of the app */
+  if(!_wasDetail){ _detailReturn=_ret; ktOpen(()=>{ if(activeView==='detail') showView(_detailReturn); }); }
 }
 /* show a soft edge-fade on the section tabs only when more tabs lie off-screen */
 function updateSnavFade(el){
@@ -6057,8 +6069,9 @@ function openCloud(){ const c=loadCloudCfg();
   const u=document.getElementById('cbUrl'), k=document.getElementById('cbKey'), code=document.getElementById('cbCode');
   if(u) u.value=c.url||''; if(k) k.value=c.key||''; if(code) code.value=c.code||'';
   cloudStatus(c.url&&c.key&&c.code?'✓ Configured. Back up or restore any time.':'Not set up yet — add your Supabase details below.', c.url?'ok':'');
-  document.getElementById('cloudModal').classList.remove('hidden'); }
-function closeCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
+  const m=document.getElementById('cloudModal'); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideCloud); }
+function _hideCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
+function closeCloud(){ ktBack(_hideCloud); }
 function saveCloud(){
   const url=(document.getElementById('cbUrl').value||'').trim().replace(/\/+$/,'');
   const key=(document.getElementById('cbKey').value||'').trim();
@@ -6733,7 +6746,8 @@ function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id)
   const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60); }
 function openAvatarPicker(id){ avatarEditing=id; const p=PROFILES.find(x=>x.id===id);
   const n=document.getElementById('avName'); if(n) n.textContent=p?p.name:'';
-  renderAvatarGrid(); document.getElementById('avatarModal').classList.remove('hidden'); }
+  renderAvatarGrid(); const m=document.getElementById('avatarModal'); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideAvatar); }
+function _hideAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
 function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!g) return; const cur=avatarFor(avatarEditing);
   g.innerHTML=AVATAR_CHOICES.map(a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`).join('');
   g.querySelectorAll('.av-choice').forEach(b=>b.addEventListener('click',()=>setAvatar(avatarEditing,b.dataset.a))); }
@@ -6742,7 +6756,7 @@ function setupLogin(){
   if(mk){ const im=new Image(); im.alt='Poppy the cat'; im.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:22px';
     im.onerror=()=>{ mk.innerHTML='<svg viewBox="0 0 100 100">'+POPPIE_FACE+'</svg>'; }; im.src='poppie.jpg'; mk.innerHTML=''; mk.appendChild(im); }
   renderProfilePick();
-  const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>document.getElementById('avatarModal').classList.add('hidden'));
+  const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>ktBack(_hideAvatar));
   document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
   const submit=()=>{ const v=document.getElementById('pinInput').value.trim();
     if(v===PROFILE_PIN){ signIn(pendingProfile); }
@@ -6778,8 +6792,9 @@ function applySound(on){ soundOn=!!on; const b=document.getElementById('soundBtn
   if(b){ b.textContent=on?'🔊':'🔇'; b.setAttribute('aria-pressed',on); }
   try{localStorage.setItem('globie_sound',on?'1':'0');}catch(e){} }
 function toggleSound(){ applySound(!soundOn); if(soundOn) sfx('pop'); }
-function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); m.classList.remove('hidden'); } }
-function closeSettings(){ const m=document.getElementById('settingsSheet'); if(m) m.classList.add('hidden'); }
+function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideSettings); } }
+function _hideSettings(){ const m=document.getElementById('settingsSheet'); if(m) m.classList.add('hidden'); }
+function closeSettings(){ ktBack(_hideSettings); }
 function syncSettings(){
   const n=document.documentElement.classList.contains('night'), sn=document.getElementById('setNight');
   if(sn){ sn.classList.toggle('on',n); sn.setAttribute('aria-checked',n); }
