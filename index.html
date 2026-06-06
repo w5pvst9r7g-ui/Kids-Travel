@@ -966,8 +966,14 @@ html.night .pack-trip{background:var(--surface);border-color:var(--line-2)}
 .phrases{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .phrase{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow-sm)}
 .phrase .ph-en{font-weight:800;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
-.phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0}
+.phrase .ph-local{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--teal-d);margin:3px 0;display:flex;align-items:center;gap:9px}
 .phrase .ph-say{font-weight:700;color:var(--ink-2);font-size:.92rem}
+.ph-speak{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);font-size:.95rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s;line-height:1}
+.ph-speak:hover{border-color:var(--teal);background:var(--teal);transform:scale(1.06)}
+.ph-speak.speaking{border-color:var(--teal-d);background:var(--teal-d);animation:speakPulse .7s ease-in-out infinite}
+@keyframes speakPulse{0%,100%{box-shadow:0 0 0 0 rgba(47,174,162,.5)}50%{box-shadow:0 0 0 6px rgba(47,174,162,0)}}
+html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
+@media(prefers-reduced-motion:reduce){.ph-speak.speaking{animation:none}}
 /* —— local cat story: cover card —— */
 .catcover-list{display:grid;gap:14px}
 .catcover{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;width:100%;text-align:left;
@@ -5594,7 +5600,7 @@ function openDest(id){
     if(!L||!L.phrases) return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">Handy phrases for ${esc(d.country)} are coming soon!</p>`;
     const canQuiz=L.phrases.length>=4;
     return `<h3 class="blockhead">🗣️ Talk like a local</h3><p class="sub">${L.flag||'🗣️'} A few handy words in ${esc(L.native||lk)}</p>
-      <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>
+      <div class="phrases">${L.phrases.map(p=>`<div class="phrase"><div class="ph-en">${esc(p.en)}</div><div class="ph-local">${esc(p.local)}${SPEAK_OK?`<button class="ph-speak" type="button" data-text="${esc(p.local)}" data-lang="${esc(lk)}" aria-label="Hear how to say ${esc(p.local)}">🔊</button>`:''}</div><div class="ph-say">🗣️ ${esc(p.say)}</div></div>`).join('')}</div>
       ${canQuiz?`<div class="langgame"><h4 class="langgame-h">🎮 Phrase game</h4><p class="sub">Match the English to the ${esc(L.native||lk)} word!</p>
         <button class="btn btn-teal" id="langQuizStart" type="button" onclick="startLangQuiz()">▶️ Start the phrase game</button>
         <div id="langQuizBody"></div></div>`:''}`;
@@ -6686,6 +6692,25 @@ function buildLangQuiz(L,seed){
     return {q:'How do you say “'+p.en+'”?', say:p.say||'', opts:opts, correct:p.local};
   });
 }
+/* ---- "Hear it" — speak a phrase aloud with the device's voice ---- */
+const SPEAK_OK = (typeof window!=='undefined') && ('speechSynthesis' in window);
+const LANG_BCP = {French:'fr-FR',Spanish:'es-ES',Portuguese:'pt-PT',Greek:'el-GR',Croatian:'hr-HR',Turkish:'tr-TR',Arabic:'ar-SA',Albanian:'sq-AL',Icelandic:'is-IS',Dhivehi:'dv-MV',Bislama:'en',Finnish:'fi-FI'};
+function speakPhrase(text,langKey,btn){
+  try{
+    if(!SPEAK_OK||!text) return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    const code=LANG_BCP[langKey]; if(code) u.lang=code;
+    u.rate=0.85; u.pitch=1.05;
+    const voices=speechSynthesis.getVoices();
+    if(code && voices && voices.length){ const pre=code.slice(0,2).toLowerCase();
+      const v=voices.find(v=>v.lang&&v.lang.toLowerCase()===code.toLowerCase())||voices.find(v=>v.lang&&v.lang.toLowerCase().slice(0,2)===pre);
+      if(v) u.voice=v; }
+    if(btn){ btn.classList.add('speaking'); const done=()=>btn.classList.remove('speaking'); u.onend=done; u.onerror=done; }
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('.ph-speak'); if(b){ e.preventDefault(); speakPhrase(b.getAttribute('data-text'),b.getAttribute('data-lang'),b); } });
 function startLangQuiz(){
   const c=currentLang(); if(!c) return;
   const seed=currentDest.id.length*7+c.lk.length+1;

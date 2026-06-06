@@ -138,6 +138,7 @@ Last updated: 2026-06-06
 - [x] **Night-mode audit** — confirmed all of this session's new components (boarding-pass fun fact, journey timeline, packing trip-picker, quiz reveal, search count) render correctly in dark theme
 - [x] **Faster hero loads (LCP)** — the big above-the-fold hero photos (Explore spotlight + destination detail) now load `eager` with `fetchpriority="high"`, while the dozens of card/gallery thumbnails stay lazy — so the largest image paints sooner without eagerly pulling everything
 - [x] **Content + a11y audit** — confirmed all 37 destinations have ≥4 attractions / kids spots / photos plus highlights, tips, phrases and a local-cat tale; badge unlocks already celebrate (confetti + toast + sound); "Surprise me" slot-machine reel is delightful
+- [x] **"Hear it" pronunciation** — every phrase on the *Talk like a local* tab now has a 🔊 button that speaks the word aloud in the right language using the device's built-in voice (free, offline-capable, 12 languages mapped to BCP-47). Pulses while speaking; gracefully hidden if the browser has no speech synthesis. A real language-learning upgrade beyond the phonetic guide.
 - [ ] *(next)* more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
