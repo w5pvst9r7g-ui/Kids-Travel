@@ -124,7 +124,8 @@ Last updated: 2026-06-06
 - [x] **Realistic airliner** replaces the paper plane everywhere (swept wings, engines, twin contrails puffing into clouds); cloudy-sky splash/login backdrops; map plane aligned to the flight arc heading
 - [x] **Tap feedback on nav** — every bottom-tab press now gives a gentle tap chime + haptic buzz
 - [x] **Mobile "Did you know?"** — the hero fun-fact (hidden <620px) now surfaces below the hero in the handwritten font on phones
-- [ ] *(next)* quiz answer reveal · journey timeline · more polish
+- [x] **Quiz answer reveal** — after each question, an inline feedback line: green "Nailed it!" praise when right, coral "Not quite — the answer is **X**" when wrong (both the destination quiz and the language mini-quiz) so kids learn from every answer
+- [ ] *(next)* journey timeline · more polish
 - [x] Incorporate cats into badges: Story Sniffer / Cat Whisperer / Tale Master (read N tales)
 - [x] Easter egg: poke any Poppy → full-screen grumpy Poppy with a funny insult (pops in)
 - [x] **Packing on its own screen** + collapsed packing-progress card on the Upcoming page

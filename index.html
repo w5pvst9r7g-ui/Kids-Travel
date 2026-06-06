@@ -681,6 +681,13 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .qopt.wrong{border-color:var(--coral);background:#FFF1EC;color:var(--coral-d)}
 .qopt.wrong .mk{border-color:var(--coral-d);background:var(--coral-d);color:#fff}
 .qopt:disabled{cursor:default}
+.qreveal{margin-top:11px;border-radius:var(--r-sm);padding:9px 13px;font-weight:700;font-size:.92rem;line-height:1.35;display:flex;gap:8px;align-items:flex-start;animation:viewIn .26s ease both}
+.qreveal .rk{flex:none;font-size:1.05rem;line-height:1.2}
+.qreveal.ok{background:#EAFBF2;border:1.5px solid var(--green);color:#1f8f63}
+.qreveal.no{background:#FFF1EC;border:1.5px solid var(--coral);color:var(--coral-d)}
+.qreveal b{color:inherit}
+html.night .qreveal.ok{background:rgba(46,160,103,.16)}
+html.night .qreveal.no{background:rgba(240,110,90,.16)}
 .qsay{margin-top:10px;background:var(--surface-2);border:1px dashed var(--line-2);border-radius:var(--r-sm);padding:8px 12px;font-weight:700;color:var(--ink-2);font-size:.9rem}
 .qsay b{color:var(--teal-d)}
 .langgame{margin-top:24px;padding-top:20px;border-top:2px dashed var(--line)}
@@ -6454,13 +6461,17 @@ function quizPanelHTML(d){
 function startQuiz(){ const d=currentDest; if(!d) return;
   quizState={dest:d, qs:buildQuiz(d), answered:[]};
   const b=document.getElementById('quizStart'); if(b) b.style.display='none'; renderQuizQuestions(); }
+const QUIZ_PRAISE=['Correct! 🌟','Nailed it! 🎯','That’s right! 👏','Spot on, explorer! 🧭','Yes! You got it! ✨','Brilliant! 🐱'];
+function quizPraise(i){ return QUIZ_PRAISE[Math.abs(i)%QUIZ_PRAISE.length]; }
 function renderQuizQuestions(){
   const body=document.getElementById('quizBody'); const st=quizState;
   body.innerHTML=st.qs.map((q,qi)=>{ const done=st.answered[qi]!=null;
+    const right=done&&q.opts[st.answered[qi]]===q.correct;
     return `<div class="qcard"><div class="qn"><span class="qi">${qi+1}</span><span>${esc(q.q)}</span></div>
       <div class="qopts">${q.opts.map((o,oi)=>{ let cls=''; if(done){ if(o===q.correct)cls='correct'; else if(st.answered[qi]===oi)cls='wrong'; }
         return `<button class="qopt ${cls}" type="button" ${done?'disabled':''} data-q="${qi}" data-o="${oi}">
-          <span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div></div>`;
+          <span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div>
+      ${done?`<div class="qreveal ${right?'ok':'no'}" role="status"><span class="rk" aria-hidden="true">${right?'🎉':'💡'}</span><span>${right?quizPraise(qi):`Not quite — the answer is <b>${esc(q.correct)}</b>.`}</span></div>`:''}</div>`;
   }).join('');
   body.querySelectorAll('.qopt:not(:disabled)').forEach(btn=>btn.addEventListener('click',()=>{
     const qi=+btn.dataset.q; if(quizState.answered[qi]!=null) return;
@@ -6518,6 +6529,7 @@ function renderLangQuiz(){
     return `<div class="qcard"><div class="qn"><span class="qi">${qi+1}</span><span>${esc(q.q)}</span></div>
       <div class="qopts">${q.opts.map((o,oi)=>{ let cls=''; if(done){ if(o===q.correct)cls='correct'; else if(st.answered[qi]===oi)cls='wrong'; }
         return `<button class="qopt ${cls}" type="button" ${done?'disabled':''} data-q="${qi}" data-o="${oi}"><span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div>
+      ${done&&q.opts[st.answered[qi]]!==q.correct?`<div class="qreveal no" role="status"><span class="rk" aria-hidden="true">💡</span><span>Not quite — it’s <b>${esc(q.correct)}</b>.</span></div>`:''}
       ${done&&q.say?`<div class="qsay">🗣️ say it like: <b>${esc(q.say)}</b></div>`:''}</div>`;
   }).join('')+'</div>';
   body.querySelectorAll('.qopt:not(:disabled)').forEach(btn=>btn.addEventListener('click',()=>{
