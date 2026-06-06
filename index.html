@@ -1411,11 +1411,12 @@ const tripsForDest = id => trips.filter(t=>t.destId===id);
 function exploreFromMap(id){ try{ if(map&&map.closePopup) map.closePopup(); }catch(e){} openDest(id); }
 /* only used for local-cat story covers: a real cat photo, falling back to a
    Poppy illustration (on-brand) — never a random non-cat stock image. */
+const CAT_POSES=['poppie-sit.png','poppie-walk.png','poppie-play.png','poppie-calm.png','poppie-stand.png','poppie-fish.png','poppie-sit2.png'];
 const pimg  = (kw, lock, w, h, alt='') => {
   let parts=String(kw).split(',').map(s=>s.trim()).filter(Boolean);
   if(parts[0]!=='cat') parts.unshift('cat');
   const k=parts.slice(0,2).join(',');
-  const fb=['poppie-stand.png'];
+  const fb=[CAT_POSES[Math.abs(lock||0)%CAT_POSES.length]];   /* varied per tale so covers differ even offline */
   return `<img loading="lazy" decoding="async" width="${w}" height="${h}" alt="${esc(alt)}" src="${flick(k,lock,w,h)}" data-fallbacks="${esc(JSON.stringify(fb))}" onerror="imgFail(this)">`;
 };
 /* caption that matches the curated gallery image for a slot (keeps labels in step) */
