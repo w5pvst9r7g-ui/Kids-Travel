@@ -257,6 +257,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .searchbar input:focus{outline:none;border-color:var(--teal)}
 .searchbar .sclear{position:absolute;right:9px;width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-2);color:var(--ink-2);font-weight:800;cursor:pointer;font-size:.9rem}
 .searchbar .sclear:hover{background:var(--line);color:var(--ink)}
+.result-count{font-weight:800;color:var(--muted);font-size:.86rem;margin:-4px 0 14px}
 .chip{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:9px 17px;
   font-weight:800;font-size:.92rem;color:var(--ink-2);transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .chip:hover{transform:translateY(-2px);color:var(--ink)}
@@ -1302,7 +1303,7 @@ create policy "atlas all" on atlas_sync
       <div><span class="eyebrow">The whole atlas</span><h2>Explore places</h2></div>
       <div class="filters" id="filters"></div>
     </div>
-    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search a place or country…" oninput="setDestSearch(this.value)" aria-label="Search destinations"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
+    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search place, country, region…" oninput="setDestSearch(this.value)" aria-label="Search destinations by name, country, region or continent"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
     <div id="destGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tap any place to explore it! ⭐ ratings &amp; map pins come from Google Maps.</p>
   </section>
@@ -5439,7 +5440,7 @@ function clearDestSearch(){ const i=document.getElementById('destSearch'); if(i)
 function renderGrid(){
   const host=document.getElementById('destGroups'),vis=visitedDestIds(),soon=plannedDestIds();
   const q=destSearch;
-  const match=d=>!q||((d.name+' '+d.country+' '+(d.short||'')+' '+(d.tagline||'')).toLowerCase().indexOf(q)>=0);
+  const match=d=>!q||((d.name+' '+d.country+' '+(d.short||'')+' '+(d.tagline||'')+' '+d.region+' '+(continentOf(d)||'')).toLowerCase().indexOf(q)>=0);
   const list=DESTS.filter(d=>(activeRegion==='All'||d.region===activeRegion)&&match(d));
   const explored=[],discover=[],dream=[];
   list.forEach(d=>{
@@ -5448,11 +5449,14 @@ function renderGrid(){
     else if(vis.has(d.id)) explored.push(cardHTML(d,'<span class="t visited">✓ Visited</span>'));
     else discover.push(cardHTML(d,`<span class="t reg-${esc(d.region)}">${regionEmoji[d.region]||'🌍'} ${esc(d.region)}</span>`));
   });
-  host.innerHTML =
+  const shown=dream.length+discover.length+explored.length;
+  const filtering=q||activeRegion!=='All';
+  const countLine=(filtering&&shown)?`<p class="result-count">${shown} place${shown===1?'':'s'}${q?` match “${esc(destSearch)}”`:''}${activeRegion!=='All'?` in ${esc(activeRegion)}`:''}</p>`:'';
+  host.innerHTML = countLine + (
       groupHTML('Places you’re dreaming of','💖','Your dream list',dream)
     + groupHTML('Where shall we go?','💭','Places to discover',discover)
     + groupHTML('Our adventures','🧭','Places we’ve explored',explored)
-    || `<div class="empty">${q?`No places match “${esc(destSearch)}”. <button class="btn-text" onclick="clearDestSearch()">Clear search</button>`:'No places match this filter — try “All”.'}</div>`;
+    || `<div class="empty">${q?`No places match “${esc(destSearch)}”. <button class="btn-text" onclick="clearDestSearch()">Clear search</button>`:'No places match this filter — try “All”.'}</div>`);
 }
 function renderUpcoming(){
   const host=document.getElementById('upcomingGroups'); if(!host) return;
