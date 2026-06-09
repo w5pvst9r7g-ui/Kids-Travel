@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{})};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -79,6 +79,26 @@ if (API) {
   let okDest = true;
   for (const d of API.DESTS) { if (!d.id || !d.name || !d.country || !d.photos || !d.photos.length) { okDest = false; break; } }
   check('every destination has id/name/country/photos', okDest);
+
+  /* ---------- 3b. food data integrity ---------- */
+  section('Food data');
+  const FOOD = API.FOOD_BY_COUNTRY || {};
+  const noFood = API.DESTS.filter(d => !(FOOD[d.country] || FOOD[d.name]));
+  check('every destination country has a food list', noFood.length === 0, 'missing: ' + [...new Set(noFood.map(d => d.country))].join(', '));
+  const TAGS = new Set(['main', 'snack', 'sweet', 'drink']);
+  let badFood = null, sweetCountries = 0;
+  for (const co of Object.keys(FOOD)) {
+    const list = FOOD[co];
+    if (!Array.isArray(list) || list.length < 4) { badFood = co + ' has <4 dishes'; break; }
+    if (list.some(f => f[3] === 'sweet')) sweetCountries++;
+    for (const f of list) {
+      if (!Array.isArray(f) || f.length < 4 || !f[0] || !f[1] || !f[2] || !TAGS.has(f[3])) { badFood = co + ' / ' + (f && f[1]); break; }
+    }
+    if (badFood) break;
+  }
+  check('every dish is [emoji, name, description, valid-tag]', badFood === null, badFood || '');
+  check('every cuisine offers a sweet treat', sweetCountries === Object.keys(FOOD).length, sweetCountries + '/' + Object.keys(FOOD).length);
+  check('Food tab is registered in the guide', /🍽️ Yummy food/.test(html) && html.indexOf("'food'") !== -1);
 
   /* ---------- 4. render every screen + actions ---------- */
   section('Renders every screen + actions');
