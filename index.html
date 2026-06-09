@@ -1002,6 +1002,9 @@ html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 .foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none;border:none;padding:0;display:block;cursor:default;font:inherit;position:relative}
 .foodcard.fav{border-color:var(--yellow-d)}
 .food-fav{position:absolute;top:9px;left:9px;z-index:6;background:var(--yellow-d);color:#3a2a00;font-family:var(--sans);font-weight:800;font-size:.68rem;letter-spacing:.02em;border-radius:999px;padding:4px 10px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.food-alldone{background:#EAFBF2;border:2px solid var(--green);color:var(--green-d);font-weight:800;border-radius:var(--r-sm);padding:9px 14px;margin:0 0 14px;font-size:.95rem}
+.food-alldone[hidden]{display:none}
+html.night .food-alldone{background:rgba(46,160,103,.18);color:#7fe0d6}
 .foodcard .food-frame:has(img.ld){cursor:zoom-in}
 .foodcard .food-frame:focus-visible{outline:3px solid var(--grape);outline-offset:-3px}
 .foodcard:hover .food-frame img{transform:scale(1.06)}
@@ -5768,6 +5771,12 @@ function toggleTriedFood(btn){ const key=btn.getAttribute('data-key'); if(!key) 
   saveTriedFoods();
   btn.classList.toggle('on',!on); btn.setAttribute('aria-pressed',String(!on)); btn.textContent=!on?'✓ Tried it!':'🍴 Tried it?';
   const fc=document.getElementById('foodCount'); if(fc){ const n=triedFoods.size; fc.textContent=n?('🍴 '+n+' tried'):''; }
+  /* per-country "tasted everything" reward */
+  const country=key.split('|')[0], cl=(typeof FOOD_BY_COUNTRY!=='undefined')&&(FOOD_BY_COUNTRY[country]);
+  const ad=document.getElementById('foodAllDone');
+  if(ad&&cl){ const allTried=cl.every(f=>triedFoods.has(country+'|'+f[1]));
+    const wasHidden=ad.hidden; ad.hidden=!allTried;
+    if(allTried&&wasHidden){ sfx('win'); if(!reduceMotion){ try{confetti();}catch(e){} const card=btn.closest('.foodcard'); emojiBurst(card||btn,'🏅'); } } }
   checkAchievements(); }
 function packList(t){ const d=DESTS.find(x=>x.id===t.destId); const reg=d&&PACK_REGION[d.region]||[]; return PACK_BASE.concat(reg); }
 function packStats(t){ const items=packList(t), st=packState[t.id]||{}, done=items.filter((_,i)=>st[i]).length; return {items,st,done,total:items.length,pct:Math.round(done/items.length*100)}; }
@@ -6946,8 +6955,10 @@ function foodPanelHTML(d){
   if(!list||!list.length) return `<h3 class="blockhead">🍽️ Yummy food</h3><p class="sub">Tasty dishes from ${esc(d.country)} are coming soon!</p>`;
   const th=themeFor(d);
   const triedN=(typeof triedFoods!=='undefined')?triedFoods.size:0;
+  const allTried=(typeof triedFoods!=='undefined')&&list.every(f=>triedFoods.has(d.country+'|'+f[1]));
   return `<h3 class="blockhead">🍽️ Yummy food in ${esc(d.country)} <span class="food-count" id="foodCount">${triedN?('🍴 '+triedN+' tried'):''}</span></h3>
     <p class="sub">Delicious things to try — tap a photo to see it big, and tick off the ones you've tasted! 😋</p>
+    <div class="food-alldone" id="foodAllDone"${allTried?'':' hidden'}>🏅 You've tasted every dish in ${esc(d.country)} — yum!</div>
     <div class="foodgrid">${list.map((f,fi)=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
       const key=d.country+'|'+f[1], tried=(typeof triedFoods!=='undefined')&&triedFoods.has(key);
       return `<div class="foodcard food-${f[3]}${fi===0?' fav':''}">
