@@ -4,7 +4,7 @@
      fall back to the cached page only when offline). This avoids the classic
      "stale single-page app" trap where users never see new deploys.
    - Static assets (images, etc.): CACHE-FIRST (fast, and fine offline). */
-const CACHE = 'poppie-atlas-v8';
+const CACHE = 'poppie-atlas-v9';
 const ASSETS = [
   './', './index.html',
   './poppie.jpg', './poppie-hi.png', './poppie-yay.png', './poppie-walk.png',
@@ -51,9 +51,11 @@ self.addEventListener('fetch', e => {
   const sameOrigin = new URL(req.url).origin === self.location.origin;
 
   if (isHTML(req)) {
-    /* network-first: fresh page when online, cached shell when offline */
+    /* network-first, bypassing the HTTP cache so a new deploy is never masked by
+       a stale (e.g. GitHub Pages 10-min) cached copy; falls back to the cached
+       shell only when offline */
     e.respondWith(
-      fetch(req).then(res => {
+      fetch(req, { cache: 'no-store' }).then(res => {
         if (res && res.ok && sameOrigin) { const copy = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); }
         return res;
       }).catch(() => caches.match(req).then(hit => hit || caches.match('./index.html')))

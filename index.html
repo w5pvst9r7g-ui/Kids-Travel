@@ -6422,7 +6422,16 @@ function shareApp(){
     document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));}catch(e){}
   /* register the offline service worker only when hosted (skips file://) */
   if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
-    window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+    /* when a new service worker takes over (a new deploy), reload once so the
+       page picks up the fresh HTML/JS instead of running a stale cached copy.
+       Only on UPDATES (a controller already existed) — never on first install,
+       and guarded against reload loops. */
+    const hadController=!!navigator.serviceWorker.controller; let _reloading=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(_reloading||!hadController) return; _reloading=true; location.reload(); });
+    window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{
+      try{ reg.update(); }catch(e){}                 /* check for a new SW on every load */
+    }).catch(()=>{}); });
   }
 })();
 /* "Add to home screen" — show a small Install pill when the browser offers it */
