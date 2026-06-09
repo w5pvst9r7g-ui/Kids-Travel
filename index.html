@@ -1212,6 +1212,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
       <li><span class="oe" aria-hidden="true">🔜</span><div><b>Upcoming</b> — count down the sleeps to your next big trip!</div></li>
       <li><span class="oe" aria-hidden="true">🌍</span><div><b>Explore</b> — tap any place for photos, fun facts, things to do and my local-cat story.</div></li>
       <li><span class="oe" aria-hidden="true">🗺️</span><div><b>Atlas Map</b> — every adventure drawn as a flight path from home.</div></li>
+      <li><span class="oe" aria-hidden="true">📔</span><div><b>Journal</b> — record every trip, earn passport stamps and see your journey timeline.</div></li>
       <li><span class="oe" aria-hidden="true">🏅</span><div><b>Badges</b> — collect explorer badges and see all your countries.</div></li>
     </ul>
     <button class="btn btn-primary" id="onbGo" onclick="closeOnboard()" style="width:100%;justify-content:center">Let's explore! →</button>
@@ -6714,7 +6715,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closes
 function startLangQuiz(){
   const c=currentLang(); if(!c) return;
   const seed=currentDest.id.length*7+c.lk.length+1;
-  langQuiz={qs:buildLangQuiz(c.L,seed), answered:[]};
+  langQuiz={qs:buildLangQuiz(c.L,seed), answered:[], lk:c.lk};
   const b=document.getElementById('langQuizStart'); if(b) b.style.display='none';
   renderLangQuiz();
 }
@@ -6725,7 +6726,7 @@ function renderLangQuiz(){
       <div class="qopts">${q.opts.map((o,oi)=>{ let cls=''; if(done){ if(o===q.correct)cls='correct'; else if(st.answered[qi]===oi)cls='wrong'; }
         return `<button class="qopt ${cls}" type="button" ${done?'disabled':''} data-q="${qi}" data-o="${oi}"><span class="mk" aria-hidden="true">${'ABCD'[oi]}</span><span>${esc(o)}</span></button>`; }).join('')}</div>
       ${done&&q.opts[st.answered[qi]]!==q.correct?`<div class="qreveal no" role="status"><span class="rk" aria-hidden="true">💡</span><span>Not quite — it’s <b>${esc(q.correct)}</b>.</span></div>`:''}
-      ${done&&q.say?`<div class="qsay">🗣️ say it like: <b>${esc(q.say)}</b></div>`:''}</div>`;
+      ${done&&q.say?`<div class="qsay">🗣️ say it like: <b>${esc(q.say)}</b>${SPEAK_OK?` <button class="ph-speak" type="button" data-text="${esc(q.correct)}" data-lang="${esc(st.lk||'')}" aria-label="Hear how to say ${esc(q.correct)}">🔊</button>`:''}</div>`:''}</div>`;
   }).join('')+'</div>';
   body.querySelectorAll('.qopt:not(:disabled)').forEach(btn=>btn.addEventListener('click',()=>{
     const qi=+btn.dataset.q; if(langQuiz.answered[qi]!=null) return;
