@@ -90,6 +90,6 @@ can be added to the `PHOTOS` and `LOCAL_CATS` data blocks.
 
 ## Credits
 
-`poppie-meow.mp3` — Poppy's real meow when you boop her — is a short clip trimmed from a cat
-sound in the [MeowPad](https://github.com/jiaweizhang1995/MeowPad) project, used under its
-Apache License 2.0.
+`poppie-meow-1..5.mp3` — the five real cat sounds Poppy makes when you boop her (a random one
+plays each time) — are short clips trimmed from the cat sounds in the
+[MeowPad](https://github.com/jiaweizhang1995/MeowPad) project, used under its Apache License 2.0.

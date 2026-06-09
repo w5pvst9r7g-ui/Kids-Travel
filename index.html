@@ -7022,20 +7022,20 @@ function sfx(name){
       g.gain.exponentialRampToValueAtTime(.0001,st+s[2]); o.start(st); o.stop(st+s[2]+.02); });
   }catch(e){}
 }
-/* —— Poppy's voice: a real recorded cat meow, played every time you boop her ——
+/* —— Poppy's voice: five real recorded cat sounds; a random one plays each boop ——
    Each boop plays a FRESH audio element from the start (rather than reusing one
    and seeking currentTime=0, which can throw on an unloaded element and fails to
-   "unlock" audio on iOS Safari). A warm element pre-fills the cache so the very
-   first meow is snappy; we only fall back to the synth blip if real playback is
+   "unlock" audio on iOS Safari). Warm elements pre-fill the cache so the first
+   meow is snappy; we only fall back to the synth blip if real playback is
    genuinely unavailable. */
-const MEOW_SRC='poppie-meow.mp3';
-let _meowWarm=null;
-try{ _meowWarm=new Audio(MEOW_SRC); _meowWarm.preload='auto'; _meowWarm.load(); }catch(e){}
+const MEOW_SRCS=['poppie-meow-1.mp3','poppie-meow-2.mp3','poppie-meow-3.mp3','poppie-meow-4.mp3','poppie-meow-5.mp3'];
+try{ MEOW_SRCS.forEach(function(s){ const w=new Audio(s); w.preload='auto'; w.load(); }); }catch(e){}
 function playMeow(){
   if(!soundOn) return;
   try{ if(navigator.vibrate) navigator.vibrate(14); }catch(e){}
   try{
-    const a=new Audio(MEOW_SRC);
+    const src=MEOW_SRCS[Math.floor(Math.random()*MEOW_SRCS.length)];
+    const a=new Audio(src);
     a.volume=.9;                         /* ignored on iOS, harmless elsewhere */
     const p=a.play();
     if(p&&p.catch) p.catch(function(){ try{ sfx('pop'); }catch(_){} });
