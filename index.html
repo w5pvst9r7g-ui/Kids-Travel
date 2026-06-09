@@ -5736,6 +5736,12 @@ function heartBurst(ev){ try{ const t=ev&&(ev.currentTarget||ev.target); if(!t||
     s.style.cssText='position:fixed;z-index:6000;pointer-events:none;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+'px;font-size:'+(12+Math.random()*10)+'px;transition:transform .8s ease,opacity .8s ease';
     document.body.appendChild(s); requestAnimationFrame(()=>{ s.style.transform='translate('+(Math.random()*60-30)+'px,'+(-30-Math.random()*40)+'px)'; s.style.opacity='0'; });
     setTimeout(()=>s.remove(),850); } }catch(e){} }
+/* a little floating burst of an emoji from an element (delightful feedback) */
+function emojiBurst(el,emoji){ try{ if(!el||!el.getBoundingClientRect||reduceMotion) return;
+  const r=el.getBoundingClientRect(); for(let i=0;i<6;i++){ const s=document.createElement('div'); s.textContent=emoji||'😋';
+    s.style.cssText='position:fixed;z-index:6000;pointer-events:none;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+'px;font-size:'+(13+Math.random()*11)+'px;transition:transform .8s ease,opacity .8s ease';
+    document.body.appendChild(s); requestAnimationFrame(()=>{ s.style.transform='translate('+(Math.random()*70-35)+'px,'+(-32-Math.random()*44)+'px) rotate('+(Math.random()*60-30)+'deg)'; s.style.opacity='0'; });
+    setTimeout(()=>s.remove(),850); } }catch(e){} }
 function loadCatsRead(){ try{const s=localStorage.getItem(dataKey('cats')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveCatsRead(){ try{localStorage.setItem(dataKey('cats'),JSON.stringify([...catsRead]));}catch(e){} }
 let catsRead=loadCatsRead();
@@ -5746,7 +5752,8 @@ function saveTriedFoods(){ try{localStorage.setItem(dataKey('foods'),JSON.string
 let triedFoods=loadTriedFoods();
 function toggleTriedFood(btn){ const key=btn.getAttribute('data-key'); if(!key) return;
   const on=triedFoods.has(key);
-  if(on){ triedFoods.delete(key); } else { triedFoods.add(key); sfx('good'); }
+  if(on){ triedFoods.delete(key); } else { triedFoods.add(key); sfx('good');
+    const card=btn.closest('.foodcard'); const em=card&&card.querySelector('.sticker'); emojiBurst(btn, em?em.textContent:'😋'); }
   saveTriedFoods();
   btn.classList.toggle('on',!on); btn.setAttribute('aria-pressed',String(!on)); btn.textContent=!on?'✓ Tried it!':'🍴 Tried it?';
   const fc=document.getElementById('foodCount'); if(fc){ const n=triedFoods.size; fc.textContent=n?('🍴 '+n+' tried'):''; }
@@ -6127,9 +6134,11 @@ function renderStats(){
   const countries=new Set(done.map(t=>t.country)).size;
   let km=0;done.forEach(t=>{if(t.lat!=null)km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2;});
   const planned=trips.filter(t=>t.planned).length;
+  const foodsTried=(typeof triedFoods!=='undefined')?triedFoods.size:0;
   document.getElementById('stats').innerHTML=[
     [countries,'Countries visited','',true],[done.length,'Adventures taken','',false],
-    [km.toLocaleString(),'km flown',' km',false],[planned,'Trips coming up','',false]
+    [km.toLocaleString(),'km flown',' km',false],[planned,'Trips coming up','',false],
+    [foodsTried,'Foods tried','',false]
   ].map(s=>s[3]
     ?`<div class="stat link" role="button" tabindex="0" onclick="showView('world')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('world')}" aria-label="${s[0]} countries visited. Open the world countries page."><div class="big">${s[0]}<span class="u">${s[2]}</span></div><div class="lbl">${s[1]}</div><span class="go">🌍 See them all →</span></div>`
     :`<div class="stat"><div class="big">${s[0]}<span class="u">${s[2]}</span></div><div class="lbl">${s[1]}</div></div>`).join('');
