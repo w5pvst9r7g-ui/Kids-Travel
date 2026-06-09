@@ -87,3 +87,9 @@ one-line table SQL shown in the dialog, paste your **Project URL** + **anon key*
 Open `index.html`, copy an existing object in the `DESTS` array, and fill in its flight info,
 country facts, attractions, kid spots and photo keywords. Curated photos and a local-cat story
 can be added to the `PHOTOS` and `LOCAL_CATS` data blocks.
+
+## Credits
+
+`poppie-meow.mp3` — Poppy's real meow when you boop her — is a short clip trimmed from a cat
+sound in the [MeowPad](https://github.com/jiaweizhang1995/MeowPad) project, used under its
+Apache License 2.0.
