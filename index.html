@@ -1000,6 +1000,9 @@ html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 .foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
 .foodcard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--teal)}
 .foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none;border:none;padding:0;display:block;cursor:default;font:inherit;position:relative}
+.foodcard .food-frame.loading::after{content:"";position:absolute;inset:0;z-index:3;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);background-size:220% 100%;animation:foodshimmer 1.1s linear infinite}
+@keyframes foodshimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.foodcard .food-frame.loading::after{display:none}}
 .foodcard.fav{border-color:var(--yellow-d)}
 .food-fav{position:absolute;top:9px;left:9px;z-index:6;background:var(--yellow-d);color:#3a2a00;font-family:var(--sans);font-weight:800;font-size:.68rem;letter-spacing:.02em;border-radius:999px;padding:4px 10px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
 .food-alldone{background:#EAFBF2;border:2px solid var(--green);color:var(--green-d);font-weight:800;border-radius:var(--r-sm);padding:9px 14px;margin:0 0 14px;font-size:.95rem}
@@ -6966,7 +6969,7 @@ function foodPanelHTML(d){
     <div class="foodgrid">${list.map((f,fi)=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
       const key=d.country+'|'+f[1], tried=(typeof triedFoods!=='undefined')&&triedFoods.has(key);
       return `<div class="foodcard food-${f[3]}${fi===0?' fav':''}">
-        <button type="button" class="frame food-frame" style="${frameStyle(th)}" aria-label="Enlarge photo of ${esc(f[1])}">${fi===0?'<span class="food-fav" aria-label="Poppy\'s favourite">⭐ Poppy\'s favourite</span>':''}<span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></button>
+        <button type="button" class="frame food-frame" style="${frameStyle(th)}" aria-label="Enlarge photo of ${esc(f[1])}">${fi===0?'<span class="food-fav" aria-label="Poppy\'s favourite">⭐ Poppy\'s favourite</span>':''}<span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld');this.parentElement&&this.parentElement.classList.remove('loading')" onerror="this.classList.add('failed');this.parentElement&&this.parentElement.classList.remove('loading')"></button>
         <div class="food-body"><div class="food-name">${esc(f[1])}</div><p>${esc(f[2])}</p>
         <div class="food-foot"><span class="food-tag tag-${f[3]}">${t[0]} ${t[1]}</span>
           <button type="button" class="food-tried${tried?' on':''}" data-key="${esc(key)}" aria-pressed="${tried}" onclick="toggleTriedFood(this)">${tried?'✓ Tried it!':'🍴 Tried it?'}</button></div>
@@ -6996,7 +6999,8 @@ function hydrateFoodPhotos(panel){
   if(!panel) return;
   panel.querySelectorAll('img.food-img[data-wiki]').forEach(img=>{
     if(img.dataset.h) return; img.dataset.h='1';
-    foodPhotoURL(img.getAttribute('data-wiki')).then(u=>{ if(u) img.src=u; else img.classList.add('failed'); });
+    const fr=img.parentElement; if(fr) fr.classList.add('loading');
+    foodPhotoURL(img.getAttribute('data-wiki')).then(u=>{ if(u){ img.src=u; } else { img.classList.add('failed'); if(fr) fr.classList.remove('loading'); } });
   });
 }
 /* tap a (loaded) dish photo to see it big */
