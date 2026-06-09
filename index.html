@@ -953,6 +953,7 @@ html.night .pack-trip{background:var(--surface);border-color:var(--line-2)}
 .lightbox{position:fixed;inset:0;z-index:5600;display:flex;align-items:center;justify-content:center;gap:8px;
   padding:16px;background:rgba(15,17,30,.92);backdrop-filter:blur(4px)}
 .lightbox.hidden{display:none}
+.lightbox.lb-one .lb-nav{display:none}
 .lb-stage{flex:1;max-width:880px;display:flex;flex-direction:column;align-items:center}
 .lb-stage #lbImg{width:100%}
 .lb-stage .frame{width:100%;aspect-ratio:4/3;border-radius:var(--r-lg);box-shadow:var(--shadow)}
@@ -985,7 +986,9 @@ html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
 .foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
 .foodcard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--teal)}
-.foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none}
+.foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none;border:none;padding:0;display:block;cursor:default;font:inherit}
+.foodcard .food-frame:has(img.ld){cursor:zoom-in}
+.foodcard .food-frame:focus-visible{outline:3px solid var(--grape);outline-offset:-3px}
 .foodcard:hover .food-frame img{transform:scale(1.06)}
 .foodcard .food-body{padding:13px 16px 15px}
 .foodcard .food-name{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.12rem;line-height:1.15}
@@ -5326,7 +5329,7 @@ let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
   catch(e){ if(storageOK){storageOK=false;alert("Heads up: this browser won't let me save your journal (private mode or full storage), so trips may be lost when you close the tab.");} } }
 let trips=loadTrips();
-let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, celebratedTrip=null, planeTimer=null;
+let editingId=null, formRating=0, currentDest=null, map=null, layer=null, lbIndex=0, lbSingle=null, celebratedTrip=null, planeTimer=null;
 /* —— local-cat story reader (full-screen page-turner) —— */
 let storyPages=[], storyPage=0, storyCat=null, storyId=null, storyIndex=0;
 function loadStoriesRead(){ try{const s=localStorage.getItem(dataKey('stories')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
@@ -5386,13 +5389,18 @@ function _hideStory(){ const o=document.getElementById('storyReader'); if(o) o.c
     if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
 function closeStory(){ ktBack(_hideStory); }
 /* —— photo lightbox —— */
-function openLightbox(i){ if(!currentDest) return; const lb=document.getElementById('lightbox'); const wasHidden=lb.classList.contains('hidden'); lbIndex=i; renderLightbox(); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); if(wasHidden) ktOpen(_hideLightbox); }
-function renderLightbox(){ const d=currentDest; if(!d) return; const n=galleryLen(d); if(!n) return; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex]||[];
+function openLightbox(i){ if(!currentDest) return; lbSingle=null; const lb=document.getElementById('lightbox'); const wasHidden=lb.classList.contains('hidden'); lb.classList.remove('lb-one'); lbIndex=i; renderLightbox(); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); if(wasHidden) ktOpen(_hideLightbox); }
+/* enlarge a single standalone image (e.g. a food photo) — no prev/next */
+function openImageLightbox(src,cap,emoji,th){ if(!src) return; lbSingle={src,cap:cap||'',emoji:emoji||'📷',th:th||''}; const lb=document.getElementById('lightbox'); const wasHidden=lb.classList.contains('hidden'); lb.classList.add('lb-one'); renderLightbox(); lb.classList.remove('hidden'); const c=lb.querySelector('.lb-close'); if(c) setTimeout(()=>c.focus(),30); if(wasHidden) ktOpen(_hideLightbox); }
+function renderLightbox(){
+  if(lbSingle){ document.getElementById('lbImg').innerHTML='<div class="frame" style="'+esc(lbSingle.th)+'"><span class="sticker" aria-hidden="true">'+lbSingle.emoji+'</span><img class="fade" alt="'+esc(lbSingle.cap)+'" src="'+esc(lbSingle.src)+'" onload="this.classList.add(\'ld\')" onerror="this.classList.add(\'failed\')"></div>';
+    document.getElementById('lbCap').textContent=lbSingle.cap; return; }
+  const d=currentDest; if(!d) return; const n=galleryLen(d); if(!n) return; lbIndex=(lbIndex+n)%n; const p=d.photos[lbIndex]||[];
   const cap=photoCaption(d.id,lbIndex,p[1]);
   document.getElementById('lbImg').innerHTML='<div class="frame" style="'+frameStyle(themeFor(d))+'">'+sticker(d.emoji)+dpic(d.id,lbIndex,p[2]||(lbIndex+1),1000,750,cap,p[0]||'')+'</div>';
   document.getElementById('lbCap').textContent=cap+' · '+(lbIndex+1)+' / '+n; }
-function lbNav(dir){ lbIndex+=dir; renderLightbox(); }
-function _hideLightbox(){ const l=document.getElementById('lightbox'); if(l) l.classList.add('hidden'); }
+function lbNav(dir){ if(lbSingle) return; lbIndex+=dir; renderLightbox(); }
+function _hideLightbox(){ const l=document.getElementById('lightbox'); if(l){ l.classList.add('hidden'); l.classList.remove('lb-one'); } lbSingle=null; }
 function closeLightbox(){ ktBack(_hideLightbox); }
 addEventListener('keydown',e=>{ const l=document.getElementById('lightbox'); if(!l||l.classList.contains('hidden'))return;
   if(e.key==='Escape')closeLightbox(); else if(e.key==='ArrowRight')lbNav(1); else if(e.key==='ArrowLeft')lbNav(-1); });
@@ -6772,7 +6780,7 @@ function foodPanelHTML(d){
     <p class="sub">Delicious things to try — including some sweet treats! 😋</p>
     <div class="foodgrid">${list.map(f=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
       return `<div class="foodcard food-${f[3]}">
-        <div class="frame food-frame" style="${frameStyle(th)}"><span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></div>
+        <button type="button" class="frame food-frame" style="${frameStyle(th)}" aria-label="Enlarge photo of ${esc(f[1])}"><span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></button>
         <div class="food-body"><div class="food-name">${esc(f[1])}</div><p>${esc(f[2])}</p>
         <span class="food-tag tag-${f[3]}">${t[0]} ${t[1]}</span></div></div>`;}).join('')}</div>`;
 }
@@ -6803,6 +6811,14 @@ function hydrateFoodPhotos(panel){
     foodPhotoURL(img.getAttribute('data-wiki')).then(u=>{ if(u) img.src=u; else img.classList.add('failed'); });
   });
 }
+/* tap a (loaded) dish photo to see it big */
+document.addEventListener('click',e=>{ const fr=e.target.closest&&e.target.closest('.food-frame'); if(!fr) return;
+  const img=fr.querySelector('img.food-img');
+  if(img&&img.classList.contains('ld')&&img.getAttribute('src')){
+    const sticker=fr.querySelector('.sticker');
+    openImageLightbox(img.getAttribute('src'), img.getAttribute('alt')||'', sticker?sticker.textContent:'🍽️', fr.getAttribute('style')||'');
+  }
+});
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
   return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>
