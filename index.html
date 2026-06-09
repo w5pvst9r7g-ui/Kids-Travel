@@ -5246,7 +5246,7 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
-  o.classList.remove('hidden'); sfx('pop'); setTimeout(()=>o.focus(),30);
+  o.classList.remove('hidden'); playMeow(); setTimeout(()=>o.focus(),30);
   img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
@@ -6933,6 +6933,17 @@ function sfx(name){
       const st=t+s[1]; g.gain.setValueAtTime(.0001,st); g.gain.exponentialRampToValueAtTime(.18,st+.012);
       g.gain.exponentialRampToValueAtTime(.0001,st+s[2]); o.start(st); o.stop(st+s[2]+.02); });
   }catch(e){}
+}
+/* —— Poppy's voice: a real recorded cat meow, played every time you boop her —— */
+let _meow=null;
+function playMeow(){
+  if(!soundOn) return;
+  try{ if(navigator.vibrate) navigator.vibrate(14); }catch(e){}
+  try{
+    if(!_meow){ _meow=new Audio('poppie-meow.mp3'); _meow.preload='auto'; _meow.volume=.85; }
+    _meow.currentTime=0;
+    const p=_meow.play(); if(p&&p.catch) p.catch(function(){ sfx('pop'); });
+  }catch(e){ try{ sfx('pop'); }catch(_){} }
 }
 try{ if(localStorage.getItem('globie_sound')==='1') applySound(true); }catch(e){}
 try{ if(localStorage.getItem('globie_night')==='1') applyNight(true); }catch(e){}
