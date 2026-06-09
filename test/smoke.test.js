@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{})};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{})};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -99,6 +99,9 @@ if (API) {
   check('every dish is [emoji, name, description, valid-tag]', badFood === null, badFood || '');
   check('every cuisine offers a sweet treat', sweetCountries === Object.keys(FOOD).length, sweetCountries + '/' + Object.keys(FOOD).length);
   check('Food tab is registered in the guide', /🍽️ Yummy food/.test(html) && html.indexOf("'food'") !== -1);
+  const FACTS = API.FOOD_FACTS || {};
+  const noFact = [...new Set(API.DESTS.map(d => d.country))].filter(c => !FACTS[c]);
+  check('every cuisine has a fun food fact', noFact.length === 0, 'missing: ' + noFact.join(', '));
 
   /* ---------- 4. render every screen + actions ---------- */
   section('Renders every screen + actions');
