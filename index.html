@@ -6724,7 +6724,14 @@ function foodPanelHTML(d){
 }
 /* fetch each dish's professional lead photo from Wikipedia (free, CORS-enabled),
    sized to ~640px; falls back to the emoji + gradient if it can't be fetched. */
-const _foodPhotoCache={};
+/* resolved dish-photo URLs are cached in memory AND persisted to localStorage so
+   repeat visits load instantly (and work offline once the image is in browser cache) */
+const FOODIMG_KEY='globie_foodimg_v1';
+let _foodPhotoStore=(function(){ try{ return JSON.parse(localStorage.getItem(FOODIMG_KEY))||{}; }catch(e){ return {}; } })();
+const _foodPhotoCache=Object.assign({}, _foodPhotoStore);   /* seed memory cache from disk */
+function _saveFoodPhoto(title,url){ if(!url) return; try{ _foodPhotoStore[title]=url;
+  const keys=Object.keys(_foodPhotoStore); if(keys.length>300) delete _foodPhotoStore[keys[0]];
+  localStorage.setItem(FOODIMG_KEY,JSON.stringify(_foodPhotoStore)); }catch(e){} }
 function foodPhotoURL(title){
   if(title in _foodPhotoCache) return Promise.resolve(_foodPhotoCache[title]);
   return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title)+'?redirect=true')
@@ -6732,7 +6739,7 @@ function foodPhotoURL(title){
     .then(j=>{ let u=null;
       if(j){ if(j.thumbnail&&j.thumbnail.source) u=j.thumbnail.source.replace(/\/\d+px-/,'/640px-');
         else if(j.originalimage&&j.originalimage.source) u=j.originalimage.source; }
-      _foodPhotoCache[title]=u; return u; })
+      _foodPhotoCache[title]=u; _saveFoodPhoto(title,u); return u; })
     .catch(()=>{ _foodPhotoCache[title]=null; return null; });
 }
 function hydrateFoodPhotos(panel){
