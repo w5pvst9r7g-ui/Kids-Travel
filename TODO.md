@@ -135,6 +135,7 @@ Last updated: 2026-06-09
 - [x] **Continent drill-down on the World page** — tap a collected continent in the "Continents collected" strip to filter your explored countries to just that continent (heading updates + ✕ Show all); tap again to clear. Verified Europe → its 9 countries, toggle restores all 16.
 - [x] **⭐ Poppy's favourite dish** — each country's signature dish (Tagine, Paella, Pastel de nata, Cheeseburger…) now wears a "Poppy's favourite" ribbon on the Food tab, giving the mascot personality and pointing kids to the must-try.
 - [x] **"Tasted everything" reward** — tick off every dish from a country and the Food tab celebrates with a "🏅 You've tasted every dish in {country}!" banner + confetti + a win chime. Mobile QA pass found no regressions across food/badges screens.
+- [x] **Smarter "Surprise me"** — the 🎲 button now prefers a place the kid hasn't visited or booked yet (better for discovery), only falling back to anywhere once they've seen them all.
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 

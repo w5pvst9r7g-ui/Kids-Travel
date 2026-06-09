@@ -6817,7 +6817,11 @@ function showAchToast(a){ sfx("win");
 /* ---- Surprise me ---- */
 function surpriseMe(){
   const btn=document.getElementById('surpriseBtn'); if(!btn) return;
-  const reel=btn.querySelector('.reel'); const pick=DESTS[Math.floor(Math.random()*DESTS.length)];
+  /* prefer somewhere new to discover; fall back to anywhere once they've seen them all */
+  const seen=new Set(trips.map(t=>t.destId).filter(Boolean));
+  const fresh=DESTS.filter(d=>!seen.has(d.id));
+  const pool=fresh.length?fresh:DESTS;
+  const reel=btn.querySelector('.reel'); const pick=pool[Math.floor(Math.random()*pool.length)];
   if(reduceMotion){ openDest(pick.id); return; }
   if(btn.classList.contains('spinning')) return;
   btn.classList.add('spinning'); const faces=DESTS.map(d=>d.emoji);
