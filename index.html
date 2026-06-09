@@ -5203,12 +5203,9 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
-  const wasHidden=o.classList.contains('hidden');
   o.classList.remove('hidden'); sfx('pop'); setTimeout(()=>o.focus(),30);
-  if(wasHidden) ktOpen(_hideEgg);
   img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
-function _hideEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
-function closeEgg(){ ktBack(_hideEgg); }
+function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); }
@@ -6121,9 +6118,8 @@ function openCloud(){ const c=loadCloudCfg();
   const u=document.getElementById('cbUrl'), k=document.getElementById('cbKey'), code=document.getElementById('cbCode');
   if(u) u.value=c.url||''; if(k) k.value=c.key||''; if(code) code.value=c.code||'';
   cloudStatus(c.url&&c.key&&c.code?'✓ Configured. Back up or restore any time.':'Not set up yet — add your Supabase details below.', c.url?'ok':'');
-  const m=document.getElementById('cloudModal'); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideCloud); }
-function _hideCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
-function closeCloud(){ ktBack(_hideCloud); }
+  const m=document.getElementById('cloudModal'); if(m) m.classList.remove('hidden'); }
+function closeCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
 function saveCloud(){
   const url=(document.getElementById('cbUrl').value||'').trim().replace(/\/+$/,'');
   const key=(document.getElementById('cbKey').value||'').trim();
@@ -6817,8 +6813,8 @@ function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id)
   const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60); }
 function openAvatarPicker(id){ avatarEditing=id; const p=PROFILES.find(x=>x.id===id);
   const n=document.getElementById('avName'); if(n) n.textContent=p?p.name:'';
-  renderAvatarGrid(); const m=document.getElementById('avatarModal'); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideAvatar); }
-function _hideAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
+  renderAvatarGrid(); const m=document.getElementById('avatarModal'); if(m) m.classList.remove('hidden'); }
+function closeAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
 function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!g) return; const cur=avatarFor(avatarEditing);
   g.innerHTML=AVATAR_CHOICES.map(a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`).join('');
   g.querySelectorAll('.av-choice').forEach(b=>b.addEventListener('click',()=>setAvatar(avatarEditing,b.dataset.a))); }
@@ -6827,7 +6823,7 @@ function setupLogin(){
   if(mk){ const im=new Image(); im.alt='Poppy the cat'; im.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:22px';
     im.onerror=()=>{ mk.innerHTML='<svg viewBox="0 0 100 100">'+POPPIE_FACE+'</svg>'; }; im.src='poppie.jpg'; mk.innerHTML=''; mk.appendChild(im); }
   renderProfilePick();
-  const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>ktBack(_hideAvatar));
+  const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>closeAvatar());
   document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
   const submit=()=>{ const v=document.getElementById('pinInput').value.trim();
     if(v===PROFILE_PIN){ signIn(pendingProfile); }
@@ -6863,9 +6859,8 @@ function applySound(on){ soundOn=!!on; const b=document.getElementById('soundBtn
   if(b){ b.textContent=on?'🔊':'🔇'; b.setAttribute('aria-pressed',on); }
   try{localStorage.setItem('globie_sound',on?'1':'0');}catch(e){} }
 function toggleSound(){ applySound(!soundOn); if(soundOn) sfx('pop'); }
-function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); const wasHidden=m.classList.contains('hidden'); m.classList.remove('hidden'); if(wasHidden) ktOpen(_hideSettings); } }
-function _hideSettings(){ const m=document.getElementById('settingsSheet'); if(m) m.classList.add('hidden'); }
-function closeSettings(){ ktBack(_hideSettings); }
+function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); m.classList.remove('hidden'); } }
+function closeSettings(){ const m=document.getElementById('settingsSheet'); if(m) m.classList.add('hidden'); }
 function syncSettings(){
   const n=document.documentElement.classList.contains('night'), sn=document.getElementById('setNight');
   if(sn){ sn.classList.toggle('on',n); sn.setAttribute('aria-checked',n); }
