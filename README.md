@@ -28,8 +28,8 @@ in any modern browser, or deploy the folder to any static host.
 - **🏅 Badges** — 45 reconciling explorer badges with progress bars and a "closest to earn"
   nudge; a **Countries of the World** page (visited list + top-5 to-go by size/population/
   popularity/beauty, and a continents-collected strip).
-- **Per-kid profiles** — Jean-Luc & Hailey, PIN-gated, each with their own saved data and
-  date-of-birth trip filtering. Pick your own avatar.
+- **Per-kid profiles** — Jean-Luc & Hailey, PIN-gated (default `1985`, changeable in Settings →
+  Secret code), each with their own saved data and date-of-birth trip filtering. Pick your own avatar.
 - **Delight** — splash screen, first-run onboarding, an Easter egg (poke Poppy for a joke or
   a sassy insult), confetti, a "scrapbook" visual identity, and an opt-in **night mode**.
 

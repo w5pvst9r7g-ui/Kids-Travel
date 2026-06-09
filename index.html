@@ -1279,6 +1279,8 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
       <button class="btn btn-ghost" onclick="closeSettings();forceOnboard()">Show</button></div>
     <div class="set-row"><div class="set-tx"><b>☁️ Cloud sync</b><span>Back up across devices</span></div>
       <button class="btn btn-ghost" onclick="closeSettings();openCloud()">Open</button></div>
+    <div class="set-row"><div class="set-tx"><b>🔑 Secret code</b><span>Change the four-digit PIN</span></div>
+      <button class="btn btn-ghost" onclick="closeSettings();openPinChange()">Change</button></div>
     <p class="set-foot">Your trips &amp; badges stay private on this device. · Poppy's Atlas v1.0.0</p>
   </div>
 </div>
@@ -1316,6 +1318,25 @@ alter table atlas_sync enable row level security;
 create policy "atlas all" on atlas_sync
   for all using (true) with check (true);</pre>
     </details>
+  </div>
+</div>
+
+<div id="pinModal" class="amodal hidden" role="dialog" aria-modal="true" aria-label="Change secret code" onclick="if(event.target.id==='pinModal')closePinChange()">
+  <div class="amodal-card cloud-card">
+    <button class="story-close" onclick="closePinChange()" aria-label="Close">✕</button>
+    <h3>🔑 Change secret code</h3>
+    <p class="cloud-lead">Pick a new <b>four-digit</b> secret code. Everyone uses the same code to unlock the app — so choose something the whole family can remember!</p>
+    <div id="pinStatus" class="cloud-status" role="status"></div>
+    <label class="cloud-l" for="pcCur">Current code</label>
+    <input id="pcCur" class="cloud-in" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="••••" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')" />
+    <label class="cloud-l" for="pcNew">New code</label>
+    <input id="pcNew" class="cloud-in" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="••••" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')" />
+    <label class="cloud-l" for="pcConf">Type the new code again</label>
+    <input id="pcConf" class="cloud-in" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="••••" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')" />
+    <div class="cloud-row">
+      <button class="btn btn-primary" onclick="savePinChange()">💾 Save new code</button>
+      <button class="btn btn-ghost" onclick="closePinChange()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -5293,7 +5314,10 @@ const PROFILES=[
   {id:'jeanluc', name:'Jean-Luc', emoji:'🦖', color:'#46B3F0', dob:2016},
   {id:'hailey',  name:'Hailey',   emoji:'🦄', color:'#FF7FB0', dob:2019}
 ];
-const PROFILE_PIN='1985';            // simple family gate (not real security)
+const DEFAULT_PIN='1985';            // simple family gate (not real security)
+const PIN_KEY='globie_pin';          // family-wide PIN, changeable in Settings
+function getPin(){ try{ const v=localStorage.getItem(PIN_KEY); if(v && /^\d{4}$/.test(v)) return v; }catch(e){} return DEFAULT_PIN; }
+function setPin(v){ try{ localStorage.setItem(PIN_KEY,v); return true; }catch(e){ return false; } }
 let currentProfile=null;             // chosen at the login screen each visit
 const dataKey=base=>'globie_atlas_'+base+'_v9_'+(currentProfile||'guest');
 function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
@@ -6181,6 +6205,27 @@ function openCloud(){ const c=loadCloudCfg();
   cloudStatus(c.url&&c.key&&c.code?'✓ Configured. Back up or restore any time.':'Not set up yet — add your Supabase details below.', c.url?'ok':'');
   const m=document.getElementById('cloudModal'); if(m) m.classList.remove('hidden'); }
 function closeCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
+function pinStatus(msg,kind){ const el=document.getElementById('pinStatus'); if(!el) return;
+  el.textContent=msg||''; el.className='cloud-status'+(kind?' '+kind:''); }
+function openPinChange(){
+  ['pcCur','pcNew','pcConf'].forEach(id=>{ const i=document.getElementById(id); if(i) i.value=''; });
+  pinStatus('','');
+  const m=document.getElementById('pinModal'); if(m) m.classList.remove('hidden');
+  const cur=document.getElementById('pcCur'); if(cur) setTimeout(()=>cur.focus(),60); }
+function closePinChange(){ const m=document.getElementById('pinModal'); if(m) m.classList.add('hidden'); }
+function savePinChange(){
+  const cur=(document.getElementById('pcCur').value||'').trim();
+  const nw=(document.getElementById('pcNew').value||'').trim();
+  const conf=(document.getElementById('pcConf').value||'').trim();
+  if(cur!==getPin()){ pinStatus("That current code isn't right — try again.",'err'); return; }
+  if(!/^\d{4}$/.test(nw)){ pinStatus('The new code must be exactly four digits (0–9).','err'); return; }
+  if(nw!==conf){ pinStatus("The two new codes don't match — try again.",'err'); return; }
+  if(nw===cur){ pinStatus('That is already your code — pick a new one.','err'); return; }
+  if(!setPin(nw)){ pinStatus("Couldn't save the new code on this device.",'err'); return; }
+  pinStatus('✓ Saved! Your new secret code is ready.','ok');
+  toast('Secret code changed 🔑');
+  setTimeout(closePinChange,900);
+}
 function saveCloud(){
   const url=(document.getElementById('cbUrl').value||'').trim().replace(/\/+$/,'');
   const key=(document.getElementById('cbKey').value||'').trim();
@@ -6976,7 +7021,7 @@ function setupLogin(){
   const ac=document.getElementById('avClose'); if(ac) ac.addEventListener('click',()=>closeAvatar());
   document.getElementById('pinBack').addEventListener('click',()=>{ document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false; });
   const submit=()=>{ const v=document.getElementById('pinInput').value.trim();
-    if(v===PROFILE_PIN){ signIn(pendingProfile); }
+    if(v===getPin()){ signIn(pendingProfile); }
     else{ document.getElementById('pinErr').textContent="Oops, that code isn't right — try again!";
       const c=document.querySelector('.login-card'); if(c){ c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
       const pi=document.getElementById('pinInput'); pi.value=''; pi.focus(); } };
