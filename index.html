@@ -7212,13 +7212,13 @@ if(!reduceMotion) setInterval(()=>{ const el=document.getElementById('globieSay'
 function syncHeader(){const s=document.querySelector('.site'); if(s) document.documentElement.style.setProperty('--header-h',s.offsetHeight+'px');}
 addEventListener('resize',syncHeader); syncHeader();
 /* —— night mode (opt-in) —— */
-function applyNight(on){
+function applyNight(on,persist){
   document.documentElement.classList.toggle('night',!!on);
   const b=document.getElementById('themeBtn'); if(b){ b.textContent=on?'☀️':'🌙'; b.setAttribute('aria-pressed',!!on); }
   const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.setAttribute('content',on?'#131A2C':'#2FAEA2');
-  try{localStorage.setItem('globie_night',on?'1':'0');}catch(e){}
+  if(persist!==false){ try{localStorage.setItem('globie_night',on?'1':'0');}catch(e){} }
 }
-function toggleNight(){ applyNight(!document.documentElement.classList.contains('night')); }
+function toggleNight(){ applyNight(!document.documentElement.classList.contains('night'),true); }
 /* —— opt-in sound effects (tiny generated tones, no assets) —— */
 let soundOn=false, _actx=null;
 function applySound(on){ soundOn=!!on; const b=document.getElementById('soundBtn');
@@ -7416,7 +7416,12 @@ function playMeow(){
   }catch(e){ try{ sfx('pop'); }catch(_){} }
 }
 try{ if(localStorage.getItem('globie_sound')==='1') applySound(true); }catch(e){}
-try{ if(localStorage.getItem('globie_night')==='1') applyNight(true); }catch(e){}
+try{ const _np=localStorage.getItem('globie_night');
+  if(_np==='1') applyNight(true,false);
+  else if(_np==='0') applyNight(false,false);
+  else if(window.matchMedia){ const _mq=matchMedia('(prefers-color-scheme: dark)'); applyNight(_mq.matches,false);  /* follow the device until the kid picks */
+    if(_mq.addEventListener) _mq.addEventListener('change',e=>{ if(localStorage.getItem('globie_night')==null) applyNight(e.matches,false); }); }
+}catch(e){}
 /* production safety-net: never white-screen if boot throws */
 try{ setupLogin(); showLogin(); }
 catch(bootErr){
