@@ -975,21 +975,23 @@ html.night .pack-trip{background:var(--surface);border-color:var(--line-2)}
 @keyframes speakPulse{0%,100%{box-shadow:0 0 0 0 rgba(47,174,162,.5)}50%{box-shadow:0 0 0 6px rgba(47,174,162,0)}}
 html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 @media(prefers-reduced-motion:reduce){.ph-speak.speaking{animation:none}}
-/* —— Yummy food cards —— */
-.foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px;margin-top:6px}
-.foodcard{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow-sm);transition:.16s}
-.foodcard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--teal)}
-.foodcard .food-emoji{flex:none;width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.95rem;background:var(--surface-2);border:2px solid var(--line)}
-.foodcard .food-body{min-width:0}
-.foodcard .food-name{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.1rem;line-height:1.15}
-.foodcard .food-body p{color:var(--ink-2);font-weight:600;font-size:.9rem;margin:3px 0 9px;line-height:1.35}
+/* —— Yummy food cards (photo-forward) —— */
+.foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
+.foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
+.foodcard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--teal)}
+.foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none}
+.foodcard:hover .food-frame img{transform:scale(1.06)}
+.foodcard .food-body{padding:13px 16px 15px}
+.foodcard .food-name{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.12rem;line-height:1.15}
+.foodcard .food-body p{color:var(--ink-2);font-weight:600;font-size:.9rem;margin:3px 0 10px;line-height:1.35}
 .food-tag{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 10px}
 .tag-main{background:#D5F3EF;color:#0A7F78}
 .tag-snack{background:#FCEFC9;color:#8a6300}
 .tag-sweet{background:#FFE0EC;color:#b03a6b}
 .tag-drink{background:#DBEEFB;color:#2C6FA6}
-.foodcard.food-sweet .food-emoji{background:#FFE9F1;border-color:#FBC4D8}
-html.night .foodcard,html.night .foodcard .food-emoji{background:var(--surface);border-color:var(--line-2)}
+.foodcard.food-sweet{border-color:#FBD3E2}
+.foodcard.food-sweet:hover{border-color:#F48FB6}
+html.night .foodcard{background:var(--surface);border-color:var(--line-2)}
 html.night .tag-main{background:rgba(47,174,162,.2);color:#7fe0d6}
 html.night .tag-snack{background:rgba(244,203,118,.2);color:#f4cb76}
 html.night .tag-sweet{background:rgba(255,127,176,.2);color:#ff9ec4}
@@ -5723,6 +5725,7 @@ function openDest(id){
     document.querySelectorAll('#panels .panel').forEach(x=>{x.classList.remove('active');x.hidden=true;});
     tb.classList.add('active');tb.setAttribute('aria-selected','true');tb.tabIndex=0;
     const p=document.getElementById('panel-'+tb.dataset.p); p.classList.add('active'); p.hidden=false;
+    if(tb.dataset.p==='food') hydrateFoodPhotos(p);
     if(tb.dataset.p==='cat' && currentDest && typeof LOCAL_CATS!=='undefined' && LOCAL_CATS[currentDest.id]) markCatRead(currentDest.id);
     if(focus) tb.focus();
     tb.scrollIntoView({inline:'center',block:'nearest',behavior:reduceMotion?'auto':'smooth'});
@@ -6669,15 +6672,52 @@ function pickVaried(pool,n,seed){
 }
 function buildQuiz(d){ const {pool,seed}=buildQuizPool(d); return pickVaried(pool,Math.min(QUIZ_LEN,pool.length),seed); }
 const FOOD_TAGS={main:['🍽️','Main dish'],snack:['🥨','Snack'],sweet:['🍨','Sweet treat'],drink:['🥤','Drink']};
+/* Wikipedia article titles for dishes whose name isn't the article title (so the
+   lead photo lookup lands on the right page). Anything not listed uses its name. */
+const FOOD_WIKI={
+  "Vegemite toast":"Vegemite","Prawns on the barbie":"Prawn cocktail","Crêpe":"Crêpe","Croque-monsieur":"Croque monsieur",
+  "Yogurt & honey":"Greek yogurt","Karelian pie":"Karelian pasty","Lihapullat":"Meatball","Salmon soup":"Lohikeitto",
+  "Pulla":"Nisu (bread)","Salmiakki":"Salty liquorice","Kleinur":"Kleina (cookie)","Banana fritters":"Pisang goreng",
+  "Mas huni":"Mas huni","Roshi":"Roti","Gulha":"Gulha","Bondibai":"Bondibai","Fresh coconut":"Coconut water",
+  "Mint tea":"Maghrebi mint tea","Mince pie":"Meat pie (Australia and New Zealand)","Hokey pokey":"Hokey pokey (ice cream)",
+  "Fish & chips":"Fish and chips","Bola de Berlim":"Berliner (doughnut)","Piri-piri chicken":"Piri piri chicken",
+  "Grilled sardines":"Sardines as food","Chicken rice":"Hainanese chicken rice","Tortilla española":"Spanish omelette",
+  "Choc-chip cookies":"Chocolate chip cookie","Mac & cheese":"Macaroni and cheese","Bangers & mash":"Bangers and mash",
+  "Pancakes":"Pancake","Scones":"Scone","Churros":"Churro","Jamón":"Jamón serrano","Köfte":"Köfte","Döner kebab":"Doner kebab",
+  "Pap":"Pap (food)","Koeksisters":"Koeksister","Hāngī":"Hāngī","Coconut fish":"Ota ika","Simboro":"Vanuatu cuisine",
+  "Tropical fruit":"Tropical fruit","Bacalhau":"Bacalhau à brás","Roti prata":"Roti canai"
+};
 function foodPanelHTML(d){
   const list=(typeof FOOD_BY_COUNTRY!=='undefined')&&(FOOD_BY_COUNTRY[d.country]||FOOD_BY_COUNTRY[d.name]);
   if(!list||!list.length) return `<h3 class="blockhead">🍽️ Yummy food</h3><p class="sub">Tasty dishes from ${esc(d.country)} are coming soon!</p>`;
+  const th=themeFor(d);
   return `<h3 class="blockhead">🍽️ Yummy food in ${esc(d.country)}</h3>
     <p class="sub">Delicious things to try — including some sweet treats! 😋</p>
-    <div class="foodgrid">${list.map(f=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main;
-      return `<div class="foodcard food-${f[3]}"><div class="food-emoji" aria-hidden="true">${f[0]}</div>
+    <div class="foodgrid">${list.map(f=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
+      return `<div class="foodcard food-${f[3]}">
+        <div class="frame food-frame" style="${frameStyle(th)}"><span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></div>
         <div class="food-body"><div class="food-name">${esc(f[1])}</div><p>${esc(f[2])}</p>
         <span class="food-tag tag-${f[3]}">${t[0]} ${t[1]}</span></div></div>`;}).join('')}</div>`;
+}
+/* fetch each dish's professional lead photo from Wikipedia (free, CORS-enabled),
+   sized to ~640px; falls back to the emoji + gradient if it can't be fetched. */
+const _foodPhotoCache={};
+function foodPhotoURL(title){
+  if(title in _foodPhotoCache) return Promise.resolve(_foodPhotoCache[title]);
+  return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title)+'?redirect=true')
+    .then(r=>r.ok?r.json():null)
+    .then(j=>{ let u=null;
+      if(j){ if(j.thumbnail&&j.thumbnail.source) u=j.thumbnail.source.replace(/\/\d+px-/,'/640px-');
+        else if(j.originalimage&&j.originalimage.source) u=j.originalimage.source; }
+      _foodPhotoCache[title]=u; return u; })
+    .catch(()=>{ _foodPhotoCache[title]=null; return null; });
+}
+function hydrateFoodPhotos(panel){
+  if(!panel) return;
+  panel.querySelectorAll('img.food-img[data-wiki]').forEach(img=>{
+    if(img.dataset.h) return; img.dataset.h='1';
+    foodPhotoURL(img.getAttribute('data-wiki')).then(u=>{ if(u) img.src=u; else img.classList.add('failed'); });
+  });
 }
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
