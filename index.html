@@ -665,6 +665,7 @@ nav.top button,.snav button,.chip,.back{min-height:44px}
 .ach-shelf .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .ach-shelf .head h3{font-size:1.4rem}
 .ach-shelf .head .count{font-weight:800;color:var(--coral-d);font-family:var(--display)}
+.ach-filters{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 16px}
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px}
 .ach{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);padding:18px 12px 14px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .18s, box-shadow .18s}
 .ach.unlocked{border-color:transparent;box-shadow:0 10px 22px -12px var(--ac,#13B5AC), inset 0 0 0 2px var(--ac,#13B5AC)}
@@ -6733,10 +6734,16 @@ function badgeProgress(a,c){
   };
   const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
 }
+let badgeFilter='all';
 function renderAchievements(){
   const host=document.getElementById('achShelf'); if(!host) return;
   const ctx=achContext();
   const got=ACHIEVEMENTS.filter(a=>unlockedAch.has(a.id)).length;
+  const filters=[['all','All '+ACHIEVEMENTS.length],['earned','✅ Earned '+got],['locked','🔒 To earn '+(ACHIEVEMENTS.length-got)]];
+  const filterHTML=`<div class="ach-filters" role="tablist" aria-label="Filter badges">${filters.map(f=>`<button class="chip ${f[0]===badgeFilter?'active':''}" role="tab" aria-selected="${f[0]===badgeFilter}" onclick="badgeFilter='${f[0]}';renderAchievements()">${f[1]}</button>`).join('')}</div>`;
+  let shown=ACHIEVEMENTS;
+  if(badgeFilter==='earned') shown=ACHIEVEMENTS.filter(a=>unlockedAch.has(a.id));
+  else if(badgeFilter==='locked') shown=ACHIEVEMENTS.filter(a=>!unlockedAch.has(a.id));
   const fmt=(v,u)=>v.toLocaleString()+(u?(' '+u):'');
   /* find the locked badge that's closest to unlocking, to cheer the kids on */
   let next=null;
@@ -6749,14 +6756,18 @@ function renderAchievements(){
         <div class="nb-bar"><i style="width:${Math.round(next.pct*100)}%"></i></div>
         <div class="nb-ds">${esc(next.a.ds)} — ${fmt(next.pr.have,next.pr.unit)} of ${fmt(next.pr.need,next.pr.unit)}!</div></div>
     </div>` : '';
-  host.innerHTML=`<div class="head"><h3>🏅 Explorer Badges</h3><span class="count">${got} / ${ACHIEVEMENTS.length} collected</span></div>
-    ${nextHTML}
-    <div class="ach-grid">${ACHIEVEMENTS.map(a=>{const on=unlockedAch.has(a.id); const pr=on?null:badgeProgress(a,ctx);
+  const gridHTML = shown.length
+    ? `<div class="ach-grid">${shown.map(a=>{const on=unlockedAch.has(a.id); const pr=on?null:badgeProgress(a,ctx);
       const pct=pr?Math.min(100,Math.round(pr.have/pr.need*100)):0;
       return `<div class="ach ${on?'unlocked':'locked'}" style="--ac:${a.ac}" tabindex="0" role="group" aria-label="${esc(a.nm)}. ${on?'Unlocked':'Locked'}. ${esc(a.ds)}.${pr?(' Progress '+fmt(pr.have,pr.unit)+' of '+fmt(pr.need,pr.unit)+'.'):''}">
         ${on?'':'<span class="lock" aria-hidden="true">🔒</span>'}<div class="em" aria-hidden="true">${a.em}</div>
         <div class="nm">${a.nm}</div><div class="ds">${a.ds}</div>
-        ${pr?`<div class="ach-prog" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="ach-progt">${fmt(pr.have,pr.unit)} / ${fmt(pr.need,pr.unit)}</div>`:''}</div>`;}).join('')}</div>`;
+        ${pr?`<div class="ach-prog" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="ach-progt">${fmt(pr.have,pr.unit)} / ${fmt(pr.need,pr.unit)}</div>`:''}</div>`;}).join('')}</div>`
+    : `<div class="empty">${badgeFilter==='earned'?'No badges earned yet — start exploring to collect your first! 🌍':'Wow — you\'ve earned them all! 🏆'}</div>`;
+  host.innerHTML=`<div class="head"><h3>🏅 Explorer Badges</h3><span class="count">${got} / ${ACHIEVEMENTS.length} collected</span></div>
+    ${filterHTML}
+    ${badgeFilter!=='earned'?nextHTML:''}
+    ${gridHTML}`;
 }
 function checkAchievements(opts){
   const ctx=achContext(); const fresh=[]; const now=new Set();

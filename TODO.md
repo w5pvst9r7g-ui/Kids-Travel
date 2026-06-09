@@ -131,6 +131,7 @@ Last updated: 2026-06-09
 - [x] **Richer printable passport** — the printout now also tallies **Badges earned** and **Foods tried** (when any), so the keepsake reflects the full collection, not just trips/km.
 - [x] **Auto dark mode** — night mode now follows the device's `prefers-color-scheme` for first-time visitors (and live-updates if they flip their system theme), until they explicitly tap the 🌙/☀️ toggle — at which point their choice is saved and wins. Verified all four cases (dark/light device, toggle, reload).
 - [x] **Every photo enlarges** — the "What to see" and "Fun stuff to do" spot photos are now tappable to open big in the single-image lightbox (keyboard + ARIA + zoom-in cursor), so all photos across the app (gallery, food, spots) behave consistently.
+- [x] **Badge filter** — the Badges page now has All / ✅ Earned / 🔒 To earn tabs (with live counts) so kids can focus on what they've collected or what's left; the "closest badge to earn" nudge hides under the Earned view. Friendly empty states for each.
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 
