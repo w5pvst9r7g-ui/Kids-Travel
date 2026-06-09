@@ -1506,16 +1506,19 @@ const gmap  = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeUR
    different ways on Apple vs Android). Reused for the map, boarding pass, login & splash. */
 const PLANE_SVG='<svg class="psvg" viewBox="0 0 230 90" aria-hidden="true"><defs><filter id="plf" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="2.8"/></filter><linearGradient id="plc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".72"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs><g filter="url(#plf)"><path d="M158 40 C115 39 65 35 6 24 C65 45 115 43 158 42 Z" fill="url(#plc)"/><path d="M158 50 C115 51 65 55 6 66 C65 45 115 47 158 48 Z" fill="url(#plc)"/><circle cx="40" cy="29" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="33" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="36" r="8.5" fill="#fff" opacity=".5"/><circle cx="40" cy="61" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="57" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="54" r="8.5" fill="#fff" opacity=".5"/></g><g stroke="rgba(20,32,56,.4)" stroke-width="1.4" stroke-linejoin="round"><path d="M168 42 L132 14 L124 17 L150 44 Z" fill="#c8d5e8"/><path d="M168 48 L132 76 L124 73 L150 46 Z" fill="#b4c3db"/><path d="M138 43 L120 31 L114 34 L130 45 Z" fill="#c8d5e8"/><path d="M138 47 L120 59 L114 56 L130 45 Z" fill="#b4c3db"/><path d="M120 45 L108 43 L108 47 Z" fill="#aebfd6"/><path d="M123 38 L198 41 Q214 45 198 49 L123 52 Q114 52 114 45 Q114 38 123 38 Z" fill="#ffffff"/><rect x="150" y="36.5" width="13" height="5" rx="2.5" fill="#93a4be" stroke="none"/><rect x="150" y="48.5" width="13" height="5" rx="2.5" fill="#8294b0" stroke="none"/><path d="M201 45 q5 -3 9 0 q-5 3 -9 0Z" fill="#6aa6dd" stroke="none"/></g></svg>';
 const flyPlane=()=>PLANE_SVG;
-/* Cat photos via loremflickr. We always force the "cat" tag first and append
-   loremflickr's "/all" matcher so EVERY tag must be present in the photo.
-   Without "/all" loremflickr OR-matches the tags, so "cat,maldives" would happily
-   return a Maldives beach snap of a boy with no cat in it. Keeping it to two tags
-   (cat + one location/flavour word) keeps the result pool full of real cats. */
+/* Generic, cat-friendly scene/colour/breed words that genuinely co-occur with the
+   "cat" tag on Flickr. Proper-noun place names (maldives, morocco, paris…) are
+   deliberately excluded: pairing them with "cat" via /all usually finds ZERO photos,
+   and loremflickr then quietly serves a random non-cat image (e.g. a boy on a beach). */
+const CAT_SAFE_TAGS=new Set(['beach','sea','coast','ocean','island','tropical','palm','sand','dunes','harbour','sails','boat','pier','river','lake','snow','mountain','street','alley','market','rooftop','window','city','town','tram','garden','park','sunset','colourful','fluffy','tabby','ginger','black','white','golden','kitten','sleeping']);
+/* Cat photos via loremflickr. Always force the "cat" tag and append the "/all"
+   matcher so the photo must contain a cat; only ever add a second tag drawn from
+   the cat-safe list above, so the tag pair always has real cat photos to return. */
 const flick = (kw, lock, w=800, h=600) => {
-  let parts=String(kw).split(',').map(s=>s.trim()).filter(Boolean);
-  if(parts[0]!=='cat') parts.unshift('cat');
-  parts=parts.slice(0,2);
-  return `https://loremflickr.com/${w}/${h}/${parts.map(encodeURIComponent).join(',')}/all?lock=${lock}`;
+  const parts=String(kw).split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const extra=parts.find(t=>t!=='cat'&&CAT_SAFE_TAGS.has(t));
+  const tags=extra?['cat',extra]:['cat'];
+  return `https://loremflickr.com/${w}/${h}/${tags.map(encodeURIComponent).join(',')}/all?lock=${lock}`;
 };
 const esc   = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 /* trips that visited a given destination guide (links Map/Journal <-> Explore) */
