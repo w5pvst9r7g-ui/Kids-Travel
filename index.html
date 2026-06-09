@@ -6641,6 +6641,15 @@ function buildQuizPool(d){
   /* must-do highlights */
   const otherHi=[]; others.forEach(o=>(o.highlights||[]).forEach(x=>otherHi.push(x)));
   (d.highlights||[]).slice(0,5).forEach(x=>add(mk('highlight',`What's a must-do in ${d.name}?`, x, otherHi)));
+  /* yummy food — which dish comes from this country */
+  if(typeof FOOD_BY_COUNTRY!=='undefined'){
+    const mine=FOOD_BY_COUNTRY[d.country]||FOOD_BY_COUNTRY[d.name];
+    if(mine&&mine.length){
+      const mineNames=new Set(mine.map(f=>f[1])), otherFoods=[];
+      Object.keys(FOOD_BY_COUNTRY).forEach(co=>FOOD_BY_COUNTRY[co].forEach(f=>{ if(!mineNames.has(f[1])) otherFoods.push(f[1]); }));
+      qshuffle(mine,seed+8).slice(0,3).forEach(f=>add(mk('food',`Which yummy food comes from ${d.country}?`, f[1], otherFoods)));
+    }
+  }
   /* local cat */
   if(typeof LOCAL_CATS!=='undefined'&&LOCAL_CATS[d.id]){ const cats=DESTS.map(o=>LOCAL_CATS[o.id]&&LOCAL_CATS[o.id].name).filter(Boolean);
     add(mk('cat',`What is the name of ${d.name}'s local cat?`, LOCAL_CATS[d.id].name, cats)); }
