@@ -126,6 +126,7 @@ Last updated: 2026-06-09
 - [x] **Food photos cached to disk** — resolved Wikipedia photo URLs now persist in localStorage (capped at 300), so repeat visits resolve instantly with zero summary-API calls (verified: 6 fetches first visit → 0 after reload) and the images work offline once in the browser cache.
 - [x] **Tap a dish photo to enlarge** — food photos now open big in a single-image lightbox (reuses the existing lightbox with a no-arrows "one" mode), with the dish name as caption, zoom-in cursor, full keyboard/ARIA, and back-button/✕/swipe to close.
 - [x] **Foodie passport** — each dish has a "🍴 Tried it?" toggle; tick the ones you've tasted and a live "X tried" counter climbs. Saved per explorer, with two new badges: **Little Foodie** (try 5) and **Master Taster** (try 15), wired into the badge progress bars. (Verified: toggle, counter, badge unlock at 5, and persistence across reloads.)
+- [x] **Search by food** — Explore search now also matches dish names, so a kid who loves churros, croissants, pavlova or baklava can type the food and find where to get it (verified: churros → the 3 Spanish spots, croissant → Paris, laksa → Singapore).
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 

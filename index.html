@@ -1469,7 +1469,7 @@ create policy "atlas all" on atlas_sync
       <div><span class="eyebrow">The whole atlas</span><h2>Explore places</h2></div>
       <div class="filters" id="filters"></div>
     </div>
-    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search place, country, region…" oninput="setDestSearch(this.value)" aria-label="Search destinations by name, country, region or continent"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
+    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search place, country, food…" oninput="setDestSearch(this.value)" aria-label="Search destinations by name, country, region, continent or food"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
     <div id="destGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tap any place to explore it! ⭐ ratings &amp; map pins come from Google Maps.</p>
   </section>
@@ -5684,7 +5684,8 @@ function clearDestSearch(){ const i=document.getElementById('destSearch'); if(i)
 function renderGrid(){
   const host=document.getElementById('destGroups'),vis=visitedDestIds(),soon=plannedDestIds();
   const q=destSearch;
-  const match=d=>!q||((d.name+' '+d.country+' '+(d.short||'')+' '+(d.tagline||'')+' '+d.region+' '+(continentOf(d)||'')).toLowerCase().indexOf(q)>=0);
+  const foodWords=d=>{ const l=(typeof FOOD_BY_COUNTRY!=='undefined')&&(FOOD_BY_COUNTRY[d.country]||FOOD_BY_COUNTRY[d.name]); return l?(' '+l.map(f=>f[1]).join(' ')):''; };
+  const match=d=>!q||((d.name+' '+d.country+' '+(d.short||'')+' '+(d.tagline||'')+' '+d.region+' '+(continentOf(d)||'')+foodWords(d)).toLowerCase().indexOf(q)>=0);
   const list=DESTS.filter(d=>(activeRegion==='All'||d.region===activeRegion)&&match(d));
   const explored=[],discover=[],dream=[];
   list.forEach(d=>{
