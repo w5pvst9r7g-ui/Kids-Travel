@@ -4,13 +4,14 @@
      fall back to the cached page only when offline). This avoids the classic
      "stale single-page app" trap where users never see new deploys.
    - Static assets (images, etc.): CACHE-FIRST (fast, and fine offline). */
-const CACHE = 'poppie-atlas-v7';
+const CACHE = 'poppie-atlas-v8';
 const ASSETS = [
   './', './index.html',
   './poppie.jpg', './poppie-hi.png', './poppie-yay.png', './poppie-walk.png',
   './poppie-fish.png', './poppie-sit.png', './poppie-sit2.png', './poppie-stand.png',
   './poppie-calm.png', './poppie-play.png',
-  './poppie-meow.mp3',
+  './poppie-meow-1.mp3', './poppie-meow-2.mp3', './poppie-meow-3.mp3',
+  './poppie-meow-4.mp3', './poppie-meow-5.mp3',
   './icon-192.png', './icon-512.png',
   './fonts/baloo-2-latin-700-normal.woff2', './fonts/baloo-2-latin-800-normal.woff2',
   './fonts/baloo-2-latin-600-normal.woff2', './fonts/baloo-2-latin-500-normal.woff2',
