@@ -2,7 +2,7 @@
 
 A living checklist so nothing gets lost. **When we get sidetracked by a new request, add it here and tick things off as they ship.**
 
-Last updated: 2026-06-06
+Last updated: 2026-06-09
 
 ---
 
@@ -24,6 +24,7 @@ Last updated: 2026-06-06
 - [x] **Per-user DOB filtering** (Jean-Luc 2016, Hailey 2019 — hide trips before they were born)
 
 ### Engagement
+- [x] **💌 Mail** — message a fellow explorer: text, emoji quick-bar + full picker, and voice notes (🎙️ up to 30s); chat bubbles, unread badge, per-chat clear; shared store rides Cloud sync
 - [x] 40 Explorer Badges (reconcile with live itinerary; 15 still to earn)
 - [x] Surprise-me 🎲, per-destination quiz, Poppy speech bubble
 - [x] Dramatic countdown to next trip + **"It's today!" celebration**
