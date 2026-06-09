@@ -494,8 +494,9 @@ html.night .bp-fun{background:rgba(244,203,118,.13);color:var(--yellow)}
 .wc-flag.plain{cursor:default}
 .wc-flag.plain:hover{transform:none;border-color:var(--line)}
 .wc-flag .fl{font-size:1.9rem;line-height:1;flex:none}
-.wc-flag .nm{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.02rem;line-height:1.1}
-.wc-flag .ct{color:var(--muted);font-weight:700;font-size:.74rem}
+.wc-flag .wc-info{display:flex;flex-direction:column;min-width:0;flex:1}
+.wc-flag .nm{font-family:var(--display);font-weight:800;color:var(--ink);font-size:.96rem;line-height:1.12;overflow-wrap:break-word;hyphens:auto}
+.wc-flag .ct{display:block;color:var(--muted);font-weight:700;font-size:.74rem;margin-top:2px}
 .wc-empty{background:var(--surface-2);border:2px dashed var(--line-2);border-radius:var(--r);padding:18px;color:var(--ink-2);font-weight:700}
 .dimnav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .dimnav::-webkit-scrollbar{display:none}
@@ -6042,7 +6043,7 @@ function renderWorld(){
   const visHTML = visited.length
     ? `<div class="wc-flags">${visited.map(c=>{const g=wcGuide(c.name);
         return `<button class="wc-flag${g?'':' plain'}" ${g?`onclick="openDest('${g}')"`:'disabled'} aria-label="${esc(c.name)}${g?', open guide':''}">
-          <span class="fl" aria-hidden="true">${c.flag}</span><span><span class="nm">${esc(c.name)}</span><span class="ct">${esc(c.continent)} ✓</span></span></button>`;}).join('')}</div>`
+          <span class="fl" aria-hidden="true">${c.flag}</span><span class="wc-info"><span class="nm">${esc(c.name)}</span><span class="ct">${esc(c.continent)} ✓</span></span></button>`;}).join('')}</div>`
     : `<div class="wc-empty">No countries logged yet — add a trip in your Journal and watch your passport fill up! ✈️</div>`;
 
   const tabs=`<div class="dimnav" role="tablist" aria-label="Sort countries by">${WORLD_DIMS.map(d=>
