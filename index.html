@@ -485,8 +485,14 @@ html.night .bp-fun{background:rgba(244,203,118,.13);color:var(--yellow)}
 .wc-h{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--ink);margin:26px 0 4px;display:flex;align-items:center;gap:9px}
 .wc-sub{color:var(--ink-2);font-weight:700;font-size:.95rem;margin:0 0 14px}
 .cont-strip{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 8px}
-.cont-chip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:78px;padding:11px 12px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface);opacity:.5;filter:grayscale(.7);transition:.15s}
+.cont-chip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:78px;padding:11px 12px;border-radius:var(--r);border:2px solid var(--line);background:var(--surface);opacity:.5;filter:grayscale(.7);transition:.15s;font:inherit;color:inherit}
 .cont-chip.on{opacity:1;filter:none;border-color:var(--teal);box-shadow:var(--shadow-sm)}
+button.cont-chip{cursor:pointer}
+button.cont-chip:hover{transform:translateY(-2px)}
+.cont-chip.sel{border-color:var(--teal-d);background:var(--surface-2);box-shadow:0 0 0 2px var(--teal-d) inset}
+.cont-chip:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+.wc-clear{font-family:var(--sans);font-weight:800;font-size:.74rem;border:2px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:999px;padding:3px 10px;cursor:pointer;margin-left:6px;vertical-align:middle}
+.wc-clear:hover{border-color:var(--teal);color:var(--teal-d)}
 .cont-chip .ce{font-size:1.5rem;line-height:1}
 .cont-chip .cn{font-weight:800;font-size:.66rem;color:var(--ink-2);text-align:center;letter-spacing:.02em}
 .cont-chip .ck{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--green-d);color:#fff;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.25)}
@@ -6252,6 +6258,8 @@ const WORLD_DIMS=[
 function wcKey(n){ n=String(n||'').trim(); return n==='Turkey'?'Türkiye':n; }
 function wcGuide(name){ const d=DESTS.find(x=>wcKey(x.country)===wcKey(name)); return d?d.id:null; }
 function setWorldDim(k){ worldDim=k; renderWorld(); }
+let worldContFilter=null;
+function setWorldCont(co){ worldContFilter=(worldContFilter===co)?null:co; renderWorld(); }
 function renderWorld(){
   const host=document.getElementById('worldBody'); if(!host) return;
   if(typeof WORLD_COUNTRIES==='undefined'){ host.innerHTML='<div class="wc-empty">Country data is still loading…</div>'; return; }
@@ -6265,11 +6273,16 @@ function renderWorld(){
   const CONTS=['Europe','Asia','Africa','North America','South America','Oceania','Antarctica'];
   const CONT_EM={Europe:'🏰',Asia:'🏯',Africa:'🦁','North America':'🗽','South America':'🌎',Oceania:'🦘',Antarctica:'🐧'};
   const visitedConts=new Set(visited.map(c=>c.continent));
-  const contStrip=`<div class="cont-strip">${CONTS.map(co=>`<div class="cont-chip ${visitedConts.has(co)?'on':''}" title="${esc(co)}">
-      <span class="ce" aria-hidden="true">${CONT_EM[co]}</span><span class="cn">${esc(co)}</span>${visitedConts.has(co)?'<span class="ck" aria-hidden="true">✓</span>':''}</div>`).join('')}</div>`;
+  if(worldContFilter && !visitedConts.has(worldContFilter)) worldContFilter=null;   /* reset stale filter */
+  const contStrip=`<div class="cont-strip">${CONTS.map(co=>{ const on=visitedConts.has(co), sel=worldContFilter===co;
+    return on
+      ? `<button type="button" class="cont-chip on${sel?' sel':''}" aria-pressed="${sel}" onclick="setWorldCont('${co}')" title="Show your ${esc(co)} countries"><span class="ce" aria-hidden="true">${CONT_EM[co]}</span><span class="cn">${esc(co)}</span><span class="ck" aria-hidden="true">${sel?'◉':'✓'}</span></button>`
+      : `<div class="cont-chip" title="${esc(co)}"><span class="ce" aria-hidden="true">${CONT_EM[co]}</span><span class="cn">${esc(co)}</span></div>`;
+    }).join('')}</div>`;
 
-  const visHTML = visited.length
-    ? `<div class="wc-flags">${visited.map(c=>{const g=wcGuide(c.name);
+  const visShown = worldContFilter ? visited.filter(c=>c.continent===worldContFilter) : visited;
+  const visHTML = visShown.length
+    ? `<div class="wc-flags">${visShown.map(c=>{const g=wcGuide(c.name);
         return `<button class="wc-flag${g?'':' plain'}" ${g?`onclick="openDest('${g}')"`:'disabled'} aria-label="${esc(c.name)}${g?', open guide':''}">
           <span class="fl" aria-hidden="true">${c.flag}</span><span class="wc-info"><span class="nm">${esc(c.name)}</span><span class="ct">${esc(c.continent)} ✓</span></span></button>`;}).join('')}</div>`
     : `<div class="wc-empty">No countries logged yet — add a trip in your Journal and watch your passport fill up! ✈️</div>`;
@@ -6292,8 +6305,8 @@ function renderWorld(){
   host.innerHTML=
     `<h3 class="wc-h">🌐 Continents collected <span style="color:var(--teal-d)">(${visitedConts.size} / 7)</span></h3>
      ${contStrip}
-     <h3 class="wc-h">🛂 Countries you've explored <span style="color:var(--teal-d)">(${visited.length})</span></h3>
-     <p class="wc-sub">Tap a country with a guide to revisit it.</p>
+     <h3 class="wc-h">🛂 Countries you've explored${worldContFilter?(' in '+esc(worldContFilter)):''} <span style="color:var(--teal-d)">(${visShown.length})</span>${worldContFilter?` <button type="button" class="wc-clear" onclick="setWorldCont('${worldContFilter}')">✕ Show all</button>`:''}</h3>
+     <p class="wc-sub">${worldContFilter?('Tap '+esc(worldContFilter)+' again to see every country.'):'Tap a continent above to filter, or a country with a guide to revisit it.'}</p>
      ${visHTML}
      <h3 class="wc-h">✨ Dream destinations to explore next</h3>
      <p class="wc-sub">The top 5 countries you haven't been to yet — ${esc(dim.heading.toLowerCase())}.</p>
