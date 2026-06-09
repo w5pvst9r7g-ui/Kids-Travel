@@ -428,7 +428,9 @@ html.night .bp-fun{background:rgba(244,203,118,.13);color:var(--yellow)}
   border-radius:var(--r);padding:13px;box-shadow:var(--shadow-sm);margin-bottom:13px;transition:.15s}
 .spot:hover{transform:translateX(4px);border-color:var(--line-2)}
 .spot:hover .spot-pic img{transform:scale(1.06)}
-.spot-pic{margin:0;position:relative;width:104px;height:104px;border-radius:15px;overflow:hidden;align-self:start}
+.spot-pic{margin:0;position:relative;width:104px;height:104px;border-radius:15px;overflow:hidden;align-self:start;padding:0;border:none;font:inherit}
+.spot-pic:has(img.ld){cursor:zoom-in}
+.spot-pic:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 @media(max-width:480px){.spot{grid-template-columns:84px 1fr;gap:13px}.spot-pic{width:84px;height:84px}}
 .spot-pic .spot-num{position:absolute;top:7px;left:7px;z-index:5;min-width:27px;height:27px;padding:0 7px;border-radius:9px;
   background:rgba(255,255,255,.94);color:var(--coral-d);font-family:var(--display);font-weight:800;font-size:1rem;
@@ -5884,13 +5886,13 @@ function openDest(id){
       </div>`,
     photos:`<h3 class="blockhead">📸 Photo story</h3><p class="sub">A few postcards from ${d.name}</p><div class="gallery">${gallery}</div>`,
     see:`<h3 class="blockhead">🏛️ What to see</h3><p class="sub">The big highlights — tap one to find it on the map</p>`+hiBox+
-      d.attractions.map((a,i)=>`<div class="spot"><figure class="spot-pic frame" style="${frameStyle(th)}"><span class="spot-num">${i+1}</span>${sticker(d.emoji)}${spotPic(d,i,0,a[1])}</figure><div class="spot-body"><h4>${a[1]}</h4><p>${a[2]}</p>
+      d.attractions.map((a,i)=>`<div class="spot"><figure class="spot-pic frame" role="button" tabindex="0" aria-label="Enlarge photo of ${esc(a[1])}" style="${frameStyle(th)}"><span class="spot-num">${i+1}</span>${sticker(d.emoji)}${spotPic(d,i,0,a[1])}</figure><div class="spot-body"><h4>${a[1]}</h4><p>${a[2]}</p>
         <a class="maplink" href="${gmap(a[1]+' '+(d.country||d.name))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
       </div></div>`).join('')+tipsBox,
     cat:catPanel,
     lang:langPanel,
     kids:`<h3 class="blockhead">🎢 Fun stuff to do</h3><p class="sub">The spots kids love most — with their Google Maps rating</p>`+
-      d.kids.map((k,i)=>`<div class="spot"><figure class="spot-pic frame" style="${frameStyle(th)}"><span class="spot-num">${i+1}</span>${sticker(d.emoji)}${spotPic(d,i,Math.ceil(((d.photos&&d.photos.length)||2)/2),k[1])}</figure><div class="spot-body"><h4>${k[1]}</h4><p>${k[2]}</p>
+      d.kids.map((k,i)=>`<div class="spot"><figure class="spot-pic frame" role="button" tabindex="0" aria-label="Enlarge photo of ${esc(k[1])}" style="${frameStyle(th)}"><span class="spot-num">${i+1}</span>${sticker(d.emoji)}${spotPic(d,i,Math.ceil(((d.photos&&d.photos.length)||2)/2),k[1])}</figure><div class="spot-body"><h4>${k[1]}</h4><p>${k[2]}</p>
         <div class="rating">${stars(k[3])}<span class="num2">${k[3]}</span><span class="rev">${k[4]} reviews</span></div>
         <a class="maplink" href="${gmap(k[5])}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
       </div></div>`).join(''),
@@ -6964,6 +6966,14 @@ document.addEventListener('click',e=>{ const fr=e.target.closest&&e.target.close
     openImageLightbox(img.getAttribute('src'), img.getAttribute('alt')||'', sticker?sticker.textContent:'🍽️', fr.getAttribute('style')||'');
   }
 });
+/* tap (or Enter/Space on) a loaded "what to see / fun" spot photo to enlarge it */
+function enlargeSpot(fr){ if(!fr) return; const img=fr.querySelector('img');
+  if(img&&img.classList.contains('ld')&&img.getAttribute('src')){
+    const sticker=fr.querySelector('.sticker');
+    openImageLightbox(img.getAttribute('src'), img.getAttribute('alt')||'', sticker?sticker.textContent:'📷', fr.getAttribute('style')||'');
+  } }
+document.addEventListener('click',e=>{ const fr=e.target.closest&&e.target.closest('.spot-pic'); if(fr) enlargeSpot(fr); });
+document.addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ') return; const fr=e.target.closest&&e.target.closest('.spot-pic'); if(fr){ e.preventDefault(); enlargeSpot(fr); } });
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
   return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>
