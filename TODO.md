@@ -18,7 +18,8 @@ Last updated: 2026-06-06
 
 ### Identity & people
 - [x] Poppy the cat mascot (real photo `poppie.jpg` + 11 pose PNGs used throughout)
-- [x] Profile login (Jean-Luc / Hailey, PIN 1985) with per-profile data
+- [x] Profile login (Jean-Luc / Hailey, default PIN 1985) with per-profile data
+- [x] **Change PIN** in Settings — set a new four-digit code once signed in (saved on device)
 - [x] Kids pick their own avatar icon
 - [x] **Per-user DOB filtering** (Jean-Luc 2016, Hailey 2019 — hide trips before they were born)
 
