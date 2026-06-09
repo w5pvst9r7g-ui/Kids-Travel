@@ -999,7 +999,9 @@ html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
 .foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
 .foodcard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--teal)}
-.foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none;border:none;padding:0;display:block;cursor:default;font:inherit}
+.foodcard .food-frame{width:100%;aspect-ratio:16/10;border-radius:0;flex:none;border:none;padding:0;display:block;cursor:default;font:inherit;position:relative}
+.foodcard.fav{border-color:var(--yellow-d)}
+.food-fav{position:absolute;top:9px;left:9px;z-index:6;background:var(--yellow-d);color:#3a2a00;font-family:var(--sans);font-weight:800;font-size:.68rem;letter-spacing:.02em;border-radius:999px;padding:4px 10px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
 .foodcard .food-frame:has(img.ld){cursor:zoom-in}
 .foodcard .food-frame:focus-visible{outline:3px solid var(--grape);outline-offset:-3px}
 .foodcard:hover .food-frame img{transform:scale(1.06)}
@@ -6946,10 +6948,10 @@ function foodPanelHTML(d){
   const triedN=(typeof triedFoods!=='undefined')?triedFoods.size:0;
   return `<h3 class="blockhead">🍽️ Yummy food in ${esc(d.country)} <span class="food-count" id="foodCount">${triedN?('🍴 '+triedN+' tried'):''}</span></h3>
     <p class="sub">Delicious things to try — tap a photo to see it big, and tick off the ones you've tasted! 😋</p>
-    <div class="foodgrid">${list.map(f=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
+    <div class="foodgrid">${list.map((f,fi)=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main; const wiki=FOOD_WIKI[f[1]]||f[1];
       const key=d.country+'|'+f[1], tried=(typeof triedFoods!=='undefined')&&triedFoods.has(key);
-      return `<div class="foodcard food-${f[3]}">
-        <button type="button" class="frame food-frame" style="${frameStyle(th)}" aria-label="Enlarge photo of ${esc(f[1])}"><span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></button>
+      return `<div class="foodcard food-${f[3]}${fi===0?' fav':''}">
+        <button type="button" class="frame food-frame" style="${frameStyle(th)}" aria-label="Enlarge photo of ${esc(f[1])}">${fi===0?'<span class="food-fav" aria-label="Poppy\'s favourite">⭐ Poppy\'s favourite</span>':''}<span class="sticker" aria-hidden="true">${f[0]}</span><img class="food-img fade" loading="lazy" decoding="async" alt="${esc(f[1])}, a dish from ${esc(d.country)}" data-wiki="${esc(wiki)}" onload="this.classList.add('ld')" onerror="this.classList.add('failed')"></button>
         <div class="food-body"><div class="food-name">${esc(f[1])}</div><p>${esc(f[2])}</p>
         <div class="food-foot"><span class="food-tag tag-${f[3]}">${t[0]} ${t[1]}</span>
           <button type="button" class="food-tried${tried?' on':''}" data-key="${esc(key)}" aria-pressed="${tried}" onclick="toggleTriedFood(this)">${tried?'✓ Tried it!':'🍴 Tried it?'}</button></div>
