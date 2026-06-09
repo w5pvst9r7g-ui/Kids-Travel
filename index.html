@@ -1109,6 +1109,12 @@ html.night .tag-drink{background:rgba(70,179,240,.2);color:#8fcdf6}
 .tgl.on{background:var(--green-d)}
 .tgl .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3);transition:transform .18s}
 .tgl.on .knob{transform:translateX(22px)}
+.prof-av{flex:none;width:54px;height:54px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);cursor:pointer;font-size:1.7rem;display:flex;align-items:center;justify-content:center;padding:5px;transition:.12s}
+.prof-av:hover{border-color:var(--teal);transform:scale(1.06)}
+.prof-av .av-svg{width:100%;height:100%}
+.set-name{display:flex;gap:10px;align-items:center;padding:0 2px 14px}
+.set-name .cloud-in{flex:1}
+.set-name .btn{flex:none;padding:11px 16px}
 .set-foot{margin:16px 0 0;font-size:.78rem;color:var(--muted);font-weight:700;text-align:center}
 
 /* ===== Night mode (opt-in) — remap neutral tokens; most of the app is token-driven ===== */
@@ -1279,6 +1285,10 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
   <div class="amodal-card set-card">
     <button class="story-close" onclick="closeSettings()" aria-label="Close">✕</button>
     <h3>⚙️ Settings</h3>
+    <div class="set-row set-prof"><div class="set-tx"><b>👤 Your explorer</b><span>Change your name &amp; icon</span></div>
+      <button class="prof-av" id="setAvatarBtn" type="button" aria-label="Change my icon" title="Change my icon" onclick="closeSettings();openAvatarPicker(currentProfile)"></button></div>
+    <div class="set-name"><input id="setNameInput" class="cloud-in" type="text" maxlength="24" placeholder="Your name" aria-label="Your name" onkeydown="if(event.key==='Enter'){event.preventDefault();saveProfileName();}" />
+      <button class="btn btn-teal" id="setNameSave" type="button" onclick="saveProfileName()">Save</button></div>
     <div class="set-row"><div class="set-tx"><b>🌙 Night mode</b><span>Dark, night-sky theme</span></div>
       <button class="tgl" id="setNight" role="switch" aria-label="Night mode" onclick="toggleNight();syncSettings()"><span class="knob"></span></button></div>
     <div class="set-row"><div class="set-tx"><b>🔊 Sound &amp; haptics</b><span>Chimes, pops &amp; a gentle buzz</span></div>
@@ -6906,6 +6916,9 @@ const AVATAR_CATEGORIES=[
 const AVATAR_CHOICES=AVATAR_CATEGORIES.reduce((all,c)=>all.concat(c.icons),[]);
 function avatarFor(id){ try{return localStorage.getItem('globie_avatar_'+id)||DEFAULT_AVATARS[id]||'🙂';}catch(e){return DEFAULT_AVATARS[id]||'🙂';} }
 function avatarHTML(av){ return SVG_AVATARS[av]?`<span class="av-svg">${SVG_AVATARS[av]}</span>`:`<span>${esc(av)}</span>`; }
+/* names: an explorer can rename themselves — but only once signed in (see Settings) */
+function nameFor(id){ const base=(PROFILES.find(x=>x.id===id)||{}).name||''; try{ return (localStorage.getItem('globie_name_'+id)||'').trim()||base; }catch(e){ return base; } }
+function setName(id,nm){ nm=(nm||'').trim().replace(/\s+/g,' ').slice(0,24); if(!nm) return false; try{localStorage.setItem('globie_name_'+id,nm);}catch(e){} renderProfilePick(); updateProfileChip(); return true; }
 function setAvatar(id,av){ try{localStorage.setItem('globie_avatar_'+id,av);}catch(e){} renderProfilePick(); updateProfileChip(); }
 function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) return;
   s.classList.remove('hidden');
@@ -6913,11 +6926,11 @@ function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) ret
   document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); }
 function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
-  if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(p.name)+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
+  if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(nameFor(p.id))+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
 function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); storiesRead=loadStoriesRead(); wishlist=loadWish(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
-function profileName(){ const p=PROFILES.find(x=>x.id===currentProfile); return p?p.name:''; }
+function profileName(){ return currentProfile?nameFor(currentProfile):''; }
 function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
   showSplash(()=>{ setTimeout(maybeOnboard,180); }); }
 let _splashTimers=[], _splashCb=null;
@@ -6938,7 +6951,7 @@ function maybeOnboard(force){
   if(!force){ if(!currentProfile) return;
     try{ if(localStorage.getItem('globie_onboard_'+currentProfile)) return; }catch(e){} }
   const p=PROFILES.find(x=>x.id===currentProfile), t=document.getElementById('onbTitle');
-  if(t) t.textContent=p?('Welcome, '+p.name+'! 🐱'):'How Poppy’s Atlas works 🐱';
+  if(t) t.textContent=p?('Welcome, '+nameFor(p.id)+'! 🐱'):'How Poppy’s Atlas works 🐱';
   const o=document.getElementById('onboard'); if(o){ o.classList.remove('hidden'); const g=document.getElementById('onbGo'); if(g) setTimeout(()=>g.focus(),90); }
 }
 function forceOnboard(){ maybeOnboard(true); }
@@ -6949,18 +6962,16 @@ function closeOnboard(){
 function renderProfilePick(){
   const wrap=document.getElementById('profilePick'); if(!wrap) return;
   wrap.innerHTML=PROFILES.map(p=>`<div class="profile-card">
-    <button class="profile-btn" data-p="${p.id}"><span class="av">${avatarHTML(avatarFor(p.id))}</span><span class="nm">${esc(p.name)}</span></button>
-    <button class="av-edit" data-edit="${p.id}" aria-label="Change ${esc(p.name)}'s icon" title="Change icon">✏️</button></div>`).join('');
+    <button class="profile-btn" data-p="${p.id}"><span class="av">${avatarHTML(avatarFor(p.id))}</span><span class="nm">${esc(nameFor(p.id))}</span></button></div>`).join('');
   wrap.querySelectorAll('.profile-btn').forEach(b=>b.addEventListener('click',()=>pickProfile(b.dataset.p)));
-  wrap.querySelectorAll('.av-edit').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openAvatarPicker(b.dataset.edit);}));
 }
 function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id);
   document.getElementById('profilePick').hidden=true; document.getElementById('pinPad').hidden=false;
-  document.getElementById('pinGreet').textContent='Hi '+p.name+'! Enter your secret code 🔑';
+  document.getElementById('pinGreet').textContent='Hi '+nameFor(id)+'! Enter your secret code 🔑';
   document.getElementById('pinErr').textContent='';
   const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60); }
-function openAvatarPicker(id){ avatarEditing=id; const p=PROFILES.find(x=>x.id===id);
-  const n=document.getElementById('avName'); if(n) n.textContent=p?p.name:'';
+function openAvatarPicker(id){ if(!id) return; avatarEditing=id;
+  const n=document.getElementById('avName'); if(n) n.textContent=nameFor(id);
   const s=document.getElementById('avSearch'); if(s) s.value='';
   renderAvatarGrid(); const m=document.getElementById('avatarModal'); if(m) m.classList.remove('hidden'); }
 function closeAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
@@ -7023,6 +7034,14 @@ function syncSettings(){
   const n=document.documentElement.classList.contains('night'), sn=document.getElementById('setNight');
   if(sn){ sn.classList.toggle('on',n); sn.setAttribute('aria-checked',n); }
   const ss=document.getElementById('setSound'); if(ss){ ss.classList.toggle('on',soundOn); ss.setAttribute('aria-checked',soundOn); }
+  const ab=document.getElementById('setAvatarBtn'); if(ab) ab.innerHTML=currentProfile?avatarHTML(avatarFor(currentProfile)):'';
+  const ni=document.getElementById('setNameInput'); if(ni) ni.value=currentProfile?nameFor(currentProfile):'';
+}
+function saveProfileName(){
+  if(!currentProfile) return;
+  const ni=document.getElementById('setNameInput'); if(!ni) return;
+  if(setName(currentProfile,ni.value)){ ni.value=nameFor(currentProfile); sfx('good'); toast('Name saved! ✏️'); }
+  else { ni.value=nameFor(currentProfile); toast('Please type a name first'); }
 }
 function sfx(name){
   if(!soundOn||reduceMotion) return;
