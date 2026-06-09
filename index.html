@@ -814,7 +814,13 @@ html.night .qreveal.no{background:rgba(240,110,90,.16)}
 .amodal.hidden{display:none}
 .amodal-card{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:24px;text-align:center;max-height:86vh;overflow:auto}
 .amodal-card h3{font-size:1.35rem;margin-bottom:16px}
-.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:10px}
+.avatar-grid{display:block}
+.av-grid-cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:9px;margin-bottom:6px}
+.av-cat{text-align:left;font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin:14px 2px 8px;position:sticky;top:-4px;background:var(--surface);padding:4px 0;z-index:1}
+.av-cat:first-child{margin-top:2px}
+.av-empty{color:var(--ink-2);font-weight:700;font-size:.92rem;padding:24px 8px}
+.av-search{width:100%;border:2px solid var(--line);border-radius:12px;padding:10px 13px;font-family:var(--sans);font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:6px}
+.av-search:focus{outline:none;border-color:var(--teal)}
 .cloud-card{position:relative;text-align:left;max-width:480px}
 .cloud-lead{color:var(--ink-2);font-weight:600;font-size:.92rem;margin:0 0 14px;line-height:1.5}
 .cloud-status{font-weight:800;font-size:.85rem;padding:9px 12px;border-radius:10px;background:var(--surface-2);color:var(--ink-2);margin-bottom:12px}
@@ -1255,6 +1261,7 @@ html.night .journey,html.night .bp-stub,html.night .qsay,html.night .wc-metric{b
 <div id="avatarModal" class="amodal hidden">
   <div class="amodal-card">
     <h3>Pick <span id="avName"></span>'s icon</h3>
+    <input id="avSearch" class="av-search" type="search" placeholder="Search groups: animal, food, space…" aria-label="Search icon groups" oninput="renderAvatarGrid()">
     <div class="avatar-grid" id="avatarGrid"></div>
     <button class="btn btn-primary" id="avClose" style="width:100%;justify-content:center;margin-top:14px">Done</button>
   </div>
@@ -6859,7 +6866,22 @@ const SVG_AVATARS={
   pokeball:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#26262B" stroke-width="6"/><path d="M7 50a43 43 0 0 1 86 0z" fill="#FF5350"/><rect x="7" y="46" width="86" height="9" fill="#26262B"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#26262B" stroke-width="6"/><circle cx="50" cy="50" r="5" fill="#fff" stroke="#26262B" stroke-width="3"/></svg>`,
   poppie:`<img src="poppie.jpg" alt="Poppy" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
 };
-const AVATAR_CHOICES=['🐱','🐶','🦊','🦄','🐲','🐉','🦖','🦕','pokeball','⚡','👾','🤖','🐧','🦁','🐯','🐨','🐼','🐸','🦉','🦋','🐢','🦜','🐙','🦈','🐝','poppie','🌟','🚀','⚽','🎮','🦸','🧚'];
+/* —— a big, kid-friendly icon library, grouped into categories —— */
+const AVATAR_CATEGORIES=[
+  {name:'⭐ Favourites', icons:['poppie','pokeball','🐱','🦄','🚀','🌟','🐶','🦖','👾','🤖','🦸','🧚']},
+  {name:'🐾 Animals', icons:['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐻‍❄️','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦅','🦆','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🦗','🕷️','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🦬','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐈','🐈‍⬛','🐓','🦃','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦫','🦦','🦥','🐁','🐀','🐿️','🦔']},
+  {name:'😀 Faces & Fun', icons:['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃']},
+  {name:'🧑 People & Heroes', icons:['👶','🧒','👦','👧','🧑','👨','👩','🧓','👴','👵','🦸','🦸‍♂️','🦸‍♀️','🦹','🦹‍♂️','🦹‍♀️','🧙','🧙‍♂️','🧙‍♀️','🧚','🧚‍♂️','🧚‍♀️','🧜','🧜‍♂️','🧜‍♀️','🧛','🧝','🧝‍♂️','🧝‍♀️','🧞','🧟','👮','🕵️','💂','👷','🤴','👸','👳','👲','🧕','🤵','👰','🤰','🎅','🤶','🦷','👮‍♀️','👨‍🚀','👩‍🚀','👨‍🚒','👩‍🚒','👨‍🍳','👩‍🍳','👨‍🎤','👩‍🎤','👨‍🎨','👩‍🎨','👨‍⚕️','👩‍⚕️','👨‍🏫','👩‍🏫','🧑‍🚀','🧑‍🎤','🧑‍🎨']},
+  {name:'✋ Hands & Hearts', icons:['👋','🤚','🖐️','✋','🖖','👌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🙏','💪','❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💕','💞','💓','💗','💖','💘','💝','💟','❣️','💔','❤️‍🔥','💯','💫','⭐','🌟','✨','💥','💢','💦','💨']},
+  {name:'🦄 Fantasy & Magic', icons:['🦄','🐉','🐲','🧚','🧙','🧜','🧝','🧞','🧟','🦸','🦹','👑','💎','🔮','🪄','⚗️','🧪','🪐','🌈','☄️','🛸','👽','🤖','🎆','🎇','🧨','🎃','👻','🦖','🦕','🗿']},
+  {name:'🍕 Food & Treats', icons:['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🥦','🥕','🌽','🥔','🍠','🥐','🍞','🥖','🥨','🧀','🥚','🍳','🥞','🧇','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥗','🍿','🧈','🧂','🥫','🍱','🍣','🍤','🍙','🍚','🍜','🍲','🍛','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍩','🍪','🌰','🥜','🍯','🥛','🍼','☕','🍵','🥤','🧃','🧋','🍓']},
+  {name:'⚽ Sports & Games', icons:['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🥅','🏒','🏑','🥍','🏏','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🥌','🎿','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚴','🚵','🎮','🕹️','🎲','🧩','♟️','🎯','🎳','🎰','🎪','🎭','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🎷','🎺','🎸','🪕','🎻']},
+  {name:'🚀 Travel & Space', icons:['🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🚨','🚔','🚍','🚘','🚖','🚡','🚠','🚟','🚃','🚋','🚞','🚝','🚄','🚅','🚈','🚂','🚆','🚇','🚊','🚉','✈️','🛫','🛬','🛩️','💺','🚀','🛸','🚁','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚧','⛽','🚦','🚥','🗺️','🗿','🗽','🗼','🏰','🏯','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏔️','⛰️','🌋','🗻','🏕️','⛺','🌍','🌎','🌏','🌐']},
+  {name:'🌈 Nature & Weather', icons:['🌸','💮','🏵️','🌹','🥀','🌺','🌻','🌼','🌷','🌱','🌲','🌳','🌴','🌵','🌾','🌿','☘️','🍀','🍁','🍂','🍃','🍄','🌰','🦋','🐚','🌍','🌝','🌞','🌛','🌜','🌚','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🌙','⭐','🌟','💫','✨','☄️','🪐','🌠','🌌','☀️','🌤️','⛅','🌥️','☁️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','☃️','⛄','🌬️','💨','🌪️','🌫️','🌈','🔥','💧','🌊']},
+  {name:'🎉 Things & Symbols', icons:['⌚','📱','💻','⌨️','🖥️','🖨️','🕹️','💾','💿','📷','📸','📹','🎥','📺','📻','🧭','⏰','⏳','📡','🔋','🔌','💡','🔦','🕯️','🧯','🛢️','💸','💵','💴','💶','💷','💰','💳','💎','⚖️','🧰','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🧱','⛓️','🧲','🔫','💣','🧨','🪓','🔪','🛡️','🚬','⚰️','🏺','🔭','🔬','🕳️','💊','💉','🩹','🩺','🌡️','🧬','🦠','🧫','🧪','🌂','🧵','🧶','👓','🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳','👙','👚','👛','👜','👝','🎒','👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒','🎩','🎓','🧢','⛑️','💄','💍','💼','🎀','🎁','🎈','🎉','🎊','🎄','🎋','🎍','🎎','🎏','🎐','🎑','🧧','🏮','🎗️','🏆','🏅','🥇','🥈','🥉','🔔','🎵','🎶','➕','➖','✖️','➗','♾️','‼️','❓','❔','❗','❕','〰️','🔱','⚜️','🔰','✅','💠','🌀','🔆','🔅','♻️']}
+];
+/* flat list — kept for any code that wants every choice in one array */
+const AVATAR_CHOICES=AVATAR_CATEGORIES.reduce((all,c)=>all.concat(c.icons),[]);
 function avatarFor(id){ try{return localStorage.getItem('globie_avatar_'+id)||DEFAULT_AVATARS[id]||'🙂';}catch(e){return DEFAULT_AVATARS[id]||'🙂';} }
 function avatarHTML(av){ return SVG_AVATARS[av]?`<span class="av-svg">${SVG_AVATARS[av]}</span>`:`<span>${esc(av)}</span>`; }
 function setAvatar(id,av){ try{localStorage.setItem('globie_avatar_'+id,av);}catch(e){} renderProfilePick(); updateProfileChip(); if(document.getElementById('avatarGrid')) renderAvatarGrid(); }
@@ -6917,10 +6939,20 @@ function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id)
   const pi=document.getElementById('pinInput'); pi.value=''; setTimeout(()=>pi.focus(),60); }
 function openAvatarPicker(id){ avatarEditing=id; const p=PROFILES.find(x=>x.id===id);
   const n=document.getElementById('avName'); if(n) n.textContent=p?p.name:'';
+  const s=document.getElementById('avSearch'); if(s) s.value='';
   renderAvatarGrid(); const m=document.getElementById('avatarModal'); if(m) m.classList.remove('hidden'); }
 function closeAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
 function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!g) return; const cur=avatarFor(avatarEditing);
-  g.innerHTML=AVATAR_CHOICES.map(a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`).join('');
+  const q=(document.getElementById('avSearch')?.value||'').trim().toLowerCase();
+  const cell=a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`;
+  const cats=q ? AVATAR_CATEGORIES.filter(c=>c.name.toLowerCase().includes(q)) : AVATAR_CATEGORIES;
+  if(!cats.length){
+    g.innerHTML=`<p class="av-empty">No groups match “${esc(q)}” — try “animal”, “food”, “space”, “sport”… 🔎</p>`;
+  } else {
+    g.innerHTML=cats.map(cat=>
+      `<h4 class="av-cat">${esc(cat.name)}</h4><div class="av-grid-cells">${cat.icons.map(cell).join('')}</div>`
+    ).join('');
+  }
   g.querySelectorAll('.av-choice').forEach(b=>b.addEventListener('click',()=>setAvatar(avatarEditing,b.dataset.a))); }
 function setupLogin(){
   const mk=document.getElementById('loginMark');
