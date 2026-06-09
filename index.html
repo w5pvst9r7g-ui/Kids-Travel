@@ -975,6 +975,25 @@ html.night .pack-trip{background:var(--surface);border-color:var(--line-2)}
 @keyframes speakPulse{0%,100%{box-shadow:0 0 0 0 rgba(47,174,162,.5)}50%{box-shadow:0 0 0 6px rgba(47,174,162,0)}}
 html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 @media(prefers-reduced-motion:reduce){.ph-speak.speaking{animation:none}}
+/* —— Yummy food cards —— */
+.foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px;margin-top:6px}
+.foodcard{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow-sm);transition:.16s}
+.foodcard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--teal)}
+.foodcard .food-emoji{flex:none;width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.95rem;background:var(--surface-2);border:2px solid var(--line)}
+.foodcard .food-body{min-width:0}
+.foodcard .food-name{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.1rem;line-height:1.15}
+.foodcard .food-body p{color:var(--ink-2);font-weight:600;font-size:.9rem;margin:3px 0 9px;line-height:1.35}
+.food-tag{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 10px}
+.tag-main{background:#D5F3EF;color:#0A7F78}
+.tag-snack{background:#FCEFC9;color:#8a6300}
+.tag-sweet{background:#FFE0EC;color:#b03a6b}
+.tag-drink{background:#DBEEFB;color:#2C6FA6}
+.foodcard.food-sweet .food-emoji{background:#FFE9F1;border-color:#FBC4D8}
+html.night .foodcard,html.night .foodcard .food-emoji{background:var(--surface);border-color:var(--line-2)}
+html.night .tag-main{background:rgba(47,174,162,.2);color:#7fe0d6}
+html.night .tag-snack{background:rgba(244,203,118,.2);color:#f4cb76}
+html.night .tag-sweet{background:rgba(255,127,176,.2);color:#ff9ec4}
+html.night .tag-drink{background:rgba(70,179,240,.2);color:#8fcdf6}
 /* —— local cat story: cover card —— */
 .catcover-list{display:grid;gap:14px}
 .catcover{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;width:100%;text-align:left;
@@ -1598,6 +1617,30 @@ function placePic(t,w,h){
   return "<img class=\"fade\" loading=\"lazy\" decoding=\"async\" width=\""+w+"\" height=\""+h+"\" alt=\""+esc(t.city)+"\" src=\""+cands[0]+"\" data-fallbacks=\""+esc(JSON.stringify(cands.slice(1)))+"\" onload=\"this.classList.add('ld')\" onerror=\"imgFail(this)\">";
 }
 
+
+/* —— Yummy food of each country (kid-appealing dishes, snacks & sweet treats) ——
+   keyed by country name; tags: main / snack / sweet / drink */
+const FOOD_BY_COUNTRY = {
+  "Albania":[["🥧","Byrek","A flaky pastry pie stuffed with cheese, spinach or meat.","snack"],["🍢","Qofte","Little grilled meatballs, yummy tucked into bread.","main"],["🍚","Tavë kosi","Baked lamb and rice in a creamy yogurt sauce.","main"],["🍦","Akullore","Albanian ice cream — a must on a hot day.","sweet"],["🍩","Petulla","Fried dough puffs dusted with sugar or drizzled with honey.","sweet"],["🍯","Revani","A sweet, syrupy semolina sponge cake.","sweet"]],
+  "Australia":[["🥧","Meat pie","A hot little pastry pie filled with savoury minced beef.","main"],["🍫","Tim Tam","A chocolate biscuit you can bite both ends off and sip warm milk through!","sweet"],["🍞","Vegemite toast","Salty dark spread Aussies love — try a thin scrape!","snack"],["🍮","Pavlova","A fluffy meringue cake piled with cream and fresh fruit.","sweet"],["🌈","Fairy bread","Buttered bread covered in rainbow sprinkles — a party classic.","sweet"],["🍤","Prawns on the barbie","Sweet prawns sizzled on the barbecue by the beach.","main"]],
+  "Croatia":[["🍝","Black risotto","Squid-ink rice that turns your tongue black!","main"],["🥩","Ćevapi","Little grilled sausages served with fluffy flatbread.","main"],["🧀","Štrukli","Baked dough pockets oozing with soft cheese.","main"],["🍩","Fritule","Tiny sweet doughnut balls with raisins.","sweet"],["🍦","Sladoled","Croatian gelato, eaten all along the sunny coast.","sweet"],["🍮","Rožata","A silky caramel custard pudding.","sweet"]],
+  "Finland":[["🥧","Karelian pie","A rye-crust boat filled with creamy rice.","snack"],["🧆","Lihapullat","Finnish meatballs with sweet lingonberry jam.","main"],["🐟","Salmon soup","Warm, creamy soup for cold snowy days.","main"],["🫐","Blueberry pie","Made with wild berries picked in the forest.","sweet"],["🍞","Pulla","Sweet cardamom bread, twisted and braided.","sweet"],["🍬","Salmiakki","Salty liquorice sweets — a brave taste test!","sweet"]],
+  "France":[["🥐","Croissant","A buttery, flaky crescent pastry for breakfast.","sweet"],["🥖","Baguette","A long crusty loaf, perfect with cheese.","snack"],["🥞","Crêpe","A thin pancake folded around chocolate, jam or sugar.","sweet"],["🐌","Escargots","Yes — snails in garlicky butter. Dare you?","main"],["🧀","Croque-monsieur","A toasted ham sandwich with melty cheese on top.","main"],["🌈","Macarons","Rainbow almond cookies with a creamy filling.","sweet"]],
+  "Greece":[["🥙","Gyros","Warm pita wrapped around meat, tomato and chips.","main"],["🥧","Spanakopita","A flaky spinach and feta cheese pie.","snack"],["🍢","Souvlaki","Grilled meat skewers straight off the coals.","main"],["🍯","Baklava","Sweet layered pastry packed with nuts and honey.","sweet"],["🍩","Loukoumades","Honey-soaked doughnut balls.","sweet"],["🍦","Yogurt & honey","Thick Greek yogurt with a golden honey drizzle.","sweet"]],
+  "Iceland":[["🌭","Pylsur","An Icelandic hot dog with crispy onions.","snack"],["🍲","Kjötsúpa","Hearty lamb and vegetable soup.","main"],["🐟","Plokkfiskur","Creamy mashed fish with potato.","main"],["🍮","Skyr","Thick, smooth yogurt eaten with berries.","sweet"],["🍩","Kleinur","Twisted little fried doughnuts.","sweet"],["🍞","Rúgbrauð","Dark rye bread baked using hot-spring steam!","snack"]],
+  "Maldives":[["🐟","Mas huni","Shredded tuna, coconut and onion — a breakfast favourite.","main"],["🫓","Roshi","Soft flatbread to scoop up curries.","snack"],["🍢","Gulha","Fried dough balls stuffed with spicy tuna.","snack"],["🥥","Fresh coconut","Sipped ice-cold straight from the shell.","drink"],["🍮","Bondibai","Sweet coconut rice pudding.","sweet"],["🍌","Banana fritters","Bananas battered and fried until sweet and warm.","sweet"]],
+  "Morocco":[["🍲","Tagine","A slow-cooked stew served in a cone-shaped pot.","main"],["🍚","Couscous","Fluffy tiny grains piled with veg and meat.","main"],["🥧","Pastilla","A sweet-and-savoury pie dusted with icing sugar.","main"],["🍪","Chebakia","Sesame cookies dipped in honey.","sweet"],["🍵","Mint tea","Sweet tea poured from way up high.","drink"],["🥞","Msemen","Square pan-fried pancakes drizzled with honey.","sweet"]],
+  "New Zealand":[["🥧","Mince pie","A flaky pie full of savoury beef.","main"],["🍠","Hāngī","Food cooked underground over hot stones — a Māori feast.","main"],["🍮","Pavlova","Meringue cake topped with cream and kiwifruit.","sweet"],["🍦","Hokey pokey","Vanilla ice cream with crunchy honeycomb bits.","sweet"],["🐟","Fish & chips","Eaten on the beach straight from the paper.","main"],["🍪","Afghan biscuit","A chocolate cornflake cookie topped with a walnut.","sweet"]],
+  "Portugal":[["🍮","Pastel de nata","A warm custard tart with a crispy, flaky shell.","sweet"],["🐟","Bacalhau","Salted codfish cooked a hundred different ways.","main"],["🥪","Bifana","A juicy pork sandwich in a soft roll.","main"],["🍗","Piri-piri chicken","Grilled chicken with a little spicy kick.","main"],["🍩","Bola de Berlim","A sugary doughnut filled with custard cream.","sweet"],["🐟","Grilled sardines","A summer festival favourite by the sea.","main"]],
+  "Singapore":[["🍗","Chicken rice","Tender chicken with fragrant, tasty rice.","main"],["🍜","Laksa","A coconut noodle soup, mild or spicy.","main"],["🥞","Roti prata","A flaky flipped pancake with curry to dip.","snack"],["🍢","Satay","Grilled skewers with peanut dipping sauce.","main"],["🍧","Ice kacang","A mountain of shaved ice with syrups and jelly.","sweet"],["🍞","Kaya toast","Toast spread with sweet coconut-egg jam.","sweet"]],
+  "South Africa":[["🌭","Boerewors","A coiled farmer's sausage off the braai (barbecue).","main"],["🥟","Bunny chow","A hollow bread loaf filled with curry.","main"],["🥩","Biltong","Chewy dried, spiced meat — a snack on the go.","snack"],["🍮","Malva pudding","Warm, sticky apricot sponge with custard.","sweet"],["🍩","Koeksisters","Plaited doughnuts soaked in sweet syrup.","sweet"],["🌽","Pap","Soft maize porridge, eaten with almost everything.","main"]],
+  "Spain":[["🥘","Paella","Saffron rice loaded with seafood or chicken.","main"],["🍅","Patatas bravas","Fried potato cubes with a spicy tomato sauce.","snack"],["🍫","Churros","Fried dough sticks for dunking in thick hot chocolate.","sweet"],["🥪","Jamón","Wafer-thin slices of cured ham.","snack"],["🍳","Tortilla española","A thick, golden potato omelette.","main"],["🍦","Turrón","A sweet almond nougat treat.","sweet"]],
+  "Turkey":[["🥙","Döner kebab","Meat carved off a spinning stack into warm bread.","main"],["🥟","Pide","A boat-shaped Turkish \"pizza\".","main"],["🍢","Köfte","Spiced grilled meatballs.","main"],["🍯","Baklava","Nutty, syrupy layered pastry.","sweet"],["🍦","Dondurma","Stretchy ice cream the seller plays tricks with!","sweet"],["🍬","Turkish delight","Soft, chewy rose-flavoured jelly cubes (lokum).","sweet"]],
+  "United Kingdom":[["🐟","Fish & chips","Battered fish with thick, chunky chips.","main"],["🍗","Sunday roast","Roast meat, potatoes and Yorkshire pudding.","main"],["🌭","Bangers & mash","Sausages piled on creamy mashed potato.","main"],["🧁","Victoria sponge","A jam-and-cream layer cake.","sweet"],["🍮","Sticky toffee pudding","Warm date sponge drowned in toffee sauce.","sweet"],["🍞","Scones","With jam and cream — a proper afternoon-tea treat.","sweet"]],
+  "United States":[["🍔","Cheeseburger","A juicy beef patty with melty cheese.","main"],["🌭","Hot dog","A sausage in a bun with ketchup and mustard.","snack"],["🥞","Pancakes","Fluffy stacks drowning in maple syrup.","sweet"],["🍪","Choc-chip cookies","Gooey and warm, straight from the oven.","sweet"],["🍨","Banana split","Three scoops of ice cream with all the toppings.","sweet"],["🧀","Mac & cheese","Creamy, cheesy baked pasta.","main"]],
+  "Vanuatu":[["🍠","Laplap","Grated root veg baked in banana leaves — the national dish.","main"],["🦀","Coconut crab","A giant crab cooked in rich coconut.","main"],["🐟","Coconut fish","Fresh fish in creamy coconut milk.","main"],["🌿","Simboro","Banana-leaf rolls filled with island greens.","main"],["🥥","Fresh coconut","Sipped straight from the palm.","drink"],["🍍","Tropical fruit","Sweet pineapple, mango and pawpaw.","sweet"]]
+};
+FOOD_BY_COUNTRY["Türkiye"]=FOOD_BY_COUNTRY["Turkey"];
 
 const DESTS = [
 {
@@ -5582,7 +5625,7 @@ function openDest(id){
     <img class="dhero-poppie" loading="lazy" alt="" src="poppie-walk.png">`;
   document.getElementById('dlead').textContent=d.tagline;
 
-  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🎢 Fun stuff to do'],['cat','🐾 Local cat'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
+  const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🎢 Fun stuff to do'],['food','🍽️ Yummy food'],['cat','🐾 Local cat'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
   const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
   dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
@@ -5670,6 +5713,7 @@ function openDest(id){
         <div class="rating">${stars(k[3])}<span class="num2">${k[3]}</span><span class="rev">${k[4]} reviews</span></div>
         <a class="maplink" href="${gmap(k[5])}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Maps</a>
       </div></div>`).join(''),
+    food:foodPanelHTML(d),
     quiz:quizPanelHTML(d)
   };
   document.getElementById('panels').innerHTML=tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}" role="tabpanel" aria-labelledby="tab-${t[0]}" tabindex="0" ${i!==0?'hidden':''}>${panels[t[0]]}</div>`).join('');
@@ -6624,6 +6668,17 @@ function pickVaried(pool,n,seed){
   return out.slice(0,n);
 }
 function buildQuiz(d){ const {pool,seed}=buildQuizPool(d); return pickVaried(pool,Math.min(QUIZ_LEN,pool.length),seed); }
+const FOOD_TAGS={main:['🍽️','Main dish'],snack:['🥨','Snack'],sweet:['🍨','Sweet treat'],drink:['🥤','Drink']};
+function foodPanelHTML(d){
+  const list=(typeof FOOD_BY_COUNTRY!=='undefined')&&(FOOD_BY_COUNTRY[d.country]||FOOD_BY_COUNTRY[d.name]);
+  if(!list||!list.length) return `<h3 class="blockhead">🍽️ Yummy food</h3><p class="sub">Tasty dishes from ${esc(d.country)} are coming soon!</p>`;
+  return `<h3 class="blockhead">🍽️ Yummy food in ${esc(d.country)}</h3>
+    <p class="sub">Delicious things to try — including some sweet treats! 😋</p>
+    <div class="foodgrid">${list.map(f=>{ const t=FOOD_TAGS[f[3]]||FOOD_TAGS.main;
+      return `<div class="foodcard food-${f[3]}"><div class="food-emoji" aria-hidden="true">${f[0]}</div>
+        <div class="food-body"><div class="food-name">${esc(f[1])}</div><p>${esc(f[2])}</p>
+        <span class="food-tag tag-${f[3]}">${t[0]} ${t[1]}</span></div></div>`;}).join('')}</div>`;
+}
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
   return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>

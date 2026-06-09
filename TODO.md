@@ -117,6 +117,8 @@ Last updated: 2026-06-06
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Fix: cloud sync / dialog modals wouldn't close** — the back-button history stack corrupted when one modal opened another (Settings → Cloud), leaving the ✕ dead; reverted dialog modals (settings, cloud, avatar, Poppy pop-up) to plain show/hide and kept the back-button stack only for full-screen content layers (lightbox, story, detail)
+- [x] **🍽️ "Yummy food" tab on every destination** — a new guide section with the country's signature dishes, snacks, drinks and kid-pleasing sweet treats (croissants, churros, pavlova, Turkish delight, ice kacang…), each with an emoji, a kid-friendly description and a colour-coded tag (Main / Snack / Sweet treat / Drink). Covers all 37 destinations via 18 cuisines, light + night mode.
 - [x] Cat stories: cover (name) on the tab → opens a full-screen page-turner (5–7 pages, story arc) with the cat narrating in a speech bubble
 - [x] **Local cat’s tale** tab on every destination (37 tales) + 5-chapter series for the 3 upcoming trips
 
