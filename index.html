@@ -6454,7 +6454,7 @@ const ACHIEVEMENTS=[
   {id:'beach_lover',em:'🏖️',nm:'Beach Lover',ds:'Visit a beach or island spot',ac:'#0FA7AF',test:c=>c.regions.has('Beach')},
   {id:'city_slicker',em:'🏙️',nm:'City Slicker',ds:'Visit a big city',ac:'#F46A4B',test:c=>c.regions.has('City')},
   {id:'safari',em:'🦒',nm:'Safari Spotter',ds:'Visit a wildlife spot',ac:'#43C28A',test:c=>c.regions.has('Wildlife')},
-  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland/Lapland)',ac:'#5BB8F0',test:c=>c.regions.has('Snow')||c.countries.has('Iceland')||c.countries.has('Finland')},
+  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy winter land (Alps or Lapland)',ac:'#5BB8F0',test:c=>c.regions.has('Snow')||['Iceland','Finland','Austria','Switzerland','Norway','Sweden'].some(n=>c.countries.has(n))},
   // —— places ——
   {id:'down_under',em:'🦘',nm:'Down Under',ds:'Visit Australia',ac:'#43C28A',test:c=>c.countries.has('Australia')},
   {id:'kiwi',em:'🥝',nm:'Kiwi Explorer',ds:'Visit New Zealand',ac:'#34B47E',test:c=>c.countries.has('New Zealand')},
