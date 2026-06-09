@@ -6422,6 +6422,8 @@ function printPassport(){
   let km=0; done.forEach(t=>{ if(t.lat!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
   const levels=[{n:0,t:'Junior Explorer'},{n:1,t:'Pathfinder'},{n:3,t:'Globetrotter'},{n:5,t:'World Explorer'},{n:8,t:'Legendary Voyager'}];
   let rank=levels[0].t; levels.forEach(l=>{ if(countries>=l.n) rank=l.t; });
+  const badges=(typeof unlockedAch!=='undefined')?unlockedAch.size:0;
+  const foodsTried=(typeof triedFoods!=='undefined')?triedFoods.size:0;
   const sorted=trips.slice().sort((a,b)=>(a.planned-b.planned)||((b.year||0)-(a.year||0)));
   const stamps=sorted.map(t=>`<div class="pp-stamp ${t.planned?'soon':''}">
       <div class="fl">${esc(t.flag||t.emoji||'🌍')}</div>
@@ -6440,6 +6442,8 @@ function printPassport(){
       <div class="pp-stat"><b>${done.length}</b><span>Adventures</span></div>
       <div class="pp-stat"><b>${km.toLocaleString()}</b><span>km flown</span></div>
       <div class="pp-stat"><b>${planned.length}</b><span>Coming up</span></div>
+      <div class="pp-stat"><b>${badges}</b><span>Badges</span></div>
+      ${foodsTried?`<div class="pp-stat"><b>${foodsTried}</b><span>Foods tried</span></div>`:''}
     </div>
     <div class="pp-grid">${stamps}</div>
     <div class="pp-foot">✈️ Printed from Poppy's Atlas — keep exploring! 🐱</div>
