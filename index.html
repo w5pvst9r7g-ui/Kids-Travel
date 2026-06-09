@@ -848,7 +848,7 @@ html.night .qreveal.no{background:rgba(240,110,90,.16)}
 .egg.hidden{display:none}
 .egg-card{text-align:center;max-width:480px}
 .egg-cat{width:min(72vw,360px);height:auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
-.egg-cat.photo{width:min(72vw,320px);aspect-ratio:1;object-fit:cover;border-radius:24px;border:4px solid #fff}
+.egg-cat.photo{width:min(72vw,320px);aspect-ratio:1;object-fit:cover;object-position:50% 30%;border-radius:24px;border:4px solid #fff;background:#CDEFE6}
 .egg-cat.pop{animation:eggpop .6s cubic-bezier(.2,1.35,.4,1) both}
 @keyframes eggpop{0%{transform:scale(.2) rotate(-14deg);opacity:0}55%{transform:scale(1.14) rotate(5deg)}72%{transform:scale(.95) rotate(-3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 .egg-bubble{margin-top:18px;background:#fff;color:var(--ink);border-radius:20px;padding:16px 22px;font-family:var(--display);font-weight:800;font-size:clamp(1.1rem,3.8vw,1.55rem);line-height:1.3;box-shadow:var(--shadow);position:relative;animation:eggrise .4s .15s both}
@@ -1515,7 +1515,20 @@ const gmap  = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeUR
    different ways on Apple vs Android). Reused for the map, boarding pass, login & splash. */
 const PLANE_SVG='<svg class="psvg" viewBox="0 0 230 90" aria-hidden="true"><defs><filter id="plf" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="2.8"/></filter><linearGradient id="plc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".72"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs><g filter="url(#plf)"><path d="M158 40 C115 39 65 35 6 24 C65 45 115 43 158 42 Z" fill="url(#plc)"/><path d="M158 50 C115 51 65 55 6 66 C65 45 115 47 158 48 Z" fill="url(#plc)"/><circle cx="40" cy="29" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="33" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="36" r="8.5" fill="#fff" opacity=".5"/><circle cx="40" cy="61" r="13" fill="#fff" opacity=".62"/><circle cx="64" cy="57" r="11" fill="#fff" opacity=".58"/><circle cx="90" cy="54" r="8.5" fill="#fff" opacity=".5"/></g><g stroke="rgba(20,32,56,.4)" stroke-width="1.4" stroke-linejoin="round"><path d="M168 42 L132 14 L124 17 L150 44 Z" fill="#c8d5e8"/><path d="M168 48 L132 76 L124 73 L150 46 Z" fill="#b4c3db"/><path d="M138 43 L120 31 L114 34 L130 45 Z" fill="#c8d5e8"/><path d="M138 47 L120 59 L114 56 L130 45 Z" fill="#b4c3db"/><path d="M120 45 L108 43 L108 47 Z" fill="#aebfd6"/><path d="M123 38 L198 41 Q214 45 198 49 L123 52 Q114 52 114 45 Q114 38 123 38 Z" fill="#ffffff"/><rect x="150" y="36.5" width="13" height="5" rx="2.5" fill="#93a4be" stroke="none"/><rect x="150" y="48.5" width="13" height="5" rx="2.5" fill="#8294b0" stroke="none"/><path d="M201 45 q5 -3 9 0 q-5 3 -9 0Z" fill="#6aa6dd" stroke="none"/></g></svg>';
 const flyPlane=()=>PLANE_SVG;
-const flick = (kw, lock, w=800, h=600) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
+/* Generic, cat-friendly scene/colour/breed words that genuinely co-occur with the
+   "cat" tag on Flickr. Proper-noun place names (maldives, morocco, paris…) are
+   deliberately excluded: pairing them with "cat" via /all usually finds ZERO photos,
+   and loremflickr then quietly serves a random non-cat image (e.g. a boy on a beach). */
+const CAT_SAFE_TAGS=new Set(['beach','sea','coast','ocean','island','tropical','palm','sand','dunes','harbour','sails','boat','pier','river','lake','snow','mountain','street','alley','market','rooftop','window','city','town','tram','garden','park','sunset','colourful','fluffy','tabby','ginger','black','white','golden','kitten','sleeping']);
+/* Cat photos via loremflickr. Always force the "cat" tag and append the "/all"
+   matcher so the photo must contain a cat; only ever add a second tag drawn from
+   the cat-safe list above, so the tag pair always has real cat photos to return. */
+const flick = (kw, lock, w=800, h=600) => {
+  const parts=String(kw).split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const extra=parts.find(t=>t!=='cat'&&CAT_SAFE_TAGS.has(t));
+  const tags=extra?['cat',extra]:['cat'];
+  return `https://loremflickr.com/${w}/${h}/${tags.map(encodeURIComponent).join(',')}/all?lock=${lock}`;
+};
 const esc   = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 /* trips that visited a given destination guide (links Map/Journal <-> Explore) */
 const tripsForDest = id => trips.filter(t=>t.destId===id);
@@ -1524,11 +1537,8 @@ function exploreFromMap(id){ try{ if(map&&map.closePopup) map.closePopup(); }cat
    Poppy illustration (on-brand) — never a random non-cat stock image. */
 const CAT_POSES=['poppie-sit.png','poppie-walk.png','poppie-play.png','poppie-calm.png','poppie-stand.png','poppie-fish.png','poppie-sit2.png'];
 const pimg  = (kw, lock, w, h, alt='') => {
-  let parts=String(kw).split(',').map(s=>s.trim()).filter(Boolean);
-  if(parts[0]!=='cat') parts.unshift('cat');
-  const k=parts.slice(0,2).join(',');
   const fb=[CAT_POSES[Math.abs(lock||0)%CAT_POSES.length]];   /* varied per tale so covers differ even offline */
-  return `<img class="fade" loading="lazy" decoding="async" width="${w}" height="${h}" alt="${esc(alt)}" src="${flick(k,lock,w,h)}" data-fallbacks="${esc(JSON.stringify(fb))}" onload="this.classList.add('ld')" onerror="imgFail(this)">`;
+  return `<img class="fade" loading="lazy" decoding="async" width="${w}" height="${h}" alt="${esc(alt)}" src="${flick(kw,lock,w,h)}" data-fallbacks="${esc(JSON.stringify(fb))}" onload="this.classList.add('ld')" onerror="imgFail(this)">`;
 };
 /* caption that matches the curated gallery image for a slot (keeps labels in step) */
 /* turn a Wikimedia filename into a tidy, accurate caption */
@@ -5320,12 +5330,9 @@ function openStory(id,si){
   const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=story.title;
   const img=document.getElementById('storyCatImg');
   if(img){
-    /* lead with the "cat" tag and keep it to 2 tags — loremflickr requires ALL tags to match,
-       so a long keyword often returns a scene with no cat in it */
-    var parts=(c.photoKw||('cat,'+id)).split(',').map(s=>s.trim()).filter(Boolean);
-    if(parts[0]!=='cat') parts.unshift('cat');
-    var kw=parts.slice(0,2).join(',');
-    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(kw,77,520,520);
+    /* flick() forces the "cat" tag and uses loremflickr's /all matcher, so the
+       story cover always shows a real cat; fall back to a Poppy illustration on error. */
+    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(c.photoKw||('cat,'+id),77,520,520);
   }
   renderStoryPage();
   const sr=document.getElementById('storyReader'); const wasHidden=sr.classList.contains('hidden');
