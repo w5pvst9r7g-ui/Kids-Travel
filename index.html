@@ -5585,7 +5585,26 @@ function getPin(){ try{ const v=localStorage.getItem(PIN_KEY); if(v && /^\d{4}$/
 function setPin(v){ try{ localStorage.setItem(PIN_KEY,v); return true; }catch(e){ return false; } }
 let currentProfile=null;             // chosen at the login screen each visit
 const dataKey=base=>'globie_atlas_'+base+'_v9_'+(currentProfile||'guest');
-function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
+/* One-time merge of newly-added booked seed trips into an existing saved
+   journal. loadTrips() only falls back to SEED_TRIPS for a brand-new profile,
+   so without this an existing user would never see a trip we add later (e.g.
+   Milan). Guarded by a per-profile flag so a trip the user later deletes is
+   not resurrected. */
+const NEW_SEED_TRIP_IDS=['t36']; // Milan, Italy (Jul 2026)
+function migrateTrips(arr){
+  try{
+    const flag=dataKey('seedmilan');
+    if(localStorage.getItem(flag)==='1') return arr;
+    let added=false;
+    SEED_TRIPS.filter(t=>NEW_SEED_TRIP_IDS.includes(t.id)).forEach(seed=>{
+      if(!arr.some(t=>t&&t.id===seed.id)){ arr.push(JSON.parse(JSON.stringify(seed))); added=true; }
+    });
+    localStorage.setItem(flag,'1');
+    if(added){ try{ localStorage.setItem(dataKey('trips'),JSON.stringify(arr)); }catch(e){} }
+  }catch(e){}
+  return arr;
+}
+function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return migrateTrips(v);}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
