@@ -5410,15 +5410,21 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
   const c=(onDetail&&currentDest&&typeof LOCAL_CATS!=='undefined')?LOCAL_CATS[currentDest.id]:null;
   let line;
   if(c){
-    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; this.classList.remove('photo'); };
+    /* loremflickr can be slow or hang, which would leave just the turquoise box.
+       Fall back to a Poppy illustration on error OR if the photo hasn't arrived in time. */
+    img.dataset.eggDone='';
+    const toPoppy=()=>{ if(img.dataset.eggDone==='1') return; img.dataset.eggDone='1'; img.onerror=null; img.onload=null; img.classList.remove('photo'); img.src='poppie-hi.png'; };
+    img.onload=function(){ img.dataset.eggDone='1'; };
+    img.onerror=toPoppy;
     img.classList.add('photo');
     img.src=flick(c.photoKw||('cat,'+currentDest.name), 99, 640, 640);
+    setTimeout(()=>{ if(img.dataset.eggDone!=='1' && !(img.complete && img.naturalWidth>0)) toPoppy(); }, 2500);
     const things=(currentDest.attractions&&currentDest.attractions.map(a=>a[1]))||[];
     const thing=things.length?things[Math.floor(Math.random()*things.length)]:currentDest.name;
     const T=localInsults(c.name, currentDest.name, thing);
     line=T[Math.floor(Math.random()*T.length)];
   } else {
-    img.onerror=null; img.classList.remove('photo'); img.src='poppie-hi.png';
+    img.onerror=null; img.onload=null; img.classList.remove('photo'); img.src='poppie-hi.png';
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
@@ -5490,9 +5496,15 @@ function openStory(id,si){
   const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=story.title;
   const img=document.getElementById('storyCatImg');
   if(img){
-    /* flick() forces the "cat" tag and uses loremflickr's /all matcher, so the
-       story cover always shows a real cat; fall back to a Poppy illustration on error. */
-    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(c.photoKw||('cat,'+id),77,520,520);
+    /* flick() forces the "cat" tag and uses loremflickr's /all matcher, so the cover
+       shows a real cat. Fall back to a Poppy illustration on error OR if loremflickr is
+       slow to respond, so the reader never gets stuck on an empty turquoise box. */
+    img.dataset.catDone='';
+    const toPoppy=()=>{ if(img.dataset.catDone==='1') return; img.dataset.catDone='1'; img.onerror=null; img.onload=null; img.src='poppie-hi.png'; };
+    img.onload=function(){ img.dataset.catDone='1'; };
+    img.onerror=toPoppy;
+    img.src=flick(c.photoKw||('cat,'+id),77,520,520);
+    setTimeout(()=>{ if(img.dataset.catDone!=='1' && !(img.complete && img.naturalWidth>0)) toPoppy(); }, 2500);
   }
   renderStoryPage();
   const sr=document.getElementById('storyReader'); const wasHidden=sr.classList.contains('hidden');
