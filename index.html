@@ -1451,6 +1451,22 @@ create policy "atlas all" on atlas_sync
   </div>
 </div>
 
+<div id="postcardModal" class="amodal hidden" role="dialog" aria-modal="true" aria-label="Send postcard" onclick="if(event.target.id==='postcardModal')closePostcard()">
+  <div class="amodal-card cloud-card">
+    <button class="story-close" onclick="closePostcard()" aria-label="Close">✕</button>
+    <h3>📮 Send your postcard</h3>
+    <p class="cloud-lead">Your note is saved here in your Mail. To pop it onto your friend's device, send them this — any way you like! When they open it, it lands right in their Mail. 💌</p>
+    <label class="cloud-l" for="pcLink">Postcard link</label>
+    <input id="pcLink" class="cloud-in" type="text" readonly onclick="this.select()" aria-label="Postcard link" />
+    <div class="cloud-row">
+      <button class="btn btn-primary" id="pcShareBtn" onclick="pcNativeShare()">📤 Share</button>
+      <button class="btn btn-teal" onclick="pcCopyLink()">🔗 Copy link</button>
+      <button class="btn btn-ghost" onclick="pcDownload()">📥 Save as file</button>
+    </div>
+    <p class="set-foot" id="pcVoiceNote" hidden>🎧 Voice notes are too big for a link — tap <b>Share</b> or <b>Save as file</b> and send the file. Your friend opens it with “📥 Get a postcard”.</p>
+  </div>
+</div>
+
 <main id="main" tabindex="-1">
   <!-- ===================== EXPLORE ===================== -->
   <section id="explore" class="view active">
@@ -1621,7 +1637,7 @@ create policy "atlas all" on atlas_sync
   <section id="messages" class="view">
     <div class="section-head"><div><span class="eyebrow">Say hi to your crew</span><h2>Postcards &amp; Notes 💌</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-hi.png"></div>
     <div class="msg-wrap">
-      <p class="hint" style="margin:-6px 0 14px">Send a fellow explorer a little message, a pile of emojis, or even record a voice note! 🎙️</p>
+      <p class="hint" style="margin:-6px 0 14px">Send a fellow explorer a little message, a pile of emojis, or even a voice note 🎙️ — then share the postcard so it lands on their device!</p>
       <div class="msg-people" id="msgPeople" role="tablist" aria-label="Who to message"></div>
       <div class="msg-thread" id="msgThread" aria-live="polite"></div>
 
@@ -1636,8 +1652,13 @@ create policy "atlas all" on atlas_sync
         <div class="msg-rechint" id="msgRecHint"><span class="dot"></span><span id="msgRecTime">Recording… tap 🎙️ to stop</span></div>
         <div class="msg-preview" id="msgPreview"><span class="msg-voice">🎧 Your voice note</span><audio id="msgPreviewAudio" controls></audio><button class="drop" type="button" onclick="msgDropVoice()" aria-label="Delete voice note" title="Delete">🗑️</button></div>
       </div>
-      <div class="msg-clearrow"><button class="btn-text" id="msgClearBtn" onclick="msgClearChat()">🧹 Clear this chat</button></div>
-      <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Messages stay private on this device, and travel with you if you turn on Cloud sync. ☁️</p>
+      <div class="msg-clearrow">
+        <button class="btn-text" onclick="document.getElementById('pcFile').click()">📥 Get a postcard</button>
+        <span aria-hidden="true" style="opacity:.4;margin:0 6px">·</span>
+        <button class="btn-text" id="msgClearBtn" onclick="msgClearChat()">🧹 Clear this chat</button>
+        <input id="pcFile" type="file" accept="application/json,.json" hidden onchange="receivePostcardFile(this)">
+      </div>
+      <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>On another device? Tap <b>Send</b>, then share the postcard link or file — your friend opens it and your note pops into their Mail. No accounts needed! 💌</p>
     </div>
   </section>
 </main>
@@ -7421,15 +7442,14 @@ function msgSend(){
   const t=document.getElementById('msgText');
   const text=t?t.value.trim():'';
   if(!text&&!_msgVoice) return;
-  const arr=loadMessages();
-  arr.push({id:'m'+Date.now()+Math.random().toString(36).slice(2,6), from:currentProfile, to:_msgPeer,
-    text:text.slice(0,500), voice:_msgVoice?_msgVoice.url:null, dur:_msgVoice?_msgVoice.dur:0, ts:Date.now(), read:false});
-  saveMessages(arr);
+  const msg={id:'m'+Date.now()+Math.random().toString(36).slice(2,6), from:currentProfile, to:_msgPeer,
+    text:text.slice(0,500), voice:_msgVoice?_msgVoice.url:null, dur:_msgVoice?_msgVoice.dur:0, ts:Date.now(), read:false};
+  const arr=loadMessages(); arr.push(msg); saveMessages(arr);
   if(t){ t.value=''; msgGrow(t); }
   msgDropVoice();
   const ep=document.getElementById('msgEmojis'); if(ep) ep.classList.remove('show');
   sfx('good'); renderMsgThread(); msgSyncSend();
-  toast('Sent to '+nameFor(_msgPeer)+'! 💌');
+  openPostcardShare(msg);
 }
 
 function msgClearChat(){ if(!_msgPeer) return;
@@ -7477,6 +7497,88 @@ function msgStopRecord(){
   if(navigator.vibrate) try{navigator.vibrate(12);}catch(e){}
 }
 
+/* ---- postcards: deliver a message to ANOTHER device with no server ----
+   There is no backend, so a message saved on one device can't magically
+   appear on another. Instead "Send" hands the note to the device's share
+   sheet as a link (text/emoji) or a small file (voice notes too). The other
+   explorer taps the link or opens the file and it drops into their Mail.
+   Rides whatever the family already uses (Messages, AirDrop, email…). */
+let _pcMsg=null;
+function b64uEnc(str){ try{ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }catch(e){ return ''; } }
+function b64uDec(s){ try{ s=String(s||'').replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; return decodeURIComponent(escape(atob(s))); }catch(e){ return ''; } }
+function postcardLink(msg){
+  /* link carries text/emoji only — voice notes are too big for a URL */
+  const slim={p:1,m:{id:msg.id,from:msg.from,to:msg.to,text:msg.text||'',ts:msg.ts}};
+  const base=(typeof location!=='undefined')?(location.origin+location.pathname):'';
+  return base+'#pc='+b64uEnc(JSON.stringify(slim));
+}
+function openPostcardShare(msg){
+  _pcMsg=msg;
+  const li=document.getElementById('pcLink'); if(li) li.value=postcardLink(msg);
+  const vn=document.getElementById('pcVoiceNote'); if(vn) vn.hidden=!msg.voice;
+  const sb=document.getElementById('pcShareBtn'); if(sb) sb.style.display=(typeof navigator!=='undefined'&&navigator.share)?'':'none';
+  const m=document.getElementById('postcardModal'); if(m) m.classList.remove('hidden');
+}
+function closePostcard(){ const m=document.getElementById('postcardModal'); if(m) m.classList.add('hidden'); }
+function pcNativeShare(){
+  const msg=_pcMsg; if(!msg||!navigator.share) return;
+  const who=nameFor(msg.from);
+  if(msg.voice && navigator.canShare){
+    try{ const file=new File([JSON.stringify({p:1,m:msg})],'poppy-postcard.json',{type:'application/json'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'A postcard from '+who,text:'Open this in Poppy’s Atlas → Mail 💌'}).then(closePostcard).catch(()=>{});
+        return; } }catch(e){}
+  }
+  navigator.share({title:'A postcard from '+who, text:(msg.text?msg.text+' ':'')+'A postcard for you 💌', url:postcardLink(msg)}).then(closePostcard).catch(()=>{});
+}
+function pcCopyLink(){ const li=document.getElementById('pcLink'); if(!li) return; const link=li.value;
+  const done=()=>toast('Link copied! Paste it to your friend. 🔗');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done).catch(()=>{ li.select(); try{document.execCommand('copy');done();}catch(e){} }); }
+  else { li.select(); try{document.execCommand('copy');done();}catch(e){ toast('Long-press the link to copy it.'); } }
+}
+function pcDownload(){ const msg=_pcMsg; if(!msg) return;
+  try{ const blob=new Blob([JSON.stringify({p:1,m:msg})],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='poppy-postcard-'+(nameFor(msg.to)||'friend').replace(/\s+/g,'-').toLowerCase()+'.json'; a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(a.href);}catch(e){}},4000);
+    toast('Saved! Send the file to your friend. 📥'); }catch(e){ toast('Could not save the file.'); }
+}
+function validPostcardMsg(m){
+  if(!m||typeof m!=='object') return null;
+  const ids=PROFILES.map(p=>p.id);
+  if(ids.indexOf(m.from)<0||ids.indexOf(m.to)<0||m.from===m.to) return null;
+  const out={ id:(typeof m.id==='string'&&m.id)?m.id.slice(0,40):'m'+Date.now()+Math.random().toString(36).slice(2,6),
+    from:m.from, to:m.to,
+    text:(typeof m.text==='string'?m.text:'').slice(0,500),
+    voice:(typeof m.voice==='string'&&/^data:audio\//.test(m.voice)&&m.voice.length<900000)?m.voice:null,
+    dur:(typeof m.dur==='number'&&m.dur>0)?Math.min(Math.round(m.dur),60):0,
+    ts:(typeof m.ts==='number'&&m.ts>0)?m.ts:Date.now(), read:false };
+  if(!out.text&&!out.voice) return null;
+  return out;
+}
+function importPostcardObj(obj){
+  const m=validPostcardMsg(obj&&(obj.m||obj));
+  if(!m){ toast('That postcard could not be read.'); return false; }
+  const arr=loadMessages();
+  if(arr.some(x=>x.id===m.id)){ toast('You already have that postcard. 📬'); return true; }
+  arr.push(m); saveMessages(arr); updateMsgBadge();
+  if(activeView==='messages'){ if(m.to===currentProfile) _msgPeer=m.from; renderMessages(); }
+  toast('📬 New postcard from '+nameFor(m.from)+' for '+nameFor(m.to)+'!');
+  return true;
+}
+function receivePostcardFile(input){ const f=input.files&&input.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ try{ importPostcardObj(JSON.parse(r.result)); }catch(e){ toast('That file is not a postcard.'); } input.value=''; };
+  r.readAsText(f); }
+function checkIncomingPostcard(){
+  if(typeof location==='undefined') return;
+  try{ const h=location.hash||''; const i=h.indexOf('pc=');
+    if(i<0) return;
+    const obj=JSON.parse(b64uDec(h.slice(i+3)));
+    try{ if(typeof history!=='undefined'&&history.replaceState) history.replaceState(null,'',location.pathname+location.search); else location.hash=''; }catch(e){}
+    importPostcardObj(obj);
+  }catch(e){}
+}
+
 function sfx(name){
   if(!soundOn||reduceMotion) return;
   /* gentle haptic to match the sound on devices that support it (no-op on desktop) */
@@ -7517,7 +7619,10 @@ try{ const _np=localStorage.getItem('globie_night');
     if(_mq.addEventListener) _mq.addEventListener('change',e=>{ if(localStorage.getItem('globie_night')==null) applyNight(e.matches,false); }); }
 }catch(e){}
 /* production safety-net: never white-screen if boot throws */
-try{ setupLogin(); showLogin(); }
+try{ setupLogin(); showLogin();
+  /* an incoming postcard link (#pc=…) drops straight into Mail */
+  try{ checkIncomingPostcard(); }catch(_e){}
+}
 catch(bootErr){
   try{ console.error('Poppy boot error:',bootErr);
     var ls=document.getElementById('loginScreen');
