@@ -27,7 +27,10 @@ in any modern browser, or deploy the folder to any static host.
   passport stamps. Backup/restore to a file, **print a passport page**, or sync to the cloud.
 - **💌 Mail** — send a fellow explorer a friendly note: type a message, pile on **emojis**
   (quick bar + a full kid-safe picker), or record a **voice note** (tap 🎙️, up to 30s). Chat
-  bubbles, an unread badge on the nav, per-chat clearing, and it rides along with Cloud sync.
+  bubbles, an unread badge on the nav, per-chat clearing. To reach **another device** with no
+  server or sign-up, Send hands the note to the share sheet as a **postcard** — a link (text/
+  emoji) or a small file (voice notes too); the other explorer taps it and it drops into their
+  Mail. Postcards also ride along with Cloud sync if it's enabled.
 - **🏅 Badges** — 45 reconciling explorer badges with progress bars and a "closest to earn"
   nudge; a **Countries of the World** page (visited list + top-5 to-go by size/population/
   popularity/beauty, and a continents-collected strip).
