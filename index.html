@@ -5539,6 +5539,10 @@ function localInsults(name,place,thing){return [
   `You travelled to ${place} and the highlight is annoying me? Sad. Smelly, AND sad.`,
   `The cats of ${place} salute you. With our tails. Which is rude. On purpose. 🙀`
 ];}
+/* return keyboard focus to whatever opened a dialog when it closes (a11y) */
+let _modalReturn=null;
+function modalCapture(){ _modalReturn=document.activeElement; }
+function modalRestore(){ const el=_modalReturn; _modalReturn=null; if(el&&el.focus){ try{ el.focus({preventScroll:true}); }catch(e){} } }
 function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) return;
   const img=o.querySelector('.egg-cat'); if(!img) return;
   const onDetail=document.getElementById('detail').classList.contains('active');
@@ -5563,9 +5567,10 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
+  if(o.classList.contains('hidden')) modalCapture();
   o.classList.remove('hidden'); playMeow(); setTimeout(()=>o.focus(),30);
   img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); }
-function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o) o.classList.add('hidden'); }
+function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o&&!o.classList.contains('hidden')){ o.classList.add('hidden'); modalRestore(); } }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); }
@@ -6548,8 +6553,8 @@ function openCloud(){ const c=loadCloudCfg();
   const u=document.getElementById('cbUrl'), k=document.getElementById('cbKey'), code=document.getElementById('cbCode');
   if(u) u.value=c.url||''; if(k) k.value=c.key||''; if(code) code.value=c.code||'';
   cloudStatus(c.url&&c.key&&c.code?'✓ Configured. Back up or restore any time.':'Not set up yet — add your Supabase details below.', c.url?'ok':'');
-  const m=document.getElementById('cloudModal'); if(m) m.classList.remove('hidden'); }
-function closeCloud(){ const m=document.getElementById('cloudModal'); if(m) m.classList.add('hidden'); }
+  const m=document.getElementById('cloudModal'); if(m){ if(m.classList.contains('hidden')) modalCapture(); m.classList.remove('hidden'); } }
+function closeCloud(){ const m=document.getElementById('cloudModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
 function pinStatus(msg,kind){ const el=document.getElementById('pinStatus'); if(!el) return;
   el.textContent=msg||''; el.className='cloud-status'+(kind?' '+kind:''); }
 function openPinChange(){
@@ -7422,8 +7427,8 @@ function pickProfile(id){ pendingProfile=id; const p=PROFILES.find(x=>x.id===id)
 function openAvatarPicker(id){ if(!id) return; avatarEditing=id;
   const n=document.getElementById('avName'); if(n) n.textContent=nameFor(id);
   const s=document.getElementById('avSearch'); if(s) s.value='';
-  renderAvatarGrid(); const m=document.getElementById('avatarModal'); if(m) m.classList.remove('hidden'); }
-function closeAvatar(){ const m=document.getElementById('avatarModal'); if(m) m.classList.add('hidden'); }
+  renderAvatarGrid(); const m=document.getElementById('avatarModal'); if(m){ if(m.classList.contains('hidden')) modalCapture(); m.classList.remove('hidden'); } }
+function closeAvatar(){ const m=document.getElementById('avatarModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
 function renderAvatarGrid(){ const g=document.getElementById('avatarGrid'); if(!g) return; const cur=avatarFor(avatarEditing);
   const q=(document.getElementById('avSearch')?.value||'').trim().toLowerCase();
   const cell=a=>`<button class="av-choice ${a===cur?'sel':''}" data-a="${a}" aria-label="Pick icon">${avatarHTML(a)}</button>`;
@@ -7477,8 +7482,8 @@ function applySound(on){ soundOn=!!on; const b=document.getElementById('soundBtn
   if(b){ b.textContent=on?'🔊':'🔇'; b.setAttribute('aria-pressed',on); }
   try{localStorage.setItem('globie_sound',on?'1':'0');}catch(e){} }
 function toggleSound(){ applySound(!soundOn); if(soundOn) sfx('pop'); }
-function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); m.classList.remove('hidden'); } }
-function closeSettings(){ const m=document.getElementById('settingsSheet'); if(m) m.classList.add('hidden'); }
+function openSettings(){ const m=document.getElementById('settingsSheet'); if(m){ syncSettings(); if(m.classList.contains('hidden')) modalCapture(); m.classList.remove('hidden'); } }
+function closeSettings(){ const m=document.getElementById('settingsSheet'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
 function syncSettings(){
   const n=document.documentElement.classList.contains('night'), sn=document.getElementById('setNight');
   if(sn){ sn.classList.toggle('on',n); sn.setAttribute('aria-checked',n); }
