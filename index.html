@@ -271,6 +271,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
 .chip{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:9px 17px;
   font-weight:800;font-size:.92rem;color:var(--ink-2);transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .chip:hover{transform:translateY(-2px);color:var(--ink)}
+/* uniform tactile press feedback across the app's pill controls */
+.chip:active,.jview button:active,.pack-trip:active,.food-tried:active,.dimnav button:active,.wc-clear:active,.ach-filters .chip:active{transform:scale(.93)}
 .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .chip .chip-n{font-size:.74rem;background:var(--surface-2);color:var(--muted);border-radius:999px;padding:1px 7px;font-weight:800}
 .chip.active .chip-n{background:rgba(255,255,255,.22);color:#fff}
