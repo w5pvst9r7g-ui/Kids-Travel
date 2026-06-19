@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **On-brand confirm dialog** — replaced the jarring native confirm() for destructive actions (delete a trip, restore sample trips) with a themed Poppy dialog (🐾 + Cancel/coral action), focus-trapped, Esc=cancel, focus restored on close. Verified Cancel keeps / Confirm removes
 - [x] **Packing completion celebration** — checking off the last item now celebrates with confetti, a win chime and a "🎒 All packed for {city} — ready for adventure!" toast (only at the moment of completion), matching the foodie/badge rewards
 - [x] **Styled toasts replace native alerts** — journal import/export, restore and add-trip validation now use the app's own toast (success or "⚠️ Oops!" error) instead of jarring browser alert() popups; the one rare critical storage-failure warning stays a blocking alert
 - [x] **Journal save feedback** — saving a trip now confirms with a toast ("🎉 …added to your journal!" for new, "✏️ Trip updated!" for edits); edits previously gave no feedback at all
