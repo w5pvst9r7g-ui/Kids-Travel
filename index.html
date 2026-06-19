@@ -5878,6 +5878,10 @@ function flightFunFact(gt){
 }
 function tripDate(t){ return t.date?new Date(t.date+'T00:00:00'):(t.year?new Date(t.year+'-07-01T00:00:00'):null); }
 function daysUntil(t){ const d=tripDate(t); if(!d) return null; return Math.max(0,Math.ceil((d-new Date())/86400000)); }
+/* once a trip's date has arrived, it counts as visited (countries, badges, journal).
+   Done in-memory each session so it's always correct without persisting side-effects. */
+function reconcileTrips(){ const now=Date.now(); if(typeof trips==='undefined'||!trips) return;
+  trips.forEach(t=>{ if(t.planned){ const d=tripDate(t); if(d && d.getTime()<=now){ t.planned=false; if(!t.year) t.year=d.getFullYear(); } } }); }
 function nextPlanned(){ const a=trips.filter(t=>t.planned).map(t=>({t,d:tripDate(t)})).filter(x=>x.d).sort((a,b)=>a.d-b.d); return a.length?a[0].t:trips.find(t=>t.planned); }
 function renderFeatured(){
   const host=document.getElementById('featured'); if(!host) return;
@@ -7556,7 +7560,7 @@ function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.cl
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(nameFor(p.id))+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
-function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); triedFoods=loadTriedFoods(); storiesRead=loadStoriesRead(); wishlist=loadWish(); celebratedTrip=null;
+function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); reconcileTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); triedFoods=loadTriedFoods(); storiesRead=loadStoriesRead(); wishlist=loadWish(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function profileName(){ return currentProfile?nameFor(currentProfile):''; }
 function signIn(id){ const pid=placeFromHash();   /* capture before showView clears the hash */
