@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Cat-spotting badges** — four new Explorer Badges tied to the Morocco Cat Counter: 😺 Cat Spotter (10), 😼 Purr-fessional (25), 🙀 Feline Fanatic (50), 👑 Sultan of Cats (100). They unlock live as you log cats (toast + confetti), with progress bars, and reconcile on reset.
 - [x] **Current trip stays "Happening now"** — a trip is shown as the live current trip from its departure date until ~10 nights later: the countdown hero becomes "🧳 Happening now! · You're there!" and the Upcoming page gets a "Happening now ✈️" section, while it also counts as visited / badges. Future trips still countdown as normal.
 - [x] **Austria & Switzerland tick the Snow badge** — the snowy winter Alps trips now count toward ❄️ Snow Seeker (alongside Iceland/Lapland & any Snow-region place)
 - [x] **Trips auto-complete on their date** — once an upcoming trip's departure date arrives, it automatically flips to "visited" and counts toward Countries visited, badges, the journal & stats (e.g. Rabac/Morocco today). Future trips stay in Upcoming; done in-memory each session so it's always correct (verified: Rabat→visited + Desert Explorer badge, future trips untouched).

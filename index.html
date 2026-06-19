@@ -7024,6 +7024,10 @@ const ACHIEVEMENTS=[
   {id:'dreamer10',em:'🌠',nm:'Sky is the Limit',ds:'Heart 10 dream places',ac:'#8A78EA',test:c=>c.wishes>=10},
   {id:'foodie',em:'🍴',nm:'Little Foodie',ds:'Try 5 yummy foods',ac:'#F4A11E',test:c=>c.foodsTried>=5},
   {id:'foodie15',em:'😋',nm:'Master Taster',ds:'Try 15 yummy foods',ac:'#FF7FB0',test:c=>c.foodsTried>=15},
+  {id:'cat_spot10', em:'😺',nm:'Cat Spotter',    ds:'Spot 10 cats in Morocco',  ac:'#F4A11E',test:c=>c.cats>=10},
+  {id:'cat_spot25', em:'😼',nm:'Purr-fessional', ds:'Spot 25 Moroccan cats',    ac:'#E0760E',test:c=>c.cats>=25},
+  {id:'cat_spot50', em:'🙀',nm:'Feline Fanatic', ds:'Spot 50 cats in Morocco',  ac:'#7C6CF4',test:c=>c.cats>=50},
+  {id:'cat_spot100',em:'👑',nm:'Sultan of Cats', ds:'Spot 100 Moroccan cats!',  ac:'#F46A4B',test:c=>c.cats>=100},
   // —— goals to chase next ——
   {id:'desert',em:'🏜️',nm:'Desert Explorer',ds:'Visit Morocco',ac:'#E0760E',test:c=>c.countries.has('Morocco')},
   {id:'aurora',em:'🌌',nm:'Aurora Chaser',ds:'See the Northern Lights (Iceland/Lapland)',ac:'#7C6CF4',test:c=>c.countries.has('Iceland')||c.countries.has('Finland')},
@@ -7041,6 +7045,9 @@ const ACHIEVEMENTS=[
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
 let unlockedAch=loadAch();
+/* total cats spotted across all cat counters for the current explorer */
+function catTotals(){ let cats=0; try{ const pre='globie_atlas_catcount_', suf='_v9_'+(currentProfile||'guest');
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf(pre)===0&&k.slice(-suf.length)===suf){ try{const o=JSON.parse(localStorage.getItem(k)); if(o) cats+=(o.big||0)+(o.kit||0);}catch(e){} } } }catch(e){} return cats; }
 function achContext(){
   const visited=trips.filter(t=>!t.planned), planned=trips.filter(t=>t.planned);
   const countries=new Set(visited.map(t=>t.country).filter(Boolean));
@@ -7048,7 +7055,7 @@ function achContext(){
   const regions=new Set(visited.map(t=>{const d=DESTS.find(x=>x.id===t.destId);return d&&d.region;}).filter(Boolean));
   const continentCounts={}; countries.forEach(co=>{ const k=CONTINENT_OF[co]; if(k) continentCounts[k]=(continentCounts[k]||0)+1; });
   let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
-  return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size,wishes:(typeof wishlist!=='undefined'?wishlist.size:0),foodsTried:(typeof triedFoods!=='undefined'?triedFoods.size:0)};
+  return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size,wishes:(typeof wishlist!=='undefined'?wishlist.size:0),foodsTried:(typeof triedFoods!=='undefined'?triedFoods.size:0),cats:catTotals()};
 }
 function badgeProgress(a,c){
   const P={
@@ -7058,7 +7065,8 @@ function badgeProgress(a,c){
     around_world:[Math.round(c.km),40000,'km'],longhaul:[Math.round(c.km),150000,'km'],millionmiler:[Math.round(c.km),300000,'km'],
     five_star:[c.visited.filter(t=>t.rating>=5).length,5],euro_explorer:[c.continentCounts.Europe||0,3],
     cat_tales:[c.catsRead,3],cat_whisperer:[c.catsRead,10],tale_master:[c.catsRead,20],
-    dreamer:[c.wishes,3],dreamer10:[c.wishes,10],foodie:[c.foodsTried,5],foodie15:[c.foodsTried,15]
+    dreamer:[c.wishes,3],dreamer10:[c.wishes,10],foodie:[c.foodsTried,5],foodie15:[c.foodsTried,15],
+    cat_spot10:[c.cats,10],cat_spot25:[c.cats,25],cat_spot50:[c.cats,50],cat_spot100:[c.cats,100]
   };
   const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
 }
@@ -7413,9 +7421,10 @@ function catPickColor(c){ const d=currentDest; if(!d||!_catStep.type) return;
   sfx('good'); const board=document.getElementById('catCounter'); if(board){ board.innerHTML=catBoardHTML(d); }
   const btn=document.querySelector('#catAdd .catc-bigbtn'); if(btn&&!reduceMotion) emojiBurst(btn, type==='kit'?'🐱':'🐈');
   toast((type==='kit'?'🐱':'🐈')+' '+catColorName(c)+' '+(type==='kit'?'kitten':'cat')+' logged! +'+(type==='kit'?2:1)+' points');
+  checkAchievements();   /* may unlock a cat-spotting badge */
 }
 function catReset(){ const d=currentDest; if(!d) return;
-  uiConfirm('Reset the Morocco cat counter to zero?','Reset',true).then(ok=>{ if(!ok) return; saveCatData(d,{big:0,kit:0,log:[]}); _catStep={stage:'idle',type:null}; const board=document.getElementById('catCounter'); if(board) board.innerHTML=catBoardHTML(d); });
+  uiConfirm('Reset the Morocco cat counter to zero?','Reset',true).then(ok=>{ if(!ok) return; saveCatData(d,{big:0,kit:0,log:[]}); _catStep={stage:'idle',type:null}; const board=document.getElementById('catCounter'); if(board) board.innerHTML=catBoardHTML(d); checkAchievements({silent:true}); });
 }
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
