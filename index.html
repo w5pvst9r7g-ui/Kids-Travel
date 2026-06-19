@@ -1412,7 +1412,7 @@ html.night .msg-quick button,html.night .msg-emojis{background:var(--surface-2)}
       <button class="btn btn-ghost" onclick="closeSettings();openCloud()">Open</button></div>
     <div class="set-row"><div class="set-tx"><b>🔑 Secret code</b><span>Change the four-digit PIN</span></div>
       <button class="btn btn-ghost" onclick="closeSettings();openPinChange()">Change</button></div>
-    <p class="set-foot">Your trips &amp; badges stay private on this device. · Poppy's Atlas v1.0.0</p>
+    <p class="set-foot">Your trips &amp; badges stay private on this device. · Poppy's Atlas v1.1.0</p>
   </div>
 </div>
 
@@ -7833,7 +7833,7 @@ catch(bootErr){
   try{ console.error('Poppy runtime error:',ev.message); }catch(_){}
 }); window.addEventListener('unhandledrejection',function(){}); })();
 /* offline indicator — handy for a travel app used on planes / abroad */
-(function(){ var APP_VERSION='1.0.0';
+(function(){ var APP_VERSION='1.1.0';
   function setOnline(){ var on=navigator.onLine!==false, el=document.getElementById('offlineBar');
     if(on){ if(el) el.remove(); return; }
     if(!el){ el=document.createElement('div'); el.id='offlineBar'; el.className='offline-bar'; el.setAttribute('role','status');
