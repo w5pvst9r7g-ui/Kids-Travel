@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Shareable destination deep-links** — every destination now has a bookmarkable URL (#place/paris); opening a shared link drops you straight into that guide after sign-in, the Share button on a destination shares its direct link ("Check out Paris on Poppy's Atlas!"), and the URL updates/clears as you navigate — all without disturbing the back-button stack (verified end-to-end + lightbox-within-deeplink + 0 console errors)
 - [x] **Meaningful page titles** — the browser tab / history entry now reflects where you are ("Paris · Poppy's Atlas", "Badges · Poppy's Atlas"…) instead of a static title, so the back button and open tabs make sense
 - [x] **Esc clears search; CI verified green** — pressing Escape in the Explore search now clears it (and resets the grid); also confirmed GitHub Actions CI is passing on main for all recent commits
 - [x] **Modals animate in** — all dialog cards (settings, cloud, avatar, change-PIN, postcard, confirm) now gently scale + fade in with a soft spring instead of popping, with a fading backdrop (reduced-motion aware)

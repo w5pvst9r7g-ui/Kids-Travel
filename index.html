@@ -5791,7 +5791,8 @@ function showView(v){
   if(v==='badges'){ renderStats(); renderAchievements(); }
   if(v==='world') renderWorld();
   if(v==='messages') renderMessages();
-  if(v!=='detail'){ const VT={explore:'Explore',upcoming:'Upcoming',map:'Atlas Map',trips:'Journal',badges:'Badges',packing:'Packing',world:'Countries of the World',messages:'Mail'}; setDocTitle(VT[v]); }
+  if(v!=='detail'){ const VT={explore:'Explore',upcoming:'Upcoming',map:'Atlas Map',trips:'Journal',badges:'Badges',packing:'Packing',world:'Countries of the World',messages:'Mail'}; setDocTitle(VT[v]);
+    if((location.hash||'').indexOf('#place/')===0){ try{ history.replaceState(history.state,'', location.pathname+location.search); }catch(e){} } }
   if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><h3>Hmm, the map hiccuped</h3><p>Something went wrong loading the map.</p><button class="btn btn-teal" onclick="initMap()">↻ Try again</button></div>'; } },90); }
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
@@ -6159,7 +6160,9 @@ function openDest(id){
   showView('detail');
   /* back button (and the in-app "All places" button) returns to the list, not out of the app */
   if(!_wasDetail){ _detailReturn=_ret; ktOpen(()=>{ if(activeView==='detail') showView(_detailReturn); }); }
+  try{ history.replaceState(history.state,'', '#place/'+d.id); }catch(e){}   /* shareable / bookmarkable URL */
 }
+function placeFromHash(){ const m=(location.hash||'').match(/^#place\/([a-z0-9_-]+)$/i); return m?m[1]:null; }
 /* show a soft edge-fade on the section tabs only when more tabs lie off-screen */
 function updateSnavFade(el){
   if(!el) return;
@@ -6852,8 +6855,13 @@ function setHeroSpotlight(){
 function openHeroSpot(){ if(heroSpotId) openDest(heroSpotId); }
 /* share the app (Web Share API, with a copy-link fallback) */
 function shareApp(){
-  const url=(location.href.split('#')[0])||'https://w5pvst9r7g-ui.github.io/kids-travel/';
-  const data={title:"Poppy's Atlas",text:"Come explore the world with Poppy the cat! 🐱✈️",url:url};
+  const base=(location.href.split('#')[0])||'https://w5pvst9r7g-ui.github.io/kids-travel/';
+  /* on a destination, share a direct link to it */
+  const onDetail=activeView==='detail'&&currentDest;
+  const url=onDetail?(base+'#place/'+currentDest.id):base;
+  const data=onDetail
+    ? {title:"Poppy's Atlas · "+currentDest.name, text:"Check out "+currentDest.name+" on Poppy's Atlas! 🐱✈️", url:url}
+    : {title:"Poppy's Atlas", text:"Come explore the world with Poppy the cat! 🐱✈️", url:url};
   if(navigator.share){ navigator.share(data).catch(()=>{}); return; }
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(()=>toast('🔗 Link copied — share it with friends!')).catch(()=>toast('🔗 '+url)); return; }
   toast('🔗 '+url);
@@ -7437,8 +7445,9 @@ function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&
 function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); triedFoods=loadTriedFoods(); storiesRead=loadStoriesRead(); wishlist=loadWish(); celebratedTrip=null;
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function profileName(){ return currentProfile?nameFor(currentProfile):''; }
-function signIn(id){ currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
-  showSplash(()=>{ setTimeout(maybeOnboard,180); }); }
+function signIn(id){ const pid=placeFromHash();   /* capture before showView clears the hash */
+  currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
+  showSplash(()=>{ setTimeout(()=>{ if(pid && typeof DESTS!=='undefined' && DESTS.some(d=>d.id===pid)){ openDest(pid); } else { maybeOnboard(); } },180); }); }
 let _splashTimers=[], _splashCb=null;
 function showSplash(cb){
   const s=document.getElementById('splash'); if(!s){ cb&&cb(); return; }
