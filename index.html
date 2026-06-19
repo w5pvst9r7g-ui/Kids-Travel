@@ -290,6 +290,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 90px}
   box-shadow:0 3px 8px rgba(0,0,0,.2);transform:rotate(-2.5deg)}
 .dcard .t.visited{background:var(--green-d);color:#fff}
 .dcard .t.soon{background:var(--yellow);color:#5a3d00}
+.dcard .t.soon.now{background:var(--green-d);color:#fff}
 .dcard .t.wish{background:var(--pink);color:#7a2247}
 .dcard .t.reg-Beach,.dcard .t.reg-Island{background:#D5F3EF;color:#0A7F78}
 .dcard .t.reg-City{background:#FFE3DB;color:#C2492F}
@@ -5882,27 +5883,39 @@ function daysUntil(t){ const d=tripDate(t); if(!d) return null; return Math.max(
    Done in-memory each session so it's always correct without persisting side-effects. */
 function reconcileTrips(){ const now=Date.now(); if(typeof trips==='undefined'||!trips) return;
   trips.forEach(t=>{ if(t.planned){ const d=tripDate(t); if(d && d.getTime()<=now){ t.planned=false; if(!t.year) t.year=d.getFullYear(); } } }); }
+/* a trip is "underway" from its departure date until ~10 nights later (or its own
+   `nights`), so the in-progress trip stays the current trip even though it now counts
+   as visited. */
+const DEFAULT_TRIP_NIGHTS=10;
+function tripEndDate(t){ const d=tripDate(t); if(!d) return null; const n=(typeof t.nights==='number'&&t.nights>0)?t.nights:DEFAULT_TRIP_NIGHTS; const e=new Date(d.getTime()); e.setDate(e.getDate()+n); e.setHours(23,59,59,999); return e; }
+function isUnderway(t){ const s=tripDate(t),e=tripEndDate(t); if(!s||!e) return false; const now=Date.now(); return now>=s.getTime() && now<=e.getTime(); }
+function currentTrip(){ const u=trips.filter(isUnderway).map(t=>({t,d:tripDate(t)})).sort((a,b)=>b.d-a.d); return u.length?u[0].t:null; }
 function nextPlanned(){ const a=trips.filter(t=>t.planned).map(t=>({t,d:tripDate(t)})).filter(x=>x.d).sort((a,b)=>a.d-b.d); return a.length?a[0].t:trips.find(t=>t.planned); }
 function renderFeatured(){
   const host=document.getElementById('featured'); if(!host) return;
-  const t=nextPlanned();
+  const cur=currentTrip();                 // a trip happening right now
+  const t=cur||nextPlanned();
   if(!t){ host.innerHTML='<div class="empty">No trips booked yet — add one with a future date in your Journal! ✈️</div>'; return; }
-  const d=DESTS.find(x=>x.id===t.destId), th=themeFor(d), days=daysUntil(t), dt=tripDate(t);
+  const d=DESTS.find(x=>x.id===t.destId), th=themeFor(d), dt=tripDate(t);
   const dstr=dt?dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
-  const wks=days!=null?Math.floor(days/7):null;
-  const today=days===0;
-  host.innerHTML=`<div class="cd-hero ${today?'cd-today':''}" style="${frameStyle(th)}">
+  const onTrip=!!cur, days=onTrip?0:daysUntil(t), today=!onTrip&&days===0, wks=days!=null?Math.floor(days/7):null;
+  const eyebrow=onTrip?'🧳 Happening now!':(today?'🎉 Adventure time!':('✈️ '+(profileName()?esc(profileName())+'’s next adventure':'Next adventure')));
+  const count=onTrip
+    ? `<span class="cd-num">📍</span><span class="cd-lab">You're<br>there!</span>`
+    : (today?`<span class="cd-num">🎉</span><span class="cd-lab">It's<br>today!</span>`:`<span class="cd-num">${days==null?'—':days}</span><span class="cd-lab">${days===1?'sleep':'sleeps'}<br>to go!</span>`);
+  const dateline=onTrip?('🧭 You’re exploring '+esc(t.city)+' right now — have the best time! ✨'):(today?'Have the BEST time! ✨':'📅 '+esc(dstr)+(wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:''));
+  host.innerHTML=`<div class="cd-hero ${(onTrip||today)?'cd-today':''}" style="${frameStyle(th)}">
     <div class="cd-bg">${d?dpic(d.id,'hero',d.photos[0][2],1200,640,t.city,d.photos[0][0]):''}</div>
     <div class="cd-scrim"></div>
     <div class="cd-inner">
-      <span class="cd-eyebrow">${today?'🎉 Adventure time!':('✈️ '+(profileName()?esc(profileName())+'’s next adventure':'Next adventure'))}</span>
-      <div class="cd-count">${today?`<span class="cd-num">🎉</span><span class="cd-lab">It's<br>today!</span>`:`<span class="cd-num">${days==null?'—':days}</span><span class="cd-lab">${days===1?'sleep':'sleeps'}<br>to go!</span>`}</div>
+      <span class="cd-eyebrow">${eyebrow}</span>
+      <div class="cd-count">${count}</div>
       <h2 class="cd-place">${esc(t.flag||'')} ${esc(t.city)}</h2>
-      <div class="cd-date">${today?'Have the BEST time! ✨':'📅 '+esc(dstr)+(wks?` · about ${wks} ${wks===1?'week':'weeks'} away!`:'')}</div>
+      <div class="cd-date">${dateline}</div>
       ${d?`<button class="btn btn-yellow" onclick="openDest('${d.id}')">Explore ${esc(d.name)} →</button>`:''}
     </div>
     <img class="cd-poppie" loading="lazy" alt="Poppy can't wait!" src="poppie-fish.png"></div>`;
-  if(today && !reduceMotion && celebratedTrip!==t.id){ celebratedTrip=t.id; confetti(); }
+  if((onTrip||today) && !reduceMotion && celebratedTrip!==t.id){ celebratedTrip=t.id; confetti(); }
 }
 
 /* =====================================================================
@@ -5968,13 +5981,18 @@ function renderGrid(){
 }
 function renderUpcoming(){
   const host=document.getElementById('upcomingGroups'); if(!host) return;
+  const now=trips.filter(isUnderway).slice().sort((a,b)=>(tripDate(b)||0)-(tripDate(a)||0));
   const planned=trips.filter(t=>t.planned).slice().sort((a,b)=>(tripDate(a)||9e15)-(tripDate(b)||9e15));
-  const seen=new Set(), cards=[];
+  const seen=new Set(), nowCards=[], cards=[];
+  now.forEach(t=>{ const d=DESTS.find(x=>x.id===t.destId); if(!d||seen.has(d.id)) return; seen.add(d.id);
+    nowCards.push(cardHTML(d,`<span class="t soon now">✈️ Happening now!</span>`)); });
   planned.forEach(t=>{ const d=DESTS.find(x=>x.id===t.destId); if(!d||seen.has(d.id)) return; seen.add(d.id);
     const dys=daysUntil(t); const lab=dys==null?'Coming up':(dys===0?'Today!':`in ${dys} sleep${dys===1?'':'s'}`);
     cards.push(cardHTML(d,`<span class="t soon">🔜 ${lab}</span>`)); });
-  host.innerHTML = cards.length ? `<div class="section-head" style="margin-top:8px"><div><span class="eyebrow">Every booked adventure</span><h3 style="font-size:1.4rem">All our upcoming trips</h3></div></div><div class="deck">${cards.join('')}</div>`
-    : `<div class="empty">No upcoming trips yet — add one with a future date in your Journal! ✈️</div>`;
+  let html='';
+  if(nowCards.length) html+=`<div class="section-head" style="margin-top:8px"><div><span class="eyebrow teal">Right now</span><h3 style="font-size:1.4rem">Happening now ✈️</h3></div></div><div class="deck">${nowCards.join('')}</div>`;
+  if(cards.length) html+=`<div class="section-head" style="margin-top:${nowCards.length?'24px':'8px'}"><div><span class="eyebrow">Every booked adventure</span><h3 style="font-size:1.4rem">All our upcoming trips</h3></div></div><div class="deck">${cards.join('')}</div>`;
+  host.innerHTML = html || `<div class="empty">No upcoming trips yet — add one with a future date in your Journal! ✈️</div>`;
   renderPacking();
 }
 
@@ -6985,7 +7003,7 @@ const ACHIEVEMENTS=[
   {id:'beach_lover',em:'🏖️',nm:'Beach Lover',ds:'Visit a beach or island spot',ac:'#0FA7AF',test:c=>c.regions.has('Beach')},
   {id:'city_slicker',em:'🏙️',nm:'City Slicker',ds:'Visit a big city',ac:'#F46A4B',test:c=>c.regions.has('City')},
   {id:'safari',em:'🦒',nm:'Safari Spotter',ds:'Visit a wildlife spot',ac:'#43C28A',test:c=>c.regions.has('Wildlife')},
-  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland/Lapland)',ac:'#5BB8F0',test:c=>c.regions.has('Snow')||c.countries.has('Iceland')||c.countries.has('Finland')},
+  {id:'snow_seeker',em:'❄️',nm:'Snow Seeker',ds:'Visit a snowy land (Iceland, Lapland or the snowy Alps)',ac:'#5BB8F0',test:c=>c.regions.has('Snow')||c.countries.has('Iceland')||c.countries.has('Finland')||c.countries.has('Austria')||c.countries.has('Switzerland')},
   // —— places ——
   {id:'down_under',em:'🦘',nm:'Down Under',ds:'Visit Australia',ac:'#43C28A',test:c=>c.countries.has('Australia')},
   {id:'kiwi',em:'🥝',nm:'Kiwi Explorer',ds:'Visit New Zealand',ac:'#34B47E',test:c=>c.countries.has('New Zealand')},

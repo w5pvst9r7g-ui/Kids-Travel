@@ -120,6 +120,8 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Current trip stays "Happening now"** — a trip is shown as the live current trip from its departure date until ~10 nights later: the countdown hero becomes "🧳 Happening now! · You're there!" and the Upcoming page gets a "Happening now ✈️" section, while it also counts as visited / badges. Future trips still countdown as normal.
+- [x] **Austria & Switzerland tick the Snow badge** — the snowy winter Alps trips now count toward ❄️ Snow Seeker (alongside Iceland/Lapland & any Snow-region place)
 - [x] **Trips auto-complete on their date** — once an upcoming trip's departure date arrives, it automatically flips to "visited" and counts toward Countries visited, badges, the journal & stats (e.g. Rabac/Morocco today). Future trips stay in Upcoming; done in-memory each session so it's always correct (verified: Rabat→visited + Desert Explorer badge, future trips untouched).
 - [x] **🐱 Morocco Cat Counter** — a new tab on the Morocco pages (Rabat & Fez share one tally): tap the big "Spotted a cat!" button → pick 🐱 Kitten (2 pts) or 🐈 Big cat (1 pt) → pick a coat colour from 9 patterned swatches (black & white, ginger, tabby, calico, tortoiseshell…) → it logs the sighting (swatch chips), totals up cat points / big cats / kittens, with a tasty toast + emoji burst. Saved per explorer, night-mode styled, reset with the themed confirm.
 - [x] **"Share this place" button** — every destination now has a Share button that fires the per-destination deep-link share (title / "Check out X!" text / #place link), making the new shareable links reachable from the guide itself
