@@ -1536,7 +1536,7 @@ create policy "atlas all" on atlas_sync
       <div><span class="eyebrow">The whole atlas</span><h2>Explore places</h2></div>
       <div class="filters" id="filters"></div>
     </div>
-    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search place, country, food…" oninput="setDestSearch(this.value)" aria-label="Search destinations by name, country, region, continent or food"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
+    <div class="searchbar"><span class="si" aria-hidden="true">🔎</span><input id="destSearch" type="search" placeholder="Search place, country, food…" oninput="setDestSearch(this.value)" onkeydown="if(event.key==='Escape'&&this.value){event.stopPropagation();this.value='';setDestSearch('');}" aria-label="Search destinations by name, country, region, continent or food"><button class="sclear" type="button" onclick="clearDestSearch()" aria-label="Clear search" hidden>✕</button></div>
     <div id="destGroups"></div>
     <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Tap any place to explore it! ⭐ ratings &amp; map pins come from Google Maps.</p>
   </section>
