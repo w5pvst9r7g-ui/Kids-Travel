@@ -5778,6 +5778,8 @@ function confetti(){
    VIEW SWITCHING
    ===================================================================== */
 let activeView='explore';
+/* keep the browser tab / history entry meaningful as you move around */
+function setDocTitle(label){ try{ document.title = label ? (label+" · Poppy's Atlas") : "Poppy's Atlas — A Kids' Travel Adventure"; }catch(e){} }
 function showView(v){
   const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail',world:'world-view',messages:'messages'};
   activeView=v;
@@ -5789,6 +5791,7 @@ function showView(v){
   if(v==='badges'){ renderStats(); renderAchievements(); }
   if(v==='world') renderWorld();
   if(v==='messages') renderMessages();
+  if(v!=='detail'){ const VT={explore:'Explore',upcoming:'Upcoming',map:'Atlas Map',trips:'Journal',badges:'Badges',packing:'Packing',world:'Countries of the World',messages:'Mail'}; setDocTitle(VT[v]); }
   if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><h3>Hmm, the map hiccuped</h3><p>Something went wrong loading the map.</p><button class="btn btn-teal" onclick="initMap()">↻ Try again</button></div>'; } },90); }
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
@@ -6026,7 +6029,7 @@ function togglePack(id,i){
    DETAIL
    ===================================================================== */
 function openDest(id){
-  const d=DESTS.find(x=>x.id===id); if(!d) return; currentDest=d; const th=themeFor(d);
+  const d=DESTS.find(x=>x.id===id); if(!d) return; currentDest=d; const th=themeFor(d); setDocTitle(d.name);
   const visYears=[...new Set(tripsForDest(d.id).filter(t=>!t.planned).map(t=>t.year))].sort();
   const visChip=visYears.length?`<div class="visited-chip">✓ You've been here · ${visYears.join(', ')}</div>`:'';
   document.getElementById('dhero').innerHTML=`

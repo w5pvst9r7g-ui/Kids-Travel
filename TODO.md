@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Meaningful page titles** — the browser tab / history entry now reflects where you are ("Paris · Poppy's Atlas", "Badges · Poppy's Atlas"…) instead of a static title, so the back button and open tabs make sense
 - [x] **Esc clears search; CI verified green** — pressing Escape in the Explore search now clears it (and resets the grid); also confirmed GitHub Actions CI is passing on main for all recent commits
 - [x] **Modals animate in** — all dialog cards (settings, cloud, avatar, change-PIN, postcard, confirm) now gently scale + fade in with a soft spring instead of popping, with a fading backdrop (reduced-motion aware)
 - [x] **On-brand confirm dialog** — replaced the jarring native confirm() for destructive actions (delete a trip, restore sample trips) with a themed Poppy dialog (🐾 + Cancel/coral action), focus-trapped, Esc=cancel, focus restored on close. Verified Cancel keeps / Confirm removes
