@@ -6153,11 +6153,12 @@ function quickVisit(id){
   checkAchievements();
 }
 /* tiny toast (reuses the badge-toast styling) */
-function toast(msg){
+function toast(msg,kind){
   let wrap=document.getElementById('achToastWrap');
   if(!wrap){ wrap=document.createElement('div'); wrap.id='achToastWrap'; wrap.className='ach-toast-wrap'; wrap.setAttribute('aria-live','polite'); document.body.appendChild(wrap); }
-  const t=document.createElement('div'); t.className='ach-toast'; t.style.setProperty('--ac','var(--green-d)'); t.setAttribute('role','status');
-  t.innerHTML=`<div class="em" aria-hidden="true">✓</div><div class="tx"><b>Nice!</b><div class="nm">${esc(msg)}</div></div>`;
+  const err=kind==='error';
+  const t=document.createElement('div'); t.className='ach-toast'; t.style.setProperty('--ac',err?'var(--coral-d)':'var(--green-d)'); t.setAttribute('role','status');
+  t.innerHTML=`<div class="em" aria-hidden="true">${err?'⚠️':'✓'}</div><div class="tx"><b>${err?'Oops!':'Nice!'}</b><div class="nm">${esc(msg)}</div></div>`;
   wrap.appendChild(t); requestAnimationFrame(()=>t.classList.add('in'));
   setTimeout(()=>{ t.classList.remove('in'); setTimeout(()=>t.remove(),400); }, 3200);
 }
@@ -7487,7 +7488,7 @@ function saveProfileName(){
   if(!currentProfile) return;
   const ni=document.getElementById('setNameInput'); if(!ni) return;
   if(setName(currentProfile,ni.value)){ ni.value=nameFor(currentProfile); sfx('good'); toast('Name saved! ✏️'); }
-  else { ni.value=nameFor(currentProfile); toast('Please type a name first'); }
+  else { ni.value=nameFor(currentProfile); toast('Please type a name first','error'); }
 }
 /* =====================================================================
    MESSAGES — send a fellow explorer a note, emojis or a voice note.
@@ -7504,7 +7505,7 @@ const MSG_QUICK=['👋','😄','❤️','👍','🎉','🦄','🚀','🌈'];
 let _msgPeer=null, _msgVoice=null, _msgRec=null, _msgChunks=[], _msgRecStart=0, _msgRecTimer=null;
 
 function loadMessages(){ try{const s=localStorage.getItem(MSG_KEY); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){} return []; }
-function saveMessages(a){ try{localStorage.setItem(MSG_KEY,JSON.stringify(a));}catch(e){ toast('Out of room — clear a chat to send more.'); } }
+function saveMessages(a){ try{localStorage.setItem(MSG_KEY,JSON.stringify(a));}catch(e){ toast('Out of room — clear a chat to send more.','error'); } }
 function msgPeers(){ return PROFILES.filter(p=>p.id!==currentProfile); }
 function msgUnreadFrom(peerId){ if(!currentProfile) return 0; return loadMessages().filter(m=>m.from===peerId&&m.to===currentProfile&&!m.read).length; }
 function msgUnreadTotal(){ if(!currentProfile) return 0; return loadMessages().filter(m=>m.to===currentProfile&&!m.read).length; }
@@ -7600,7 +7601,7 @@ function msgDropVoice(){ _msgVoice=null;
 
 function msgToggleRecord(){
   if(_msgRec&&_msgRec.state==='recording'){ msgStopRecord(); return; }
-  if(!msgVoiceSupported()){ toast('Voice notes need microphone access in a supported browser.'); return; }
+  if(!msgVoiceSupported()){ toast('Voice notes need microphone access in a supported browser.','error'); return; }
   navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
     let mime=''; try{ if(MediaRecorder.isTypeSupported('audio/webm')) mime='audio/webm';
       else if(MediaRecorder.isTypeSupported('audio/mp4')) mime='audio/mp4'; }catch(e){}
@@ -7621,7 +7622,7 @@ function msgToggleRecord(){
     _msgRecTimer=setInterval(()=>{ const s=Math.round((Date.now()-_msgRecStart)/1000);
       const el=document.getElementById('msgRecTime'); if(el) el.textContent='Recording '+s+'s… tap ⏹️ to stop';
       if(s>=30) msgStopRecord(); },300);
-  }).catch(()=>{ toast('Couldn’t use the microphone. Check permissions.'); });
+  }).catch(()=>{ toast('Couldn’t use the microphone. Check permissions.','error'); });
 }
 function msgStopRecord(){
   if(_msgRecTimer){ clearInterval(_msgRecTimer); _msgRecTimer=null; }
@@ -7668,14 +7669,14 @@ function pcNativeShare(){
 function pcCopyLink(){ const li=document.getElementById('pcLink'); if(!li) return; const link=li.value;
   const done=()=>toast('Link copied! Paste it to your friend. 🔗');
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done).catch(()=>{ li.select(); try{document.execCommand('copy');done();}catch(e){} }); }
-  else { li.select(); try{document.execCommand('copy');done();}catch(e){ toast('Long-press the link to copy it.'); } }
+  else { li.select(); try{document.execCommand('copy');done();}catch(e){ toast('Long-press the link to copy it.','error'); } }
 }
 function pcDownload(){ const msg=_pcMsg; if(!msg) return;
   try{ const blob=new Blob([JSON.stringify({p:1,m:msg})],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='poppy-postcard-'+(nameFor(msg.to)||'friend').replace(/\s+/g,'-').toLowerCase()+'.json'; a.click();
     setTimeout(()=>{try{URL.revokeObjectURL(a.href);}catch(e){}},4000);
-    toast('Saved! Send the file to your friend. 📥'); }catch(e){ toast('Could not save the file.'); }
+    toast('Saved! Send the file to your friend. 📥'); }catch(e){ toast('Could not save the file.','error'); }
 }
 function validPostcardMsg(m){
   if(!m||typeof m!=='object') return null;
@@ -7692,7 +7693,7 @@ function validPostcardMsg(m){
 }
 function importPostcardObj(obj){
   const m=validPostcardMsg(obj&&(obj.m||obj));
-  if(!m){ toast('That postcard could not be read.'); return false; }
+  if(!m){ toast('That postcard could not be read.','error'); return false; }
   const arr=loadMessages();
   if(arr.some(x=>x.id===m.id)){ toast('You already have that postcard. 📬'); return true; }
   arr.push(m); saveMessages(arr); updateMsgBadge();
@@ -7701,7 +7702,7 @@ function importPostcardObj(obj){
   return true;
 }
 function receivePostcardFile(input){ const f=input.files&&input.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=()=>{ try{ importPostcardObj(JSON.parse(r.result)); }catch(e){ toast('That file is not a postcard.'); } input.value=''; };
+  const r=new FileReader(); r.onload=()=>{ try{ importPostcardObj(JSON.parse(r.result)); }catch(e){ toast('That file is not a postcard.','error'); } input.value=''; };
   r.readAsText(f); }
 function checkIncomingPostcard(){
   if(typeof location==='undefined') return;
