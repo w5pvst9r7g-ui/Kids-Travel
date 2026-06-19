@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Packing completion celebration** — checking off the last item now celebrates with confetti, a win chime and a "🎒 All packed for {city} — ready for adventure!" toast (only at the moment of completion), matching the foodie/badge rewards
 - [x] **Styled toasts replace native alerts** — journal import/export, restore and add-trip validation now use the app's own toast (success or "⚠️ Oops!" error) instead of jarring browser alert() popups; the one rare critical storage-failure warning stays a blocking alert
 - [x] **Journal save feedback** — saving a trip now confirms with a toast ("🎉 …added to your journal!" for new, "✏️ Trip updated!" for edits); edits previously gave no feedback at all
 - [x] **A11y: lightbox returns focus** — closing the photo lightbox (gallery, food, or spot) now returns keyboard focus to the exact image that opened it, instead of dropping focus to the page top

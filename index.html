@@ -5991,7 +5991,15 @@ function renderPackingScreen(){
       return `<button class="pack-trip ${x.id===t.id?'active':''}" role="tab" aria-selected="${x.id===t.id}" onclick="packTripId='${x.id}';renderPackingScreen()"><span class="pt-city">${esc(x.flag||'')} ${esc(x.city)}</span><span class="pt-prog ${done?'done':''}">${done?'✓ packed':s.done+'/'+s.total}</span></button>`; }).join('')}</div>` : '';
   host.innerHTML = picker + packBoxHTML(t);
 }
-function togglePack(id,i){ if(!packState[id])packState[id]={}; packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); renderPackingScreen(); }
+function togglePack(id,i){
+  if(!packState[id])packState[id]={};
+  const trip=trips.find(t=>t.id===id); const before=trip?packStats(trip):null;
+  packState[id][i]=!packState[id][i]; savePack(packState); renderPacking(); renderPackingScreen();
+  if(trip){ const after=packStats(trip);
+    if(after.total>0 && after.done===after.total && (!before||before.done<before.total)){
+      sfx('win'); if(!reduceMotion){ try{confetti();}catch(e){} } toast('🎒 All packed for '+(trip.city||'your trip')+' — ready for adventure!');
+    } }
+}
 
 /* =====================================================================
    DETAIL
