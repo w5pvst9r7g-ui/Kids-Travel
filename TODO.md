@@ -122,6 +122,7 @@ Last updated: 2026-06-09
 ## 🆕 New tasks (added as they come up)
 - [x] **A11y: lightbox returns focus** — closing the photo lightbox (gallery, food, or spot) now returns keyboard focus to the exact image that opened it, instead of dropping focus to the page top
 - [x] **A11y: dialogs return focus** — closing Settings, Cloud sync, the avatar picker or the Poppy pop-up now returns keyboard focus to the control that opened it (shared modalCapture/modalRestore), completing the modal focus-management pattern
+- [x] **A11y: complete focus management** — the cat-story reader now also returns focus to its cover on close, so every overlay in the app (lightbox, story, settings, cloud, avatar, pop-up) restores focus to its trigger — verified across all of them
 - [x] **Fix: error toasts looked like success** — failures (out of room, mic blocked, bad postcard file…) showed a green "✓ Nice!"; toasts now take an error variant ("⚠️ Oops!" in coral) so problems read as problems
 - [x] **Friendlier map states** — the map loading/error/offline states are now clean centred layouts (big icon, clear heading, short explanation, ↻ Try again) instead of a cramped run-on sentence — what kids on restricted school/guest Wi‑Fi actually see
 - [x] **Icon stat tiles** — the travel-stats tiles (below the Atlas Map) now each carry an emoji icon above the number (🌍 countries, 🧭 adventures, ✈️ km, 📅 coming up, 🍴 foods) for a more visual, scannable, colourful look

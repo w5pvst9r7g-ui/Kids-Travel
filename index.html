@@ -5667,6 +5667,7 @@ function openStory(id,si){
   }
   renderStoryPage();
   const sr=document.getElementById('storyReader'); const wasHidden=sr.classList.contains('hidden');
+  if(wasHidden) modalCapture();
   sr.classList.remove('hidden');
   if(wasHidden) ktOpen(_hideStory);
   if(currentDest) markCatRead(currentDest.id);
@@ -5690,7 +5691,8 @@ function _hideStory(){ const o=document.getElementById('storyReader'); if(o) o.c
     const panel=document.getElementById('panel-cat');
     const covers=panel?panel.querySelectorAll('.catcover'):[];
     const cov=covers[storyIndex], pic=cov&&cov.querySelector('.catcover-pic');
-    if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } } }
+    if(pic && !cov.querySelector('.cover-read')){ const b=document.createElement('span'); b.className='cover-read'; b.textContent='✓ Read'; pic.appendChild(b); } }
+  modalRestore(); }
 function closeStory(){ ktBack(_hideStory); }
 /* —— photo lightbox —— */
 let _lbReturnFocus=null;
