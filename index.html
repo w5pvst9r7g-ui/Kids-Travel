@@ -832,6 +832,11 @@ html.night .qreveal.no{background:rgba(240,110,90,.16)}
 .amodal{position:fixed;inset:0;z-index:5500;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(20,22,40,.55);backdrop-filter:blur(3px)}
 .amodal.hidden{display:none}
 .amodal-card{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);max-width:430px;width:100%;padding:24px;text-align:center;max-height:86vh;overflow:auto}
+@keyframes amodalCardIn{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes amodalBgIn{from{opacity:0}to{opacity:1}}
+.amodal:not(.hidden){animation:amodalBgIn .2s ease both}
+.amodal:not(.hidden) .amodal-card{animation:amodalCardIn .28s cubic-bezier(.34,1.35,.5,1) both}
+@media(prefers-reduced-motion:reduce){.amodal:not(.hidden),.amodal:not(.hidden) .amodal-card{animation:none}}
 .amodal-card h3{font-size:1.35rem;margin-bottom:16px}
 .confirm-card{max-width:380px}
 .confirm-card .confirm-ico{font-size:2.6rem;line-height:1;margin-bottom:8px}
