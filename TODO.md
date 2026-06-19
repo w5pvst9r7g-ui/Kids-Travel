@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Icon stat tiles** — the travel-stats tiles (below the Atlas Map) now each carry an emoji icon above the number (🌍 countries, 🧭 adventures, ✈️ km, 📅 coming up, 🍴 foods) for a more visual, scannable, colourful look
 - [x] **Bahamas added as a visited country** — a 2025 hop from the Miami trip (Nassau), counts for both Jean-Luc & Hailey on the World page, badges and stats; curated Wikimedia photos added so the guide-less trip still shows imagery
 - [x] **Tactile pill controls** — added uniform `:active` press feedback to all filter chips / sort tabs / food toggles, matching the buttons - [x] **Design review + nav polish** nav for a consistently responsive feel
 - [x] **Design review + nav polish** — full desktop/mobile/320px UX pass (confirmed: 1160px max-width container, responsive padding, nav holds to 320px with no overflow, constrained text measures, cohesive palette). Refined the bottom-nav active tab: gradient depth, springy lift, enlarged icon + tactile press feedback (reduced-motion aware). *(Note: couldn't install a "UX UI Pro" MCP — MCP servers are configured in Claude Code settings, not installable from this sandbox — so the review used the headless-browser workflow.)*
