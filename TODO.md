@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Friendlier map states** — the map loading/error/offline states are now clean centred layouts (big icon, clear heading, short explanation, ↻ Try again) instead of a cramped run-on sentence — what kids on restricted school/guest Wi‑Fi actually see
 - [x] **Icon stat tiles** — the travel-stats tiles (below the Atlas Map) now each carry an emoji icon above the number (🌍 countries, 🧭 adventures, ✈️ km, 📅 coming up, 🍴 foods) for a more visual, scannable, colourful look
 - [x] **Bahamas added as a visited country** — a 2025 hop from the Miami trip (Nassau), counts for both Jean-Luc & Hailey on the World page, badges and stats; curated Wikimedia photos added so the guide-less trip still shows imagery
 - [x] **Tactile pill controls** — added uniform `:active` press feedback to all filter chips / sort tabs / food toggles, matching the buttons - [x] **Design review + nav polish** nav for a consistently responsive feel

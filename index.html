@@ -462,6 +462,11 @@ html.night .bp-fun{background:rgba(244,203,118,.13);color:var(--yellow)}
   outline:1px solid var(--line);margin-top:6px;z-index:1;background:#dfeef5}
 .maperr{height:min(60vh,560px);border-radius:var(--r-xl);background:var(--surface);border:2px solid var(--line);
   display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;padding:24px}
+.maperr-in{max-width:400px;display:flex;flex-direction:column;align-items:center;gap:7px}
+.maperr-in .maperr-ico{font-size:2.8rem;line-height:1;filter:drop-shadow(0 3px 5px rgba(0,0,0,.12))}
+.maperr-in h3{font-family:var(--display);font-weight:800;color:var(--ink);font-size:1.22rem}
+.maperr-in p{color:var(--muted);font-weight:700;line-height:1.45;margin:0}
+.maperr-in .btn{margin-top:12px}
 .badge-ribbon{display:flex;align-items:center;gap:15px;background:linear-gradient(120deg,#fff,var(--surface-2));
   border:2px solid var(--line);border-radius:var(--r-lg);padding:15px 20px;box-shadow:var(--shadow-sm);margin-top:18px;flex-wrap:wrap}
 .badge-ribbon .em{font-size:2.6rem;line-height:1}
@@ -5754,7 +5759,7 @@ function showView(v){
   if(v==='badges'){ renderStats(); renderAchievements(); }
   if(v==='world') renderWorld();
   if(v==='messages') renderMessages();
-  if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='🗺️ Something went wrong loading the map. <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; } },90); }
+  if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><h3>Hmm, the map hiccuped</h3><p>Something went wrong loading the map.</p><button class="btn btn-teal" onclick="initMap()">↻ Try again</button></div>'; } },90); }
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
   observeReveals();
 }
@@ -6239,12 +6244,12 @@ function initMap(){
   if(typeof L!=='undefined'){ buildMap(); return; }
   if(leafletLoading) return;
   leafletLoading=true;
-  el.className='maperr'; el.innerHTML='🗺️ Loading your map…';
+  el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><p>Loading your map…</p></div>';
   ensureLeafletCss();
   loadFrom(LEAFLET_JS,0,u=>{const s=document.createElement('script');s.src=u;return s;},ok=>{
     leafletLoading=false;
     if(ok && typeof L!=='undefined'){ el.className=''; el.innerHTML=''; buildMap(); }
-    else{ el.className='maperr'; el.innerHTML='🗺️ Couldn’t load the map library. Your network may be blocking unpkg, jsDelivr <em>and</em> cdnjs (some school / work / iOS content filters do this). Try a different Wi‑Fi or turn off any content blocker, then <button class="btn btn-teal" style="margin-top:12px" onclick="initMap()">Try again</button>'; }
+    else{ el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><h3>The map needs the internet</h3><p>Your network might be blocking it — this can happen on school, work or guest Wi‑Fi. Try another network or turn off any content blocker.</p><button class="btn btn-teal" onclick="initMap()">↻ Try again</button></div>'; }
   });
 }
 function buildMap(){
