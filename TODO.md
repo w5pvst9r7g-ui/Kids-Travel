@@ -24,7 +24,8 @@ Last updated: 2026-06-09
 - [x] **Per-user DOB filtering** (Jean-Luc 2016, Hailey 2019 — hide trips before they were born)
 
 ### Engagement
-- [x] **💌 Mail** — message a fellow explorer: text, emoji quick-bar + full picker, and voice notes (🎙️ up to 30s); chat bubbles, unread badge, per-chat clear; shared store rides Cloud sync
+- [x] **💌 Mail** — message a fellow explorer: text, emoji quick-bar + full picker, and voice notes (🎙️ up to 30s); chat bubbles, unread badge, per-chat clear
+- [x] **Postcards** — cross-device delivery with no backend: Send shares a link (text/emoji) or file (voice) via the device share sheet; tapping/opening it imports into the other device's Mail (validated, deduped); also rides Cloud sync
 - [x] 40 Explorer Badges (reconcile with live itinerary; 15 still to earn)
 - [x] Surprise-me 🎲, per-destination quiz, Poppy speech bubble
 - [x] Dramatic countdown to next trip + **"It's today!" celebration**

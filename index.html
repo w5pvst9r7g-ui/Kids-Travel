@@ -1451,6 +1451,22 @@ create policy "atlas all" on atlas_sync
   </div>
 </div>
 
+<div id="postcardModal" class="amodal hidden" role="dialog" aria-modal="true" aria-label="Send postcard" onclick="if(event.target.id==='postcardModal')closePostcard()">
+  <div class="amodal-card cloud-card">
+    <button class="story-close" onclick="closePostcard()" aria-label="Close">✕</button>
+    <h3>📮 Send your postcard</h3>
+    <p class="cloud-lead">Your note is saved here in your Mail. To pop it onto your friend's device, send them this — any way you like! When they open it, it lands right in their Mail. 💌</p>
+    <label class="cloud-l" for="pcLink">Postcard link</label>
+    <input id="pcLink" class="cloud-in" type="text" readonly onclick="this.select()" aria-label="Postcard link" />
+    <div class="cloud-row">
+      <button class="btn btn-primary" id="pcShareBtn" onclick="pcNativeShare()">📤 Share</button>
+      <button class="btn btn-teal" onclick="pcCopyLink()">🔗 Copy link</button>
+      <button class="btn btn-ghost" onclick="pcDownload()">📥 Save as file</button>
+    </div>
+    <p class="set-foot" id="pcVoiceNote" hidden>🎧 Voice notes are too big for a link — tap <b>Share</b> or <b>Save as file</b> and send the file. Your friend opens it with “📥 Get a postcard”.</p>
+  </div>
+</div>
+
 <main id="main" tabindex="-1">
   <!-- ===================== EXPLORE ===================== -->
   <section id="explore" class="view active">
@@ -1621,7 +1637,7 @@ create policy "atlas all" on atlas_sync
   <section id="messages" class="view">
     <div class="section-head"><div><span class="eyebrow">Say hi to your crew</span><h2>Postcards &amp; Notes 💌</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-hi.png"></div>
     <div class="msg-wrap">
-      <p class="hint" style="margin:-6px 0 14px">Send a fellow explorer a little message, a pile of emojis, or even record a voice note! 🎙️</p>
+      <p class="hint" style="margin:-6px 0 14px">Send a fellow explorer a little message, a pile of emojis, or even a voice note 🎙️ — then share the postcard so it lands on their device!</p>
       <div class="msg-people" id="msgPeople" role="tablist" aria-label="Who to message"></div>
       <div class="msg-thread" id="msgThread" aria-live="polite"></div>
 
@@ -1636,8 +1652,13 @@ create policy "atlas all" on atlas_sync
         <div class="msg-rechint" id="msgRecHint"><span class="dot"></span><span id="msgRecTime">Recording… tap 🎙️ to stop</span></div>
         <div class="msg-preview" id="msgPreview"><span class="msg-voice">🎧 Your voice note</span><audio id="msgPreviewAudio" controls></audio><button class="drop" type="button" onclick="msgDropVoice()" aria-label="Delete voice note" title="Delete">🗑️</button></div>
       </div>
-      <div class="msg-clearrow"><button class="btn-text" id="msgClearBtn" onclick="msgClearChat()">🧹 Clear this chat</button></div>
-      <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>Messages stay private on this device, and travel with you if you turn on Cloud sync. ☁️</p>
+      <div class="msg-clearrow">
+        <button class="btn-text" onclick="document.getElementById('pcFile').click()">📥 Get a postcard</button>
+        <span aria-hidden="true" style="opacity:.4;margin:0 6px">·</span>
+        <button class="btn-text" id="msgClearBtn" onclick="msgClearChat()">🧹 Clear this chat</button>
+        <input id="pcFile" type="file" accept="application/json,.json" hidden onchange="receivePostcardFile(this)">
+      </div>
+      <p class="footnote"><span class="mini">✦ ✦ ✦</span><br>On another device? Tap <b>Send</b>, then share the postcard link or file — your friend opens it and your note pops into their Mail. No accounts needed! 💌</p>
     </div>
   </section>
 </main>
@@ -1805,6 +1826,7 @@ const FOOD_BY_COUNTRY = {
   "France":[["🥐","Croissant","A buttery, flaky crescent pastry for breakfast.","sweet"],["🥖","Baguette","A long crusty loaf, perfect with cheese.","snack"],["🥞","Crêpe","A thin pancake folded around chocolate, jam or sugar.","sweet"],["🐌","Escargots","Yes — snails in garlicky butter. Dare you?","main"],["🧀","Croque-monsieur","A toasted ham sandwich with melty cheese on top.","main"],["🌈","Macarons","Rainbow almond cookies with a creamy filling.","sweet"]],
   "Greece":[["🥙","Gyros","Warm pita wrapped around meat, tomato and chips.","main"],["🥧","Spanakopita","A flaky spinach and feta cheese pie.","snack"],["🍢","Souvlaki","Grilled meat skewers straight off the coals.","main"],["🍯","Baklava","Sweet layered pastry packed with nuts and honey.","sweet"],["🍩","Loukoumades","Honey-soaked doughnut balls.","sweet"],["🍦","Yogurt & honey","Thick Greek yogurt with a golden honey drizzle.","sweet"]],
   "Iceland":[["🌭","Pylsur","An Icelandic hot dog with crispy onions.","snack"],["🍲","Kjötsúpa","Hearty lamb and vegetable soup.","main"],["🐟","Plokkfiskur","Creamy mashed fish with potato.","main"],["🍮","Skyr","Thick, smooth yogurt eaten with berries.","sweet"],["🍩","Kleinur","Twisted little fried doughnuts.","sweet"],["🍞","Rúgbrauð","Dark rye bread baked using hot-spring steam!","snack"]],
+  "Italy":[["🍕","Pizza Margherita","A thin pizza with tomato, mozzarella and basil — born in Italy!","main"],["🍝","Spaghetti","Long pasta twirled with tomato or creamy sauce.","main"],["🍨","Gelato","Silky Italian ice cream in every flavour you can dream of.","sweet"],["🧀","Risotto alla Milanese","Golden saffron rice — Milan’s own creamy speciality.","main"],["🥖","Focaccia","A soft, dimpled flatbread brushed with olive oil and salt.","snack"],["🍮","Tiramisù","Coffee-soaked sponge layered with creamy mascarpone.","sweet"]],
   "Maldives":[["🐟","Mas huni","Shredded tuna, coconut and onion — a breakfast favourite.","main"],["🫓","Roshi","Soft flatbread to scoop up curries.","snack"],["🍢","Gulha","Fried dough balls stuffed with spicy tuna.","snack"],["🥥","Fresh coconut","Sipped ice-cold straight from the shell.","drink"],["🍮","Bondibai","Sweet coconut rice pudding.","sweet"],["🍌","Banana fritters","Bananas battered and fried until sweet and warm.","sweet"]],
   "Morocco":[["🍲","Tagine","A slow-cooked stew served in a cone-shaped pot.","main"],["🍚","Couscous","Fluffy tiny grains piled with veg and meat.","main"],["🥧","Pastilla","A sweet-and-savoury pie dusted with icing sugar.","main"],["🍪","Chebakia","Sesame cookies dipped in honey.","sweet"],["🍵","Mint tea","Sweet tea poured from way up high.","drink"],["🥞","Msemen","Square pan-fried pancakes drizzled with honey.","sweet"]],
   "New Zealand":[["🥧","Mince pie","A flaky pie full of savoury beef.","main"],["🍠","Hāngī","Food cooked underground over hot stones — a Māori feast.","main"],["🍮","Pavlova","Meringue cake topped with cream and kiwifruit.","sweet"],["🍦","Hokey pokey","Vanilla ice cream with crunchy honeycomb bits.","sweet"],["🐟","Fish & chips","Eaten on the beach straight from the paper.","main"],["🍪","Afghan biscuit","A chocolate cornflake cookie topped with a walnut.","sweet"]],
@@ -1860,6 +1882,71 @@ const DESTS = [
     ['🏎️','Fast Track Go-Karts','The longest e-go-kart track in the Maldives — for thrill-seekers aged 10+.',4.7,'1,420','Kandima Maldives Fast Track go kart'],
     ['💦','The Big Waterslide','A giant slide straight into the pool — Kandima’s most famous splash.',4.7,'1,420','Kandima Maldives'],
     ['🐠','Glass-Bottom Kayak','Paddle over the lagoon and watch the reef through the see-through floor.',4.7,'1,420','Kandima Maldives water sports']
+  ]
+},
+{
+  id:'milan', name:'Milan', short:'Italy', country:'Italy', flag:'🇮🇹',
+  emoji:'⛪', region:'City', tag:'Coming Soon', colors:['#c1121f','#1d7874'],
+  tagline:'A grand cathedral you can climb, Leonardo da Vinci’s famous painting, a knights’ castle and the best gelato in the world!',
+  lat:45.4642, lng:9.1900,
+  gettingThere:{
+    to:'MXP', toName:'Milan Malpensa', flightTime:'~2 h 40 (direct ✈️)',
+    route:'Dublin → Milan Malpensa (Ryanair, nonstop). You fly home from Milan Bergamo (Orio al Serio).',
+    distance:'≈ 1,560 km', tz:'GMT +2 (summer)', best:'Apr–Jun & Sep–Oct; you go in July ☀️'
+  },
+  country_info:{
+    capital:'Rome', language:'Italian', currency:'Euro (€)',
+    population:'≈ 59 million (Italy)', tz:'GMT +1 (GMT +2 in summer)',
+    fun:[
+      'Italy is shaped like a long boot kicking a ball — the island of Sicily — into the sea! 👢',
+      'Italians invented pizza, gelato and spaghetti, and each person eats about 25 kg of pasta a year. 🍝',
+      'Milan’s great cathedral, the Duomo, took almost 600 years to build and has 135 marble spires.'
+    ],
+    kid:[
+      'You can ride a lift to the Duomo rooftop and walk among the spires high above the whole city. ⛪',
+      'In the Galleria arcade, everyone spins their heel on a little bull mosaic for good luck. 🐂',
+      'Milan still runs rattly orange trams, and some of them are nearly 100 years old! 🚋'
+    ]
+  },
+  photos:[
+    ['milan,duomo,cathedral','The Duomo',361],['galleria,vittorio,emanuele,milan','Galleria arcade',362],
+    ['sforza,castle,milan','Sforza Castle',363],['navigli,milan,canal','Navigli canals',364],
+    ['milan,tram,street','Vintage tram',365],['last,supper,leonardo,milan','The Last Supper',366],
+    ['gelato,italy,icecream','Italian gelato',367],['san,siro,stadium,milan','San Siro stadium',368],
+    ['milan,duomo,rooftop','Duomo rooftop',369],['parco,sempione,milan','Parco Sempione',370]
+  ],
+  attractions:[
+    ['⛪','Duomo di Milano','Italy’s biggest cathedral — climb to the rooftop and walk among 135 marble spires.'],
+    ['🛍️','Galleria Vittorio Emanuele II','A grand glass-domed shopping arcade — spin on the bull mosaic for good luck.'],
+    ['🏰','Sforza Castle','A huge red-brick castle with drawbridges, museums and leafy Parco Sempione behind it.'],
+    ['🖼️','The Last Supper','Leonardo da Vinci’s giant 500-year-old wall painting at Santa Maria delle Grazie.'],
+    ['🛶','Navigli Canals','Old canals — some designed by Leonardo — lined with cafés and weekend markets.'],
+    ['⚽','San Siro Stadium','One of Europe’s biggest football grounds, shared by AC Milan and Inter.'],
+    ['🚋','Historic Trams','Hop on a rattly orange tram from the 1920s for a ride through the city.'],
+    ['🎡','Duomo Rooftop Terraces','Walk along the cathedral roof for a close-up of the golden Madonnina statue.']
+  ],
+  kids:[
+    ['🔬','Leonardo da Vinci Science Museum','Italy’s biggest science & tech museum — Leonardo’s machines, trains, planes and a real submarine.',4.6,'27,000','Leonardo da Vinci National Museum Science Technology Milan'],
+    ['🐠','Acquario Civico','Milan’s pretty Liberty-style aquarium with rivers, reefs and rock pools — and it’s free!',4.2,'6,500','Acquario Civico di Milano'],
+    ['🌳','Parco Sempione','A big park behind the castle with ponds, ducks, a playground and a tall viewing tower.',4.6,'62,000','Parco Sempione Milan'],
+    ['🎢','Gardaland','Italy’s favourite theme park, an hour away by Lake Garda, with coasters and a Lego land.',4.5,'48,000','Gardaland Resort Castelnuovo del Garda'],
+    ['🦖','Natural History Museum','Dinosaur skeletons, a giant whale and sparkling minerals in a grand old building.',4.4,'9,000','Museo di Storia Naturale Milano'],
+    ['⛪','Duomo Rooftop','Take the lift up and wander among the spires high above Milan.',4.8,'88,000','Duomo di Milano rooftop terraces'],
+    ['🧸','Leolandia','A fairy-tale theme park near Bergamo with Peppa Pig, a mini-Italy and farm animals.',4.4,'30,000','Leolandia Capriate San Gervasio'],
+    ['🍨','Gelato Tasting','Hunt for the city’s best gelato — pistachio, stracciatella and fruity sorbets.',4.7,'12,000','best gelato Milan']
+  ],
+  highlights:[
+    'Ride the lift up the Duomo and walk among its 135 marble spires ⛪',
+    'Spin your heel on the lucky bull mosaic in the Galleria 🐂',
+    'See Leonardo da Vinci’s 500-year-old Last Supper painting 🖼️',
+    'Explore the knights’ castle and feed the ducks in Parco Sempione 🏰',
+    'Eat real Italian gelato beside the Navigli canals 🍨'
+  ],
+  tips:[
+    'The Last Supper sells out weeks ahead — book your timed tickets early. 🎟️',
+    'July is hot in Milan — start sightseeing early and take a gelato break in the afternoon. 🍦',
+    'You fly home from Bergamo (Orio al Serio), about an hour from the city centre — leave plenty of time. ✈️',
+    'The metro and trams are quick and cheap — a day pass saves tired little legs. 🚋'
   ]
 },
 {
@@ -3425,6 +3512,27 @@ const LANG_PHRASES = {
     ]
   },
 
+  "Italian": {
+    native: "Italiano", flag: "🇮🇹",
+    phrases: [
+      {en:"Hello", local:"Ciao", say:"CHOW"},
+      {en:"Goodbye", local:"Arrivederci", say:"ah-ree-veh-DAIR-chee"},
+      {en:"Please", local:"Per favore", say:"pair fah-VOH-reh"},
+      {en:"Thank you", local:"Grazie", say:"GRAH-tsee-eh"},
+      {en:"Yes", local:"Sì", say:"SEE"},
+      {en:"No", local:"No", say:"NOH"},
+      {en:"My name is…", local:"Mi chiamo…", say:"mee kee-AH-moh"},
+      {en:"How are you?", local:"Come stai?", say:"KOH-meh STY?"},
+      {en:"Where is the toilet?", local:"Dov'è il bagno?", say:"doh-VEH eel BAH-nyoh?"},
+      {en:"How much is it?", local:"Quanto costa?", say:"KWAN-toh KOH-stah?"},
+      {en:"Can I have an ice cream please?", local:"Un gelato, per favore?", say:"oon jeh-LAH-toh, pair fah-VOH-reh?"},
+      {en:"Water please", local:"Acqua, per favore", say:"AH-kwah, pair fah-VOH-reh"},
+      {en:"Help!", local:"Aiuto!", say:"ah-YOO-toh!"},
+      {en:"Wow / Cool!", local:"Forte!", say:"FOR-teh!"},
+      {en:"One, Two, Three", local:"Uno, due, tre", say:"OO-noh, DOO-eh, TREH"}
+    ]
+  },
+
   "Spanish": {
     native: "Español", flag: "🇪🇸",
     phrases: [
@@ -3789,6 +3897,7 @@ const LANG_PHRASES = {
 const DEST_LANG = {
   "maldives": "Dhivehi",
   "rabat": "Arabic",
+  "milan": "Italian",
   "lapland": "Finnish",
   "athens": "Greek",
   "rhodes": "Greek",
@@ -4712,6 +4821,19 @@ const LOCAL_CATS = {
       "That night Coco curled on the warm planks of her favourite walkway, watching the lagoon glow faintly blue with tiny glowing plankton. She had crossed the sea, met the dolphins, saved a sandwich and become a hero — and still come safely home. “The best adventure,” she purred, tucking her nose under her paw, “always ends back where you belong.” And the parrotfish below seemed to agree."
     ]
   },
+  "milan": {
+    name: "Gattino",
+    photoKw: "cat,milan,city",
+    title: "Gattino and the Spires of the Duomo",
+    pages: [
+      "Gattino was a sleek grey cat with white socks who lived in the Galleria Vittorio Emanuele II, the grand glass-roofed arcade in the very middle of Milan. All day long he watched smart shoppers spin their heels on a little mosaic bull in the floor for good luck. Gattino spun on it too, of course — three twirls every morning — and then trotted out to gaze up at the enormous cathedral next door, the Duomo, with its 135 pointy marble spires reaching into the sky.",
+      "More than anything, Gattino dreamed of climbing all the way to the top of the Duomo, up among those spires where the golden statue called the Madonnina shines. But the cathedral was so tall and so steep that every cat in Milan said it simply could not be done. “Stay on the ground, little one,” the old market cats told him. “Chase pigeons in the piazza like a sensible cat.” Gattino only flicked his tail and kept on dreaming.",
+      "One bright morning a flock of pigeons swirled up off the square, and right in the middle of them tumbled a tiny lost sparrow, too tired to fly home to her nest. The wind caught her and carried her up, up, up — and she landed, peeping and frightened, on a ledge high on the cathedral roof. The pigeons could not reach her. The people far below could not reach her. Somebody small and brave and clever was needed.",
+      "Gattino did not stop to think. He slipped through an open little door, found a winding stone staircase, and began to climb. Round and round and up and up he went, his white socks twinkling in the dim light, until at last he burst out onto the marble rooftop — into a magical forest of spires and statues, with the whole red-roofed city of Milan spread out far below and the Alps glittering on the edge of the sky.",
+      "Carefully, paw over paw along a narrow ledge, Gattino crept toward the trembling little sparrow. “Hop onto my back,” he purred gently. “I’ll carry you down.” The sparrow buried herself in his soft grey fur, and step by careful step Gattino padded back across the dizzy heights, down all the winding stairs, and out into the warm sunshine of the piazza, where the sparrow’s mother was waiting with happy, fluttering wings.",
+      "A crowd had gathered, and when they saw the brave little cat who had climbed the great Duomo, they cheered and clapped. A kind gelato-seller scooped him a tiny dish of pistachio gelato as a reward. Gattino licked it clean, then curled up that night back home in his Galleria, under the glittering glass dome, the proudest and happiest cat in all of Milan — for he had climbed the spires at last, and helped a friend get home."
+    ]
+  },
   "rabat": {
     name: "Zellij",
     photoKw: "cat,morocco,kasbah",
@@ -5278,7 +5400,8 @@ const SEED_TRIPS = [
   // —— Coming up ——
   {id:'t27', era:'ireland', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, date:'2026-07-23', year:2026, planned:true, rating:0, note:'The big family trip — 23 July to 9 August! Overwater villas, snorkelling and the famous waterslide await.'},
   {id:'t28', era:'ireland', destId:'sunshinecoast', city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-26.6500, lng:153.0667, date:'2026-12-20', year:2026, planned:true, rating:0, note:'Three weeks back on the Sunshine Coast for Christmas! 🎄🏖️'},
-  {id:'t29', era:'ireland', destId:'rabat', city:'Rabat', country:'Morocco', flag:'🇲🇦', emoji:'🕌', lat:34.0209, lng:-6.8416, date:'2026-06-19', year:2026, planned:true, rating:0, note:'Exploring the blue kasbah, Hassan Tower and Rabat Zoo!'}
+  {id:'t29', era:'ireland', destId:'rabat', city:'Rabat', country:'Morocco', flag:'🇲🇦', emoji:'🕌', lat:34.0209, lng:-6.8416, date:'2026-06-19', year:2026, planned:true, rating:0, note:'Exploring the blue kasbah, Hassan Tower and Rabat Zoo!'},
+  {id:'t36', era:'ireland', destId:'milan', city:'Milan', country:'Italy', flag:'🇮🇹', emoji:'⛪', lat:45.4642, lng:9.1900, date:'2026-07-09', year:2026, planned:true, rating:0, note:'A long weekend in Milan (9–12 July)! The Duomo rooftop, Leonardo’s Last Supper, the knights’ castle and lots of gelato 🍨'}
 ];
 
 /* =====================================================================
@@ -5412,15 +5535,21 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
   const c=(onDetail&&currentDest&&typeof LOCAL_CATS!=='undefined')?LOCAL_CATS[currentDest.id]:null;
   let line;
   if(c){
-    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; this.classList.remove('photo'); };
+    /* loremflickr can be slow or hang, which would leave just the turquoise box.
+       Fall back to a Poppy illustration on error OR if the photo hasn't arrived in time. */
+    img.dataset.eggDone='';
+    const toPoppy=()=>{ if(img.dataset.eggDone==='1') return; img.dataset.eggDone='1'; img.onerror=null; img.onload=null; img.classList.remove('photo'); img.src='poppie-hi.png'; };
+    img.onload=function(){ img.dataset.eggDone='1'; };
+    img.onerror=toPoppy;
     img.classList.add('photo');
     img.src=flick(c.photoKw||('cat,'+currentDest.name), 99, 640, 640);
+    setTimeout(()=>{ if(img.dataset.eggDone!=='1' && !(img.complete && img.naturalWidth>0)) toPoppy(); }, 2500);
     const things=(currentDest.attractions&&currentDest.attractions.map(a=>a[1]))||[];
     const thing=things.length?things[Math.floor(Math.random()*things.length)]:currentDest.name;
     const T=localInsults(c.name, currentDest.name, thing);
     line=T[Math.floor(Math.random()*T.length)];
   } else {
-    img.onerror=null; img.classList.remove('photo'); img.src='poppie-hi.png';
+    img.onerror=null; img.onload=null; img.classList.remove('photo'); img.src='poppie-hi.png';
     line=EGG_LINES[Math.floor(Math.random()*EGG_LINES.length)];
   }
   document.getElementById('eggLine').textContent=line;
@@ -5458,7 +5587,26 @@ function getPin(){ try{ const v=localStorage.getItem(PIN_KEY); if(v && /^\d{4}$/
 function setPin(v){ try{ localStorage.setItem(PIN_KEY,v); return true; }catch(e){ return false; } }
 let currentProfile=null;             // chosen at the login screen each visit
 const dataKey=base=>'globie_atlas_'+base+'_v9_'+(currentProfile||'guest');
-function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return v;}}catch(e){}
+/* One-time merge of newly-added booked seed trips into an existing saved
+   journal. loadTrips() only falls back to SEED_TRIPS for a brand-new profile,
+   so without this an existing user would never see a trip we add later (e.g.
+   Milan). Guarded by a per-profile flag so a trip the user later deletes is
+   not resurrected. */
+const NEW_SEED_TRIP_IDS=['t36']; // Milan, Italy (Jul 2026)
+function migrateTrips(arr){
+  try{
+    const flag=dataKey('seedmilan');
+    if(localStorage.getItem(flag)==='1') return arr;
+    let added=false;
+    SEED_TRIPS.filter(t=>NEW_SEED_TRIP_IDS.includes(t.id)).forEach(seed=>{
+      if(!arr.some(t=>t&&t.id===seed.id)){ arr.push(JSON.parse(JSON.stringify(seed))); added=true; }
+    });
+    localStorage.setItem(flag,'1');
+    if(added){ try{ localStorage.setItem(dataKey('trips'),JSON.stringify(arr)); }catch(e){} }
+  }catch(e){}
+  return arr;
+}
+function loadTrips(){ try{const s=localStorage.getItem(dataKey('trips')); if(s){const v=JSON.parse(s); if(Array.isArray(v)) return migrateTrips(v);}}catch(e){}
   return JSON.parse(JSON.stringify(SEED_TRIPS)); }
 let storageOK=true;
 function saveTrips(){ try{localStorage.setItem(dataKey('trips'),JSON.stringify(trips));}
@@ -5492,9 +5640,15 @@ function openStory(id,si){
   const tEl=document.getElementById('storyTitleEl'); if(tEl) tEl.textContent=story.title;
   const img=document.getElementById('storyCatImg');
   if(img){
-    /* flick() forces the "cat" tag and uses loremflickr's /all matcher, so the
-       story cover always shows a real cat; fall back to a Poppy illustration on error. */
-    img.onerror=function(){ this.onerror=null; this.src='poppie-hi.png'; }; img.src=flick(c.photoKw||('cat,'+id),77,520,520);
+    /* flick() forces the "cat" tag and uses loremflickr's /all matcher, so the cover
+       shows a real cat. Fall back to a Poppy illustration on error OR if loremflickr is
+       slow to respond, so the reader never gets stuck on an empty turquoise box. */
+    img.dataset.catDone='';
+    const toPoppy=()=>{ if(img.dataset.catDone==='1') return; img.dataset.catDone='1'; img.onerror=null; img.onload=null; img.src='poppie-hi.png'; };
+    img.onload=function(){ img.dataset.catDone='1'; };
+    img.onerror=toPoppy;
+    img.src=flick(c.photoKw||('cat,'+id),77,520,520);
+    setTimeout(()=>{ if(img.dataset.catDone!=='1' && !(img.complete && img.naturalWidth>0)) toPoppy(); }, 2500);
   }
   renderStoryPage();
   const sr=document.getElementById('storyReader'); const wasHidden=sr.classList.contains('hidden');
@@ -6971,6 +7125,7 @@ const FOOD_FACTS={
   France:"The French eat around 30,000 tonnes of snails every single year! 🐌",
   Greece:"Greeks are the world's biggest olive-oil fans — they drizzle it on almost everything!",
   Iceland:"Some Icelandic rye bread is baked underground using heat from bubbling hot springs!",
+  Italy:"Pizza was born in Italy, and Italians each munch through about 25 kg of pasta a year! 🍝",
   Maldives:"Tuna is so important in the Maldives it turns up at breakfast, lunch AND dinner!",
   Morocco:"Mint tea is poured from way up high to make a frothy top — and to say 'welcome'!",
   "New Zealand":"A hāngī feast is cooked underground over hot stones — it can take hours!",
@@ -7411,15 +7566,14 @@ function msgSend(){
   const t=document.getElementById('msgText');
   const text=t?t.value.trim():'';
   if(!text&&!_msgVoice) return;
-  const arr=loadMessages();
-  arr.push({id:'m'+Date.now()+Math.random().toString(36).slice(2,6), from:currentProfile, to:_msgPeer,
-    text:text.slice(0,500), voice:_msgVoice?_msgVoice.url:null, dur:_msgVoice?_msgVoice.dur:0, ts:Date.now(), read:false});
-  saveMessages(arr);
+  const msg={id:'m'+Date.now()+Math.random().toString(36).slice(2,6), from:currentProfile, to:_msgPeer,
+    text:text.slice(0,500), voice:_msgVoice?_msgVoice.url:null, dur:_msgVoice?_msgVoice.dur:0, ts:Date.now(), read:false};
+  const arr=loadMessages(); arr.push(msg); saveMessages(arr);
   if(t){ t.value=''; msgGrow(t); }
   msgDropVoice();
   const ep=document.getElementById('msgEmojis'); if(ep) ep.classList.remove('show');
   sfx('good'); renderMsgThread(); msgSyncSend();
-  toast('Sent to '+nameFor(_msgPeer)+'! 💌');
+  openPostcardShare(msg);
 }
 
 function msgClearChat(){ if(!_msgPeer) return;
@@ -7467,6 +7621,88 @@ function msgStopRecord(){
   if(navigator.vibrate) try{navigator.vibrate(12);}catch(e){}
 }
 
+/* ---- postcards: deliver a message to ANOTHER device with no server ----
+   There is no backend, so a message saved on one device can't magically
+   appear on another. Instead "Send" hands the note to the device's share
+   sheet as a link (text/emoji) or a small file (voice notes too). The other
+   explorer taps the link or opens the file and it drops into their Mail.
+   Rides whatever the family already uses (Messages, AirDrop, email…). */
+let _pcMsg=null;
+function b64uEnc(str){ try{ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }catch(e){ return ''; } }
+function b64uDec(s){ try{ s=String(s||'').replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; return decodeURIComponent(escape(atob(s))); }catch(e){ return ''; } }
+function postcardLink(msg){
+  /* link carries text/emoji only — voice notes are too big for a URL */
+  const slim={p:1,m:{id:msg.id,from:msg.from,to:msg.to,text:msg.text||'',ts:msg.ts}};
+  const base=(typeof location!=='undefined')?(location.origin+location.pathname):'';
+  return base+'#pc='+b64uEnc(JSON.stringify(slim));
+}
+function openPostcardShare(msg){
+  _pcMsg=msg;
+  const li=document.getElementById('pcLink'); if(li) li.value=postcardLink(msg);
+  const vn=document.getElementById('pcVoiceNote'); if(vn) vn.hidden=!msg.voice;
+  const sb=document.getElementById('pcShareBtn'); if(sb) sb.style.display=(typeof navigator!=='undefined'&&navigator.share)?'':'none';
+  const m=document.getElementById('postcardModal'); if(m) m.classList.remove('hidden');
+}
+function closePostcard(){ const m=document.getElementById('postcardModal'); if(m) m.classList.add('hidden'); }
+function pcNativeShare(){
+  const msg=_pcMsg; if(!msg||!navigator.share) return;
+  const who=nameFor(msg.from);
+  if(msg.voice && navigator.canShare){
+    try{ const file=new File([JSON.stringify({p:1,m:msg})],'poppy-postcard.json',{type:'application/json'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'A postcard from '+who,text:'Open this in Poppy’s Atlas → Mail 💌'}).then(closePostcard).catch(()=>{});
+        return; } }catch(e){}
+  }
+  navigator.share({title:'A postcard from '+who, text:(msg.text?msg.text+' ':'')+'A postcard for you 💌', url:postcardLink(msg)}).then(closePostcard).catch(()=>{});
+}
+function pcCopyLink(){ const li=document.getElementById('pcLink'); if(!li) return; const link=li.value;
+  const done=()=>toast('Link copied! Paste it to your friend. 🔗');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done).catch(()=>{ li.select(); try{document.execCommand('copy');done();}catch(e){} }); }
+  else { li.select(); try{document.execCommand('copy');done();}catch(e){ toast('Long-press the link to copy it.'); } }
+}
+function pcDownload(){ const msg=_pcMsg; if(!msg) return;
+  try{ const blob=new Blob([JSON.stringify({p:1,m:msg})],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='poppy-postcard-'+(nameFor(msg.to)||'friend').replace(/\s+/g,'-').toLowerCase()+'.json'; a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(a.href);}catch(e){}},4000);
+    toast('Saved! Send the file to your friend. 📥'); }catch(e){ toast('Could not save the file.'); }
+}
+function validPostcardMsg(m){
+  if(!m||typeof m!=='object') return null;
+  const ids=PROFILES.map(p=>p.id);
+  if(ids.indexOf(m.from)<0||ids.indexOf(m.to)<0||m.from===m.to) return null;
+  const out={ id:(typeof m.id==='string'&&m.id)?m.id.slice(0,40):'m'+Date.now()+Math.random().toString(36).slice(2,6),
+    from:m.from, to:m.to,
+    text:(typeof m.text==='string'?m.text:'').slice(0,500),
+    voice:(typeof m.voice==='string'&&/^data:audio\//.test(m.voice)&&m.voice.length<900000)?m.voice:null,
+    dur:(typeof m.dur==='number'&&m.dur>0)?Math.min(Math.round(m.dur),60):0,
+    ts:(typeof m.ts==='number'&&m.ts>0)?m.ts:Date.now(), read:false };
+  if(!out.text&&!out.voice) return null;
+  return out;
+}
+function importPostcardObj(obj){
+  const m=validPostcardMsg(obj&&(obj.m||obj));
+  if(!m){ toast('That postcard could not be read.'); return false; }
+  const arr=loadMessages();
+  if(arr.some(x=>x.id===m.id)){ toast('You already have that postcard. 📬'); return true; }
+  arr.push(m); saveMessages(arr); updateMsgBadge();
+  if(activeView==='messages'){ if(m.to===currentProfile) _msgPeer=m.from; renderMessages(); }
+  toast('📬 New postcard from '+nameFor(m.from)+' for '+nameFor(m.to)+'!');
+  return true;
+}
+function receivePostcardFile(input){ const f=input.files&&input.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ try{ importPostcardObj(JSON.parse(r.result)); }catch(e){ toast('That file is not a postcard.'); } input.value=''; };
+  r.readAsText(f); }
+function checkIncomingPostcard(){
+  if(typeof location==='undefined') return;
+  try{ const h=location.hash||''; const i=h.indexOf('pc=');
+    if(i<0) return;
+    const obj=JSON.parse(b64uDec(h.slice(i+3)));
+    try{ if(typeof history!=='undefined'&&history.replaceState) history.replaceState(null,'',location.pathname+location.search); else location.hash=''; }catch(e){}
+    importPostcardObj(obj);
+  }catch(e){}
+}
+
 function sfx(name){
   if(!soundOn||reduceMotion) return;
   /* gentle haptic to match the sound on devices that support it (no-op on desktop) */
@@ -7507,7 +7743,10 @@ try{ const _np=localStorage.getItem('globie_night');
     if(_mq.addEventListener) _mq.addEventListener('change',e=>{ if(localStorage.getItem('globie_night')==null) applyNight(e.matches,false); }); }
 }catch(e){}
 /* production safety-net: never white-screen if boot throws */
-try{ setupLogin(); showLogin(); }
+try{ setupLogin(); showLogin();
+  /* an incoming postcard link (#pc=…) drops straight into Mail */
+  try{ checkIncomingPostcard(); }catch(_e){}
+}
 catch(bootErr){
   try{ console.error('Poppy boot error:',bootErr);
     var ls=document.getElementById('loginScreen');
