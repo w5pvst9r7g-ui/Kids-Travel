@@ -6176,13 +6176,14 @@ function renderDetailCta(d){
   const planned=tripsForDest(d.id).some(t=>t.planned);
   const wished=wishlist.has(d.id);
   const wishBtn=`<button class="btn btn-ghost" onclick="toggleWish('${d.id}',event)">${wished?'💖 On your dream list':'🤍 Add to dream list'}</button>`;
+  const shareBtn=`<button class="btn-text" onclick="shareApp()" aria-label="Share ${esc(d.name)}">🔗 Share this place</button>`;
   wrap.innerHTML = (visited
     ? `<span class="cta-done">✓ You've been here!</span>
        <button class="btn btn-ghost" onclick="showView('map')">🗺️ See on map</button>
        <button class="btn-text" onclick="showView('trips');prefillForm('${d.id}')">✏️ Add another visit / details</button>`
     : `<button class="btn btn-primary" onclick="quickVisit('${d.id}')">✓ I've been here!</button>
        <button class="btn btn-teal" onclick="showView('trips');prefillForm('${d.id}')">⭐ Add with details</button>
-       ${planned?'<span class="note">Already on your upcoming list ✈️</span>':''}`)+wishBtn;
+       ${planned?'<span class="note">Already on your upcoming list ✈️</span>':''}`)+wishBtn+shareBtn;
 }
 function quickVisit(id){
   const d=DESTS.find(x=>x.id===id); if(!d) return;
