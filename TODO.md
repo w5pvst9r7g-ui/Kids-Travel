@@ -120,6 +120,7 @@ Last updated: 2026-06-09
 ---
 
 ## 🆕 New tasks (added as they come up)
+- [x] **Journal save feedback** — saving a trip now confirms with a toast ("🎉 …added to your journal!" for new, "✏️ Trip updated!" for edits); edits previously gave no feedback at all
 - [x] **A11y: lightbox returns focus** — closing the photo lightbox (gallery, food, or spot) now returns keyboard focus to the exact image that opened it, instead of dropping focus to the page top
 - [x] **A11y: dialogs return focus** — closing Settings, Cloud sync, the avatar picker or the Poppy pop-up now returns keyboard focus to the control that opened it (shared modalCapture/modalRestore), completing the modal focus-management pattern
 - [x] **A11y: complete focus management** — the cat-story reader now also returns focus to its cover on close, so every overlay in the app (lightbox, story, settings, cloud, avatar, pop-up) restores focus to its trigger — verified across all of them

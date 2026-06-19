@@ -6737,7 +6737,8 @@ document.getElementById('saveTrip').addEventListener('click',()=>{
   if(editingId){const i=trips.findIndex(t=>t.id===editingId);if(i>-1)trips[i]={...trips[i],...data};}
   else{data.id='t'+Date.now();trips.push(data);}
   saveTrips();resetForm();renderPassport();renderGrid();renderUpcoming();renderFeatured();renderStats();if(map)initMap();
-  if(isNew) confetti();
+  if(isNew){ confetti(); toast('🎉 '+(data.city||'Trip')+' added to your journal!'); }
+  else { sfx('good'); toast('✏️ Trip updated!'); }
   checkAchievements();
 });
 function editTrip(id){
