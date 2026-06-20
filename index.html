@@ -1099,6 +1099,7 @@ html.night .catc-statsbox,html.night .catc-mini,html.night .catc-fav{background:
 .catpin{background:none;border:none}
 .catpin .catpin-dot{position:absolute;inset:0;border-radius:50% 50% 50% 4px;transform:rotate(45deg);border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 .catpin .catpin-emo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transform:translateY(-1px)}
+.catpin.approx .catpin-dot{border-style:dashed;opacity:.92}
 html.night .catmap-head,html.night .catmap-note{background:var(--surface);border-color:var(--line-2)}
 /* —— Yummy food cards (photo-forward) —— */
 .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
@@ -7435,7 +7436,28 @@ function catColorSwatch(id){ const c=CAT_COLORS.find(x=>x.id===id); return c?c.s
 function catKey(d){ return dataKey('catcount_'+(d&&d.country||'Morocco').toLowerCase()); }
 function catData(d){ try{const s=localStorage.getItem(catKey(d)); if(s){const o=JSON.parse(s); o.big=o.big||0; o.kit=o.kit||0; o.log=Array.isArray(o.log)?o.log:[];
   if(!o.colors||typeof o.colors!=='object'){ o.colors={}; o.log.forEach(x=>{ if(x&&x.c) o.colors[x.c]=(o.colors[x.c]||0)+1; }); }   /* migrate older saves */
+  if(catBackfill(o)){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }   /* place any cats that have no location yet */
   return o;}}catch(e){} return {big:0,kit:0,log:[],colors:{}}; }
+/* real spots from the family's Morocco trip — used to place sightings logged
+   without GPS, in the proportions described (mostly Casablanca medina). */
+const CAT_ZONES=[
+  {w:50,kind:'pt',lat:33.6030,lng:-7.6168,r:0.0017},                 /* Casablanca old medina */
+  {w:24,kind:'ln',a:[33.6083,-7.6326],b:[33.6068,-7.6173],r:0.0006}, /* Hassan II Mosque → marina mall path */
+  {w:16,kind:'ln',a:[33.6017,-7.6109],b:[33.6083,-7.6326],r:0.0009}, /* Casa-Port station → mosque drive */
+  {w:10,kind:'pt',lat:34.0276,lng:-6.8356,r:0.0017}                  /* Rabat medina */
+];
+function catBackfill(o){
+  if(!o||!Array.isArray(o.log)) return false; let changed=false;
+  o.log.forEach((x,i)=>{ if(!x||typeof x.lat==='number') return;
+    let s=((x.ts||((i+1)*2654435761))>>>0)||1; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
+    let pick=rnd()*100, zone=CAT_ZONES[0]; for(let z=0,acc=0;z<CAT_ZONES.length;z++){ acc+=CAT_ZONES[z].w; if(pick<acc){ zone=CAT_ZONES[z]; break; } }
+    let lat,lng;
+    if(zone.kind==='ln'){ const t=rnd(); lat=zone.a[0]+(zone.b[0]-zone.a[0])*t+(rnd()-0.5)*zone.r; lng=zone.a[1]+(zone.b[1]-zone.a[1])*t+(rnd()-0.5)*zone.r; }
+    else { lat=zone.lat+(rnd()-0.5)*2*zone.r; lng=zone.lng+(rnd()-0.5)*2*zone.r; }
+    x.lat=+lat.toFixed(5); x.lng=+lng.toFixed(5); x.approx=true; changed=true;
+  });
+  return changed;
+}
 function saveCatData(d,o){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }
 function catPoints(o){ return (o.big||0) + (o.kit||0)*2; }
 let _catStep={stage:'idle',type:null};
@@ -7547,7 +7569,7 @@ function catPickColor(c){ const d=currentDest; if(!d||!_catStep.type) return;
 function catCaptureLocation(d, ts){
   if(!navigator.geolocation) return;
   try{ navigator.geolocation.getCurrentPosition(function(pos){
-    try{ const o=catData(d); const e=o.log.find(x=>x.ts===ts); if(e && pos&&pos.coords){ e.lat=pos.coords.latitude; e.lng=pos.coords.longitude; saveCatData(d,o);
+    try{ const o=catData(d); const e=o.log.find(x=>x.ts===ts); if(e && pos&&pos.coords){ e.lat=pos.coords.latitude; e.lng=pos.coords.longitude; delete e.approx; saveCatData(d,o);
       if(currentDest && currentDest.country===d.country){ const board=document.getElementById('catCounter'); if(board) board.innerHTML=catBoardHTML(d); }
       if(_catMapOpen) renderCatMarkers(d); } }catch(e){}
   }, function(){/* denied/unavailable — log stays without a location */}, {enableHighAccuracy:true,timeout:12000,maximumAge:60000}); }catch(e){}
@@ -7587,9 +7609,9 @@ function renderCatMarkers(d){
   if(!located.length){ if(note) note.innerHTML='📍 No cats on the map yet — log a cat with location turned on and it’ll appear here!'; return; }
   const pts=[];
   located.forEach(x=>{
-    const icon=L.divIcon({className:'catpin',html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
+    const icon=L.divIcon({className:'catpin'+(x.approx?' approx':''),html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
     const mk=L.marker([x.lat,x.lng],{icon:icon}).addTo(_catMapLayer);
-    mk.bindPopup('<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+(x.ts?'<br><span style="color:#888">'+new Date(x.ts).toLocaleDateString()+'</span>':''));
+    mk.bindPopup('<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+(x.ts?'<br><span style="color:#888">'+new Date(x.ts).toLocaleDateString()+(x.approx?' · around here':'')+'</span>':''));
     pts.push([x.lat,x.lng]);
   });
   try{ _catMap.fitBounds(pts,{padding:[44,44],maxZoom:16}); }catch(e){}
