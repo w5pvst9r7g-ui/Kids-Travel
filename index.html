@@ -117,6 +117,8 @@ img{display:block}
 .btn-teal:hover{transform:translateY(-2px);filter:brightness(1.05)}
 .btn-yellow{background:linear-gradient(180deg,#f9d98e,var(--yellow));color:#5a3d00;box-shadow:0 6px 0 0 var(--yellow-d), 0 14px 24px -12px rgba(207,154,51,.5), inset 0 2px 0 rgba(255,255,255,.5)}
 .btn-yellow:hover{transform:translateY(-2px);filter:brightness(1.03)}
+.btn-grape{background:linear-gradient(180deg,#9a8bef,var(--grape-d));color:#fff;box-shadow:0 6px 0 0 #4a3ab8, 0 14px 24px -12px rgba(91,73,214,.5), inset 0 2px 0 rgba(255,255,255,.32)}
+.btn-grape:hover{transform:translateY(-2px);filter:brightness(1.05)}
 .btn-ghost{background:var(--surface);color:var(--ink);box-shadow:0 6px 0 0 var(--line), 0 12px 22px -12px rgba(38,50,74,.2), inset 0 2px 0 rgba(255,255,255,.6);border:2px solid var(--line)}
 .btn-ghost:hover{transform:translateY(-2px);color:var(--teal-d);border-color:var(--teal)}
 .btn-text{background:none;box-shadow:none;padding:9px 6px;color:var(--teal-d);font-weight:800}
@@ -1054,7 +1056,13 @@ html.night .ph-speak{background:var(--surface);border-color:var(--line-2)}
 .catc-log{display:flex;flex-wrap:wrap;gap:8px}
 .catc-chip{position:relative;display:inline-flex}
 .catc-chip .catc-k{position:absolute;right:-4px;bottom:-4px;font-size:.8rem;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.catc-chip-img{width:34px;height:34px;border-radius:9px;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);flex:none}
+.catc-chip .catc-cam{position:absolute;left:-5px;top:-5px;font-size:.62rem;background:#fff;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.catc-photo-row{display:flex;align-items:center;gap:11px;margin-top:12px;padding:11px 13px;background:var(--surface-2);border:2px dashed var(--line-2);border-radius:var(--r)}
+.catc-photo-thumb{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:none;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.catc-photo-ico{font-size:1.6rem;line-height:1;flex:none}
 .catc-empty{color:var(--muted);font-weight:700;text-align:center;margin-top:16px}
+.cqd-photo{display:block;width:160px;height:160px;object-fit:cover;border-radius:var(--r-lg);margin:0 auto 8px;border:3px solid #fff;box-shadow:var(--shadow)}
 .catc-reset{margin-top:14px;display:inline-block}
 html.night .catc-stat,html.night .catc-step,html.night .catc-typebtn,html.night .catc-colorbtn{background:var(--surface);border-color:var(--line-2)}
 html.night .catc-stat.big{background:var(--surface-2)}
@@ -1103,6 +1111,9 @@ html.night .catc-statsbox,html.night .catc-mini,html.night .catc-fav{background:
 .catpin .catpin-dot{position:absolute;inset:0;border-radius:50% 50% 50% 4px;transform:rotate(45deg);border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 .catpin .catpin-emo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transform:translateY(-1px)}
 .catpin.approx .catpin-dot{border-style:dashed;opacity:.92}
+.catpin.photo .catpin-photo{position:absolute;inset:0;border-radius:50% 50% 50% 4px;transform:rotate(45deg);border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);background-size:cover;background-position:center;overflow:hidden}
+.catpin.photo .catpin-emo.sm{font-size:.78rem;position:absolute;right:-2px;bottom:-2px;inset:auto;background:#fff;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);transform:none}
+.catpop-img{display:block;width:100%;max-width:200px;border-radius:10px;margin:0 0 7px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 html.night .catmap-head,html.night .catmap-note{background:var(--surface);border-color:var(--line-2)}
 /* —— floating quick-log cat button (FAB) —— */
 .cat-fab{position:fixed;right:18px;bottom:calc(var(--nav-h,64px) + 16px);z-index:5200;width:62px;height:62px;border:none;border-radius:50%;cursor:pointer;
@@ -1619,6 +1630,7 @@ create policy "atlas all" on atlas_sync
 <button id="catFab" class="cat-fab hidden" type="button" onclick="openCatQuick()" aria-label="Quickly log a cat sighting" title="Spotted a cat? Log it!">
   <span class="cat-fab-emo" aria-hidden="true">🐱</span><span class="cat-fab-plus" aria-hidden="true">＋</span>
 </button>
+<input id="catPhotoInput" type="file" accept="image/*" capture="environment" class="sr-only" onchange="onCatPhotoPicked(this)" aria-hidden="true" tabindex="-1">
 <div id="catQuickModal" class="amodal hidden" role="dialog" aria-modal="true" aria-labelledby="catQuickTitle" onclick="if(event.target.id==='catQuickModal')closeCatQuick()">
   <div class="amodal-card catquick-card">
     <button class="story-close" type="button" onclick="closeCatQuick()" aria-label="Close">✕</button>
@@ -7530,7 +7542,56 @@ function catLogSighting(type,c,opts){
 function catPoints(o){ return (o.big||0) + (o.kit||0)*2; }
 function catCountries(o){ const m={}; (o.log||[]).forEach(x=>{ if(x.country) m[x.country]=(m[x.country]||0)+1; }); return m; }
 function catWho(id){ const p=PROFILES.find(x=>x.id===id); return (p&&nameFor(p.id))||(id==='guest'?'a guest':'an explorer'); }
+/* ----- cat photos: stored one-per-key (kept out of the main atlas JSON so
+   saves stay light, and so we can evict photos independently on quota) ----- */
+const CATPHOTO_PRE='globie_atlas_catphoto_';
+function catPhotoKey(id){ return CATPHOTO_PRE+id; }
+function getCatPhoto(id){ try{ return id?localStorage.getItem(catPhotoKey(id)):null; }catch(e){ return null; } }
+function saveCatPhoto(id,dataUrl){
+  try{ localStorage.setItem(catPhotoKey(id),dataUrl); return true; }catch(e){}
+  /* out of room — drop the oldest photos and try again */
+  try{
+    const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf(CATPHOTO_PRE)===0&&k!==catPhotoKey(id)) keys.push(k); }
+    keys.sort();   /* ids begin with 'c'+timestamp, so this is ~chronological */
+    for(let n=0;n<keys.length;n++){ try{ localStorage.removeItem(keys[n]); }catch(e){}
+      try{ localStorage.setItem(catPhotoKey(id),dataUrl); return true; }catch(e){} }
+  }catch(e){}
+  return false;
+}
+/* shrink a captured image to a small JPEG data URL so it fits in storage */
+function compressImage(file,maxDim,quality){
+  return new Promise((resolve,reject)=>{
+    try{
+      const url=URL.createObjectURL(file); const img=new Image();
+      img.onload=function(){ try{ URL.revokeObjectURL(url);
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        const scale=Math.min(1,maxDim/Math.max(w,h)); w=Math.max(1,Math.round(w*scale)); h=Math.max(1,Math.round(h*scale));
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',quality||0.6));
+      }catch(e){ reject(e); } };
+      img.onerror=function(){ try{URL.revokeObjectURL(url);}catch(e){} reject(new Error('decode')); };
+      img.src=url;
+    }catch(e){ reject(e); }
+  });
+}
+let _catPhotoTarget=null;
+function attachCatPhoto(id){ _catPhotoTarget=id; const inp=document.getElementById('catPhotoInput'); if(inp){ inp.value=''; inp.click(); } }
+function onCatPhotoPicked(inp){
+  const f=inp&&inp.files&&inp.files[0], id=_catPhotoTarget; if(!f||!id) return;
+  toast('📷 Saving photo…');
+  compressImage(f,720,0.6).then(durl=>{
+    if(saveCatPhoto(id,durl)){
+      const o=worldCats(); const e=o.log.find(x=>x.id===id); if(e){ e.hasPhoto=1; saveWorldCats(o); }
+      sfx('good'); toast('📸 Photo saved!');
+      const qm=document.getElementById('catQuickModal');
+      if(typeof renderCatQuick==='function' && qm && !qm.classList.contains('hidden')) renderCatQuick();
+      refreshCatBoard(); if(_catMapOpen) renderCatMarkers();
+    } else { toast('Storage is full — couldn’t save the photo','error'); }
+  }).catch(()=>toast('Couldn’t read that photo','error'));
+}
 let _catStep={stage:'idle',type:null};
+let _lastCatId=null;   /* most recently logged sighting (for the "add a photo" prompt) */
 function catCounterHTML(d){
   return `<h3 class="blockhead">🐱 World Cat Atlas</h3>
     <p class="sub">Morocco is famous for its friendly street cats — but cats are everywhere! Every explorer adds to <b>one shared atlas</b> across all your trips. 🐈 Big cats = 1 point · 🐱 kittens = <b>2 points</b>. Allow location and each cat gets pinned to the world map! 📍🗺️ Tip: use the floating 🐱 button to log a cat from anywhere.</p>
@@ -7546,12 +7607,21 @@ function catBoardHTML(d){
   const located=o.log.filter(s=>typeof s.lat==='number').length;
   const cc=catCountries(o); const nCountries=Object.keys(cc).length;
   const log = o.log.length
-    ? `<div class="catc-logwrap"><div class="catc-loglbl">Latest sightings${nCountries>1?` · across ${nCountries} countries 🌍`:''}</div><div class="catc-log">${o.log.slice(-30).reverse().map(s=>
-        `<span class="catc-chip${typeof s.lat==='number'?' located':''}" title="${esc(catColorName(s.c))} ${s.t==='kit'?'kitten':'big cat'}${s.country?' · '+esc(s.country):''}${s.by?' · spotted by '+esc(catWho(s.by)):''}${typeof s.lat==='number'?' · 📍 on the map':''}"><span class="catc-sw" style="background:${catColorSwatch(s.c)}"></span><span class="catc-k">${s.t==='kit'?'🐱':'🐈'}</span></span>`).join('')}</div>
+    ? `<div class="catc-logwrap"><div class="catc-loglbl">Latest sightings${nCountries>1?` · across ${nCountries} countries 🌍`:''}</div><div class="catc-log">${o.log.slice(-30).reverse().map(s=>{
+        const ph=s.hasPhoto?getCatPhoto(s.id):null;
+        return `<span class="catc-chip${typeof s.lat==='number'?' located':''}${ph?' has-photo':''}" title="${esc(catColorName(s.c))} ${s.t==='kit'?'kitten':'big cat'}${s.country?' · '+esc(s.country):''}${s.by?' · spotted by '+esc(catWho(s.by)):''}${typeof s.lat==='number'?' · 📍 on the map':''}${ph?' · 📷 has a photo':''}">${ph?`<img class="catc-chip-img" src="${ph}" alt="">`:`<span class="catc-sw" style="background:${catColorSwatch(s.c)}"></span>`}<span class="catc-k">${s.t==='kit'?'🐱':'🐈'}</span>${ph?'<span class="catc-cam">📷</span>':''}</span>`;}).join('')}</div>
         <div class="catc-logbtns"><button class="btn btn-teal catc-mapbtn" type="button" onclick="openCatMap()">🗺️ See the World Cat Atlas${located?` (${located})`:''}</button>
         <button class="btn-text catc-reset" type="button" onclick="catReset()">↺ Reset atlas</button></div></div>`
     : `<p class="catc-empty">No cats spotted yet — tap the button and log your first one! 🐾</p>`;
-  return stats + `<div id="catAdd" class="catc-add">${catAddHTML()}</div>` + log + catStatsHTML(o);
+  return stats + `<div id="catAdd" class="catc-add">${catAddHTML()}</div>` + catLastPhotoHTML() + log + catStatsHTML(o);
+}
+/* prompt to snap a photo of the cat you just logged (Morocco panel) */
+function catLastPhotoHTML(){
+  const id=_lastCatId; if(!id) return '';
+  const o=worldCats(); const e=o.log.find(x=>x.id===id); if(!e) return '';
+  const ph=getCatPhoto(id);
+  return `<div class="catc-photo-row">${ph?`<img class="catc-photo-thumb" src="${ph}" alt="Photo of your last cat">`:'<span class="catc-photo-ico" aria-hidden="true">📷</span>'}
+    <button class="btn-text" type="button" onclick="attachCatPhoto('${id}')">${ph?'Change the':'📷 Take a'} photo of your last cat</button></div>`;
 }
 /* a delightfully over-the-top cat statistics panel 🐈📊 */
 const CAT_RANKS=[
@@ -7628,7 +7698,7 @@ function catPickType(t){ if(!t){ _catStep={stage:'type',type:null}; } else { _ca
 function catPickColor(c){ if(!_catStep.type) return;
   const type=_catStep.type;
   const id=catLogSighting(type,c,{country:(currentDest&&currentDest.country)||''});
-  _catStep={stage:'idle',type:null};
+  _lastCatId=id; _catStep={stage:'idle',type:null};
   sfx('good'); refreshCatBoard();
   const btn=document.querySelector('#catAdd .catc-bigbtn'); if(btn&&!reduceMotion) emojiBurst(btn, type==='kit'?'🐱':'🐈');
   toast((type==='kit'?'🐱':'🐈')+' '+catColorName(c)+' '+(type==='kit'?'kitten':'cat')+' logged! +'+(type==='kit'?2:1)+' points');
@@ -7680,9 +7750,13 @@ function renderCatMarkers(){
   if(!located.length){ if(note) note.innerHTML='📍 No cats on the map yet — log a cat with location turned on and it’ll appear here!'; return; }
   const pts=[];
   located.forEach(x=>{
-    const icon=L.divIcon({className:'catpin',html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
+    const ph=x.hasPhoto?getCatPhoto(x.id):null;
+    const icon=ph
+      ? L.divIcon({className:'catpin photo',html:'<span class="catpin-photo" style="background-image:url('+ph+')"></span><span class="catpin-emo sm">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[46,46],iconAnchor:[23,23],popupAnchor:[0,-22]})
+      : L.divIcon({className:'catpin',html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
     const mk=L.marker([x.lat,x.lng],{icon:icon}).addTo(_catMapLayer);
-    mk.bindPopup('<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+
+    mk.bindPopup((ph?'<img class="catpop-img" src="'+ph+'" alt="">':'')+
+      '<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+
       (x.country?'<br>📍 '+esc(x.country):'')+
       (x.by?'<br>👀 spotted by '+esc(catWho(x.by)):'')+
       (x.ts?'<br><span style="color:#888">'+new Date(x.ts).toLocaleDateString()+'</span>':''));
@@ -7714,12 +7788,14 @@ function renderCatQuick(){ const body=document.getElementById('catQuickBody'), t
       <button class="btn-text" type="button" onclick="catQBack()">‹ Back</button>`; return; }
   if(_catQStep.stage==='done'){ if(title) title.innerHTML='🎉 Logged!';
     const o=catData(), total=(o.big||0)+(o.kit||0), pts=catPoints(o);
+    const photo=_catQStep.id?getCatPhoto(_catQStep.id):null;
     body.innerHTML=`<div class="catquick-done">
-      <div class="cqd-big">${_catQStep.type==='kit'?'🐱':'🐈'}</div>
+      ${photo?`<img class="cqd-photo" src="${photo}" alt="Photo of the cat you spotted">`:`<div class="cqd-big">${_catQStep.type==='kit'?'🐱':'🐈'}</div>`}
       <p class="catquick-sub" style="margin:0 0 8px">${esc(catColorName(_catQStep.color))} ${_catQStep.type==='kit'?'kitten':'big cat'} added to the atlas!${_catQStep.where?' 📍':''}</p>
       <div class="cqd-tot">🐾 ${total} cat${total===1?'':'s'} in the World Cat Atlas</div>
       <div class="cqd-pts">🏆 ${pts} cat points${_catQStep.where?'':' · turn on location to pin it on the map'}</div>
       <div class="catquick-actions">
+        <button class="btn btn-grape" type="button" onclick="attachCatPhoto('${_catQStep.id}')">📷 ${photo?'Retake the':'Take a'} photo</button>
         <button class="btn btn-yellow" type="button" onclick="catQAgain()">➕ Log another cat</button>
         <button class="btn btn-teal" type="button" onclick="closeCatQuick();openCatMap()">🌍 See the World Cat Atlas</button>
       </div></div>`; return; }
@@ -7729,7 +7805,7 @@ function catQBack(){ _catQStep={stage:'type',type:_catQStep.type}; renderCatQuic
 function catQAgain(){ _catQStep={stage:'type',type:null}; renderCatQuick(); }
 function catQColor(c){ const type=_catQStep.type; if(!type) return;
   const id=catLogSighting(type,c,{country:(currentDest&&currentDest.country)||''});
-  _catQStep={stage:'done',type:type,color:c,where:false};
+  _lastCatId=id; _catQStep={stage:'done',type:type,color:c,where:false,id:id};
   sfx('good'); renderCatQuick();
   toast((type==='kit'?'🐱':'🐈')+' '+catColorName(c)+' '+(type==='kit'?'kitten':'cat')+' logged! +'+(type==='kit'?2:1)+' points');
   if(!reduceMotion) confetti();
