@@ -1112,7 +1112,7 @@ html.night .catc-statsbox,html.night .catc-mini,html.night .catc-fav{background:
 .catpin .catpin-emo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transform:translateY(-1px)}
 .catpin.approx .catpin-dot{border-style:dashed;opacity:.92}
 .catpin.photo .catpin-photo{position:absolute;inset:0;border-radius:50% 50% 50% 4px;transform:rotate(45deg);border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);background-size:cover;background-position:center;overflow:hidden}
-.catpin.photo .catpin-emo.sm{font-size:.78rem;position:absolute;right:-2px;bottom:-2px;inset:auto;background:#fff;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);transform:none}
+.catpin.photo .catpin-emo.sm{font-size:.95rem;position:absolute;right:-3px;bottom:-3px;inset:auto;background:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35);transform:none}
 .catpop-img{display:block;width:100%;max-width:200px;border-radius:10px;margin:0 0 7px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 html.night .catmap-head,html.night .catmap-note{background:var(--surface);border-color:var(--line-2)}
 /* —— floating quick-log cat button (FAB) —— */
@@ -7752,7 +7752,7 @@ function renderCatMarkers(){
   located.forEach(x=>{
     const ph=x.hasPhoto?getCatPhoto(x.id):null;
     const icon=ph
-      ? L.divIcon({className:'catpin photo',html:'<span class="catpin-photo" style="background-image:url('+ph+')"></span><span class="catpin-emo sm">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[46,46],iconAnchor:[23,23],popupAnchor:[0,-22]})
+      ? L.divIcon({className:'catpin photo',html:'<span class="catpin-photo" style="background-image:url('+ph+')"></span><span class="catpin-emo sm">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[60,60],iconAnchor:[30,30],popupAnchor:[0,-29]})
       : L.divIcon({className:'catpin',html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
     const mk=L.marker([x.lat,x.lng],{icon:icon}).addTo(_catMapLayer);
     mk.bindPopup((ph?'<img class="catpop-img" src="'+ph+'" alt="">':'')+
