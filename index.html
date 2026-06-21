@@ -7436,33 +7436,13 @@ function catColorSwatch(id){ const c=CAT_COLORS.find(x=>x.id===id); return c?c.s
 function catKey(d){ return dataKey('catcount_'+(d&&d.country||'Morocco').toLowerCase()); }
 function catData(d){ try{const s=localStorage.getItem(catKey(d)); if(s){const o=JSON.parse(s); o.big=o.big||0; o.kit=o.kit||0; o.log=Array.isArray(o.log)?o.log:[];
   if(!o.colors||typeof o.colors!=='object'){ o.colors={}; o.log.forEach(x=>{ if(x&&x.c) o.colors[x.c]=(o.colors[x.c]||0)+1; }); }   /* migrate older saves */
-  if(catBackfill(o)){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }   /* place any cats that have no location yet */
+  if(catStripApprox(o)){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }   /* keep only really-recorded (GPS) locations */
   return o;}}catch(e){} return {big:0,kit:0,log:[],colors:{}}; }
-/* curated ON-LAND spots from the family's Morocco trip (alleys, esplanades &
-   roads — never the sea), used to place sightings logged without GPS. [lat,lng,weight] */
-const CAT_BF_VER=2;
-const CAT_SPOTS=[
-  /* Casablanca old medina — dense land alleys (heaviest) */
-  [33.60175,-7.61690,6],[33.60092,-7.61762,5],[33.60130,-7.61585,5],[33.60022,-7.61808,4],[33.60238,-7.61640,4],
-  [33.59972,-7.61720,4],[33.60158,-7.61872,3],[33.60068,-7.61532,3],[33.59918,-7.61835,3],[33.60210,-7.61780,3],
-  /* Hassan II Mosque → marina-mall corridor — esplanade / Bd des Almohades (land side) */
-  [33.60470,-7.62240,2],[33.60438,-7.62010,2],[33.60468,-7.61840,2],[33.60505,-7.61712,2],[33.60392,-7.61918,2],
-  /* Casa-Port station → mosque drive — coastal boulevard (land) */
-  [33.60215,-7.61255,2],[33.60308,-7.61512,2],[33.60388,-7.61762,2],[33.60452,-7.61988,2],
-  /* Rabat medina — land alleys (away from the river & sea) */
-  [34.02512,-6.83608,2],[34.02608,-6.83718,2],[34.02452,-6.83520,2],[34.02680,-6.83602,2],[34.02560,-6.83458,2]
-];
-const _CAT_SPOTS_EXP=(function(){ const a=[]; CAT_SPOTS.forEach(s=>{ for(let i=0;i<(s[2]||1);i++) a.push([s[0],s[1]]); }); return a; })();
-function catBackfill(o){
-  if(!o||!Array.isArray(o.log)) return false; let changed=false; const N=_CAT_SPOTS_EXP.length;
-  o.log.forEach((x,i)=>{ if(!x) return;
-    const placed=typeof x.lat==='number';
-    if(placed && !(x.approx && x.bf!==CAT_BF_VER)) return;   /* leave real GPS pins and already-current ones */
-    let s=((x.ts||((i+1)*2654435761))>>>0)||1; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
-    const spot=_CAT_SPOTS_EXP[Math.floor(rnd()*N)%N];
-    const lat=spot[0]+(rnd()-0.5)*0.0004, lng=spot[1]+(rnd()-0.5)*0.0004;   /* ±~22 m, stays on the block */
-    x.lat=+lat.toFixed(5); x.lng=+lng.toFixed(5); x.approx=true; x.bf=CAT_BF_VER; changed=true;
-  });
+/* only cats whose location was actually recorded (GPS) keep coordinates —
+   drop any that were auto-placed (marked approx). */
+function catStripApprox(o){
+  if(!o||!Array.isArray(o.log)) return false; let changed=false;
+  o.log.forEach(x=>{ if(x&&x.approx){ delete x.lat; delete x.lng; delete x.approx; delete x.bf; changed=true; } });
   return changed;
 }
 function saveCatData(d,o){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }
