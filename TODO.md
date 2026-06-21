@@ -2,11 +2,16 @@
 
 A living checklist so nothing gets lost. **When we get sidetracked by a new request, add it here and tick things off as they ship.**
 
-Last updated: 2026-06-09
+Last updated: 2026-06-21
 
 ---
 
 ## ✅ Done
+
+### Latest
+- [x] **🌍 World Cat Atlas — shared cat sightings across all trips & explorers** — the cat counter is no longer Morocco-only or per-kid. Every sighting now lands in **one shared logbook** (`globie_atlas_worldcats_v1`, not profile-suffixed), each tagged with **who** spotted it and **which country**, so the family builds a single world atlas across every trip. The old per-profile Morocco counters are migrated in automatically (idempotent, deterministic ids, counts preserved). The map is now a full-world view that fits to all pins, with popups showing coat / type / country / who / date, and a "across N countries 🌍" note. Cat-spotting badges count the whole shared atlas.
+- [x] **🐱 Quick-log button (FAB)** — a floating cat button appears right after login on every screen. Tap it → "Kitten or big cat?" → coat colour → it logs straight into the World Cat Atlas, pins the GPS location, fires confetti + a toast, and shows a "Logged! 🎉 — N cats in the World Cat Atlas" screen with "Log another" / "See the World Cat Atlas" actions. Focus-trapped, Esc to close, hidden on the login screen, claymorphic styling, reduced-motion aware.
+- [x] **Redesign: Claymorphism look & feel (ui-ux-pro-max)** — softer 3D design tokens (chunkier radii, layered inset+drop shadows, a `--clay` token), puffy gradient buttons with a gentle bounce, clay-treated stat tiles. No features removed; night mode & mobile verified.
 
 ### Core app
 - [x] Standalone single-file app (`index.html`) — Explore / Upcoming / Map / Journal / Badges

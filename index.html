@@ -1104,6 +1104,27 @@ html.night .catc-statsbox,html.night .catc-mini,html.night .catc-fav{background:
 .catpin .catpin-emo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transform:translateY(-1px)}
 .catpin.approx .catpin-dot{border-style:dashed;opacity:.92}
 html.night .catmap-head,html.night .catmap-note{background:var(--surface);border-color:var(--line-2)}
+/* —— floating quick-log cat button (FAB) —— */
+.cat-fab{position:fixed;right:18px;bottom:calc(var(--nav-h,64px) + 16px);z-index:5200;width:62px;height:62px;border:none;border-radius:50%;cursor:pointer;
+  background:linear-gradient(180deg,#ffe08a,var(--yellow));color:#5a3d00;
+  box-shadow:0 8px 0 0 rgba(0,0,0,.10), 0 16px 26px -12px rgba(38,50,74,.4), inset 0 2px 0 rgba(255,255,255,.6);
+  display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.34,1.5,.6,1),box-shadow .2s;animation:catFabIn .4s cubic-bezier(.34,1.5,.6,1) both}
+.cat-fab.hidden{display:none}
+.cat-fab .cat-fab-emo{font-size:1.9rem;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.cat-fab .cat-fab-plus{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-weight:900;font-size:.95rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.cat-fab:hover{transform:translateY(-3px) scale(1.05);filter:brightness(1.03)}
+.cat-fab:active{transform:translateY(2px) scale(.96);box-shadow:0 4px 0 0 rgba(0,0,0,.10), 0 8px 14px -10px rgba(38,50,74,.4), inset 0 2px 0 rgba(255,255,255,.6)}
+@keyframes catFabIn{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.cat-fab{animation:none}}
+@media(min-width:761px){.cat-fab{right:26px;bottom:26px;width:68px;height:68px}}
+.catquick-card{max-width:440px;text-align:center}
+.catquick-title{font-family:var(--display);font-size:1.5rem;color:var(--ink);margin:0 0 4px}
+.catquick-sub{color:var(--ink-2);font-weight:700;margin:0 0 14px;font-size:.95rem}
+.catquick-done{padding:6px 0 2px}
+.catquick-done .cqd-big{font-size:3rem;line-height:1;margin-bottom:6px;animation:catFabIn .5s cubic-bezier(.34,1.5,.6,1) both}
+.catquick-done .cqd-tot{font-family:var(--display);font-size:1.2rem;color:var(--teal-d);font-weight:800;margin:6px 0 2px}
+.catquick-done .cqd-pts{color:var(--ink-2);font-weight:700;font-size:.9rem;margin-bottom:14px}
+.catquick-actions{display:flex;flex-direction:column;gap:9px;margin-top:6px}
 /* —— Yummy food cards (photo-forward) —— */
 .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
 .foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
@@ -1589,9 +1610,21 @@ create policy "atlas all" on atlas_sync
 </div>
 
 <div id="catMapModal" class="catmap-modal hidden" role="dialog" aria-modal="true" aria-label="Cat spotting map">
-  <div class="catmap-head"><span class="catmap-title">🐱 Where I spotted cats</span><button class="story-close" type="button" onclick="closeCatMap()" aria-label="Close map">✕</button></div>
+  <div class="catmap-head"><span class="catmap-title">🌍 World Cat Atlas</span><button class="story-close" type="button" onclick="closeCatMap()" aria-label="Close map">✕</button></div>
   <div id="catMap" class="catmap"></div>
   <div id="catMapNote" class="catmap-note" role="status"></div>
+</div>
+
+<!-- floating quick-log: spot a cat from anywhere -->
+<button id="catFab" class="cat-fab hidden" type="button" onclick="openCatQuick()" aria-label="Quickly log a cat sighting" title="Spotted a cat? Log it!">
+  <span class="cat-fab-emo" aria-hidden="true">🐱</span><span class="cat-fab-plus" aria-hidden="true">＋</span>
+</button>
+<div id="catQuickModal" class="amodal hidden" role="dialog" aria-modal="true" aria-labelledby="catQuickTitle" onclick="if(event.target.id==='catQuickModal')closeCatQuick()">
+  <div class="amodal-card catquick-card">
+    <button class="story-close" type="button" onclick="closeCatQuick()" aria-label="Close">✕</button>
+    <h3 id="catQuickTitle" class="catquick-title">🐱 Spotted a cat?</h3>
+    <div id="catQuickBody"></div>
+  </div>
 </div>
 
 <main id="main" tabindex="-1">
@@ -5690,10 +5723,10 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o&&!o.classList.contains('hidden')){ o.classList.add('hidden'); modalRestore(); } }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 /* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
-const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal';
+const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal';
 function topOpenModal(){ const open=[...document.querySelectorAll(MODAL_SEL)].filter(m=>!m.classList.contains('hidden')); return open[open.length-1]||null; }
 function focusablesIn(m){ return [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null||el===document.activeElement); }
 document.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
@@ -7111,9 +7144,8 @@ const ACHIEVEMENTS=[
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
 let unlockedAch=loadAch();
-/* total cats spotted across all cat counters for the current explorer */
-function catTotals(){ let cats=0; try{ const pre='globie_atlas_catcount_', suf='_v9_'+(currentProfile||'guest');
-  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf(pre)===0&&k.slice(-suf.length)===suf){ try{const o=JSON.parse(localStorage.getItem(k)); if(o) cats+=(o.big||0)+(o.kit||0);}catch(e){} } } }catch(e){} return cats; }
+/* total cats spotted across the whole shared World Cat Atlas */
+function catTotals(){ try{ if(typeof worldCats==='function'){ if(typeof migrateCatsToWorld==='function') migrateCatsToWorld(); const o=worldCats(); return (o.log||[]).length; } }catch(e){} return 0; }
 function achContext(){
   const visited=trips.filter(t=>!t.planned), planned=trips.filter(t=>t.planned);
   const countries=new Set(visited.map(t=>t.country).filter(Boolean));
@@ -7437,24 +7469,71 @@ const CAT_COLORS=[
 ];
 function catColorName(id){ const c=CAT_COLORS.find(x=>x.id===id); return c?c.name:'Mystery'; }
 function catColorSwatch(id){ const c=CAT_COLORS.find(x=>x.id===id); return c?c.sw:'#999'; }
-function catKey(d){ return dataKey('catcount_'+(d&&d.country||'Morocco').toLowerCase()); }
-function catData(d){ try{const s=localStorage.getItem(catKey(d)); if(s){const o=JSON.parse(s); o.big=o.big||0; o.kit=o.kit||0; o.log=Array.isArray(o.log)?o.log:[];
-  if(!o.colors||typeof o.colors!=='object'){ o.colors={}; o.log.forEach(x=>{ if(x&&x.c) o.colors[x.c]=(o.colors[x.c]||0)+1; }); }   /* migrate older saves */
-  if(catStripApprox(o)){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }   /* keep only really-recorded (GPS) locations */
-  return o;}}catch(e){} return {big:0,kit:0,log:[],colors:{}}; }
-/* only cats whose location was actually recorded (GPS) keep coordinates —
-   drop any that were auto-placed (marked approx). */
-function catStripApprox(o){
-  if(!o||!Array.isArray(o.log)) return false; let changed=false;
-  o.log.forEach(x=>{ if(x&&x.approx){ delete x.lat; delete x.lng; delete x.approx; delete x.bf; changed=true; } });
-  return changed;
+/* ===================================================================
+   WORLD CAT ATLAS — one shared logbook for every explorer & every trip
+   Sightings are stored in a single, NON-profile-suffixed key so that all
+   the kids contribute to the same world atlas. Each entry remembers who
+   spotted it (by) and which country (so we can map cats across trips).
+   =================================================================== */
+const WORLD_CAT_KEY='globie_atlas_worldcats_v1';
+function worldCats(){
+  try{ const s=localStorage.getItem(WORLD_CAT_KEY);
+    if(s){ const o=JSON.parse(s); o.log=Array.isArray(o.log)?o.log:[];
+      if(!o.colors||typeof o.colors!=='object'){ o.colors={}; o.log.forEach(x=>{ if(x&&x.c) o.colors[x.c]=(o.colors[x.c]||0)+1; }); }
+      return o; } }catch(e){}
+  return {log:[],colors:{}};
 }
-function saveCatData(d,o){ try{localStorage.setItem(catKey(d),JSON.stringify(o));}catch(e){} }
+function saveWorldCats(o){ try{ localStorage.setItem(WORLD_CAT_KEY,JSON.stringify(o)); }catch(e){} }
+/* import of the old per-profile Morocco counters into the shared atlas.
+   Runs once per page load; entry ids are deterministic so re-runs never
+   duplicate, and it always catches legacy counters present at load. */
+let _catMigrated=false;
+function migrateCatsToWorld(){
+  if(_catMigrated) return; _catMigrated=true;
+  const o=worldCats(); const seen=new Set(o.log.map(x=>x.id).filter(Boolean)); let added=0;
+  try{
+    const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k) keys.push(k); }
+    keys.forEach(k=>{
+      const m=k.match(/^globie_atlas_catcount_([a-z]+)_v9_(.+)$/); if(!m) return;
+      const country=m[1].charAt(0).toUpperCase()+m[1].slice(1), by=m[2];
+      let src; try{ src=JSON.parse(localStorage.getItem(k)); }catch(e){ return; } if(!src) return;
+      const srcLog=Array.isArray(src.log)?src.log:[];
+      srcLog.forEach((x,i)=>{
+        const id='mig_'+m[1]+'_'+by+'_'+(x.ts||('n'+i)); if(seen.has(id)) return; seen.add(id);
+        const e={id:id,t:x.t==='kit'?'kit':'big',c:x.c||null,ts:x.ts||0,by:by,country:country};
+        if(typeof x.lat==='number'&&typeof x.lng==='number'&&!x.approx){ e.lat=x.lat; e.lng=x.lng; }
+        o.log.push(e); if(e.c) o.colors[e.c]=(o.colors[e.c]||0)+1; added++;
+      });
+      /* old counters kept big/kit even after the log was capped — pad to match */
+      const lb=srcLog.filter(x=>x.t!=='kit').length, lk=srcLog.filter(x=>x.t==='kit').length;
+      for(let n=lb;n<(src.big||0);n++){ const id='mig_'+m[1]+'_'+by+'_pb'+n; if(seen.has(id))continue; seen.add(id); o.log.push({id:id,t:'big',c:null,ts:0,by:by,country:country,legacy:true}); added++; }
+      for(let n=lk;n<(src.kit||0);n++){ const id='mig_'+m[1]+'_'+by+'_pk'+n; if(seen.has(id))continue; seen.add(id); o.log.push({id:id,t:'kit',c:null,ts:0,by:by,country:country,legacy:true}); added++; }
+    });
+  }catch(e){}
+  if(added) saveWorldCats(o);
+}
+/* a view of the shared atlas in the shape the cat UI expects */
+function catData(d){
+  migrateCatsToWorld();
+  const o=worldCats(); let big=0,kit=0; const colors={};
+  o.log.forEach(x=>{ if(x.t==='kit')kit++; else big++; if(x.c)colors[x.c]=(colors[x.c]||0)+1; });
+  return {big:big,kit:kit,log:o.log,colors:colors,_world:true};
+}
+/* add a sighting to the shared atlas; returns the new entry's id */
+function catLogSighting(type,c,opts){
+  opts=opts||{}; const o=worldCats(); const ts=Date.now();
+  const e={id:'c'+ts+Math.random().toString(36).slice(2,6),t:(type==='kit'?'kit':'big'),c:c||null,ts:ts,by:currentProfile||'guest'};
+  if(opts.country) e.country=opts.country;
+  o.log.push(e); if(c) o.colors[c]=(o.colors[c]||0)+1;
+  saveWorldCats(o); return e.id;
+}
 function catPoints(o){ return (o.big||0) + (o.kit||0)*2; }
+function catCountries(o){ const m={}; (o.log||[]).forEach(x=>{ if(x.country) m[x.country]=(m[x.country]||0)+1; }); return m; }
+function catWho(id){ const p=PROFILES.find(x=>x.id===id); return (p&&nameFor(p.id))||(id==='guest'?'a guest':'an explorer'); }
 let _catStep={stage:'idle',type:null};
 function catCounterHTML(d){
-  return `<h3 class="blockhead">🐱 Morocco Cat Counter</h3>
-    <p class="sub">Morocco is famous for its friendly street cats! Tap ➕ each time you spot one. 🐈 Big cats = 1 point · 🐱 kittens = <b>2 points</b>. Allow location and each cat gets pinned to your map! 📍🗺️</p>
+  return `<h3 class="blockhead">🐱 World Cat Atlas</h3>
+    <p class="sub">Morocco is famous for its friendly street cats — but cats are everywhere! Every explorer adds to <b>one shared atlas</b> across all your trips. 🐈 Big cats = 1 point · 🐱 kittens = <b>2 points</b>. Allow location and each cat gets pinned to the world map! 📍🗺️ Tip: use the floating 🐱 button to log a cat from anywhere.</p>
     <div id="catCounter" class="catc">${catBoardHTML(d)}</div>`;
 }
 function catBoardHTML(d){
@@ -7465,11 +7544,12 @@ function catBoardHTML(d){
       <div class="catc-stat"><div class="cs-n">${o.kit}</div><div class="cs-l">🐱 Kittens</div></div>
     </div>`;
   const located=o.log.filter(s=>typeof s.lat==='number').length;
+  const cc=catCountries(o); const nCountries=Object.keys(cc).length;
   const log = o.log.length
-    ? `<div class="catc-logwrap"><div class="catc-loglbl">Your sightings</div><div class="catc-log">${o.log.slice(-30).reverse().map(s=>
-        `<span class="catc-chip${typeof s.lat==='number'?' located':''}" title="${esc(catColorName(s.c))} ${s.t==='kit'?'kitten':'big cat'}${typeof s.lat==='number'?' · 📍 on the map':''}"><span class="catc-sw" style="background:${catColorSwatch(s.c)}"></span><span class="catc-k">${s.t==='kit'?'🐱':'🐈'}</span></span>`).join('')}</div>
-        <div class="catc-logbtns"><button class="btn btn-teal catc-mapbtn" type="button" onclick="openCatMap()">🗺️ See your cat map${located?` (${located})`:''}</button>
-        <button class="btn-text catc-reset" type="button" onclick="catReset()">↺ Reset counter</button></div></div>`
+    ? `<div class="catc-logwrap"><div class="catc-loglbl">Latest sightings${nCountries>1?` · across ${nCountries} countries 🌍`:''}</div><div class="catc-log">${o.log.slice(-30).reverse().map(s=>
+        `<span class="catc-chip${typeof s.lat==='number'?' located':''}" title="${esc(catColorName(s.c))} ${s.t==='kit'?'kitten':'big cat'}${s.country?' · '+esc(s.country):''}${s.by?' · spotted by '+esc(catWho(s.by)):''}${typeof s.lat==='number'?' · 📍 on the map':''}"><span class="catc-sw" style="background:${catColorSwatch(s.c)}"></span><span class="catc-k">${s.t==='kit'?'🐱':'🐈'}</span></span>`).join('')}</div>
+        <div class="catc-logbtns"><button class="btn btn-teal catc-mapbtn" type="button" onclick="openCatMap()">🗺️ See the World Cat Atlas${located?` (${located})`:''}</button>
+        <button class="btn-text catc-reset" type="button" onclick="catReset()">↺ Reset atlas</button></div></div>`
     : `<p class="catc-empty">No cats spotted yet — tap the button and log your first one! 🐾</p>`;
   return stats + `<div id="catAdd" class="catc-add">${catAddHTML()}</div>` + log + catStatsHTML(o);
 }
@@ -7508,7 +7588,7 @@ function catStatsHTML(o){
   ];
   const bars=ranked.map(x=>`<div class="catc-bar"><span class="catc-bsw" style="background:${x.c.sw}"></span><span class="catc-bn">${esc(x.c.name)}</span><span class="catc-btrack"><span class="catc-bfill" style="width:${Math.round(x.n/max*100)}%"></span></span><span class="catc-bv">${x.n}</span></div>`).join('');
   return `<div class="catc-statsbox">
-    <h4 class="catc-sh">📊 Your cat statistics</h4>
+    <h4 class="catc-sh">📊 World Cat Atlas statistics</h4>
     <div class="catc-rank"><span class="catc-rank-e" aria-hidden="true">${rank.e}</span>
       <div><div class="catc-rank-t">You're a <b>${esc(rank.t)}</b>!</div>
         <div class="catc-rank-s">${nextRank?('Spot '+(nextRank.n-total)+' more to become a '+esc(nextRank.t)+' '+nextRank.e):'Top rank — you’ve seen ALL the cats! 🎉'}</div></div></div>
@@ -7545,28 +7625,29 @@ function _catRerenderAdd(){ const el=document.getElementById('catAdd'); if(el) e
 function catAddStart(){ _catStep={stage:'type',type:null}; _catRerenderAdd(); }
 function catCancel(){ _catStep={stage:'idle',type:null}; _catRerenderAdd(); }
 function catPickType(t){ if(!t){ _catStep={stage:'type',type:null}; } else { _catStep={stage:'color',type:t}; sfx('tap'); } _catRerenderAdd(); }
-function catPickColor(c){ const d=currentDest; if(!d||!_catStep.type) return;
-  const type=_catStep.type, ts=Date.now();
-  const o=catData(d); if(type==='kit') o.kit++; else o.big++; o.log.push({t:type,c:c,ts:ts}); if(o.log.length>120) o.log=o.log.slice(-120);
-  if(!o.colors) o.colors={}; o.colors[c]=(o.colors[c]||0)+1;
-  saveCatData(d,o); _catStep={stage:'idle',type:null};
-  sfx('good'); const board=document.getElementById('catCounter'); if(board){ board.innerHTML=catBoardHTML(d); }
+function catPickColor(c){ if(!_catStep.type) return;
+  const type=_catStep.type;
+  const id=catLogSighting(type,c,{country:(currentDest&&currentDest.country)||''});
+  _catStep={stage:'idle',type:null};
+  sfx('good'); refreshCatBoard();
   const btn=document.querySelector('#catAdd .catc-bigbtn'); if(btn&&!reduceMotion) emojiBurst(btn, type==='kit'?'🐱':'🐈');
   toast((type==='kit'?'🐱':'🐈')+' '+catColorName(c)+' '+(type==='kit'?'kitten':'cat')+' logged! +'+(type==='kit'?2:1)+' points');
   checkAchievements();   /* may unlock a cat-spotting badge */
-  catCaptureLocation(d, ts);   /* record exactly where, in the background */
+  catCaptureLocation(id);   /* record exactly where, in the background */
 }
+/* re-render the Morocco board (if it's on screen) */
+function refreshCatBoard(){ const board=document.getElementById('catCounter'); if(board){ const d=currentDest||{country:'Morocco'}; board.innerHTML=catBoardHTML(d); } }
 /* grab the device's location and pin it to the sighting we just logged */
-function catCaptureLocation(d, ts){
-  if(!navigator.geolocation) return;
+function catCaptureLocation(id){
+  if(!navigator.geolocation||!id) return;
   try{ navigator.geolocation.getCurrentPosition(function(pos){
-    try{ const o=catData(d); const e=o.log.find(x=>x.ts===ts); if(e && pos&&pos.coords){ e.lat=pos.coords.latitude; e.lng=pos.coords.longitude; delete e.approx; saveCatData(d,o);
-      if(currentDest && currentDest.country===d.country){ const board=document.getElementById('catCounter'); if(board) board.innerHTML=catBoardHTML(d); }
-      if(_catMapOpen) renderCatMarkers(d); } }catch(e){}
+    try{ const o=worldCats(); const e=o.log.find(x=>x.id===id); if(e && pos&&pos.coords){ e.lat=pos.coords.latitude; e.lng=pos.coords.longitude; saveWorldCats(o);
+      refreshCatBoard();
+      if(_catMapOpen) renderCatMarkers(); } }catch(e){}
   }, function(){/* denied/unavailable — log stays without a location */}, {enableHighAccuracy:true,timeout:12000,maximumAge:60000}); }catch(e){}
 }
-function catReset(){ const d=currentDest; if(!d) return;
-  uiConfirm('Reset the Morocco cat counter to zero?','Reset',true).then(ok=>{ if(!ok) return; saveCatData(d,{big:0,kit:0,log:[],colors:{}}); _catStep={stage:'idle',type:null}; const board=document.getElementById('catCounter'); if(board) board.innerHTML=catBoardHTML(d); checkAchievements({silent:true}); });
+function catReset(){
+  uiConfirm('This clears the <b>shared</b> World Cat Atlas for everyone on this device. Are you sure?','Clear atlas',true).then(ok=>{ if(!ok) return; saveWorldCats({log:[],colors:{}}); _catStep={stage:'idle',type:null}; refreshCatBoard(); if(_catMapOpen) renderCatMarkers(); checkAchievements({silent:true}); });
 }
 /* —— the cat-spotting map —— */
 let _catMap=null,_catMapLayer=null,_catMapOpen=false,_catMapDest=null;
@@ -7583,30 +7664,82 @@ function openCatMap(){
 }
 function closeCatMap(){ const m=document.getElementById('catMapModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); _catMapOpen=false; modalRestore(); } }
 function buildCatMap(){
-  const d=_catMapDest||currentDest;
   if(!_catMap){
-    _catMap=L.map('catMap',{scrollWheelZoom:true,minZoom:2}).setView([31.79,-7.09],5);   /* Morocco */
+    _catMap=L.map('catMap',{scrollWheelZoom:true,minZoom:2,worldCopyJump:true}).setView([25,5],2);   /* the whole world */
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(_catMap);
   }
-  renderCatMarkers(d);
+  renderCatMarkers();
   setTimeout(()=>{ try{_catMap.invalidateSize();}catch(e){} },70);
 }
-function renderCatMarkers(d){
-  if(!_catMap||typeof L==='undefined') return; d=d||_catMapDest||currentDest; if(!d) return;
+function renderCatMarkers(){
+  if(!_catMap||typeof L==='undefined') return;
   if(_catMapLayer){ try{_catMapLayer.remove();}catch(e){} }
   _catMapLayer=L.layerGroup().addTo(_catMap);
-  const o=catData(d), located=o.log.filter(x=>typeof x.lat==='number'&&typeof x.lng==='number');
+  const o=worldCats(), located=o.log.filter(x=>typeof x.lat==='number'&&typeof x.lng==='number');
   const note=document.getElementById('catMapNote');
   if(!located.length){ if(note) note.innerHTML='📍 No cats on the map yet — log a cat with location turned on and it’ll appear here!'; return; }
   const pts=[];
   located.forEach(x=>{
-    const icon=L.divIcon({className:'catpin'+(x.approx?' approx':''),html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
+    const icon=L.divIcon({className:'catpin',html:'<span class="catpin-dot" style="background:'+catColorSwatch(x.c)+'"></span><span class="catpin-emo">'+(x.t==='kit'?'🐱':'🐈')+'</span>',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-16]});
     const mk=L.marker([x.lat,x.lng],{icon:icon}).addTo(_catMapLayer);
-    mk.bindPopup('<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+(x.ts?'<br><span style="color:#888">'+new Date(x.ts).toLocaleDateString()+(x.approx?' · around here':'')+'</span>':''));
+    mk.bindPopup('<b>'+(x.t==='kit'?'🐱':'🐈')+' '+esc(catColorName(x.c))+' '+(x.t==='kit'?'kitten':'big cat')+'</b>'+
+      (x.country?'<br>📍 '+esc(x.country):'')+
+      (x.by?'<br>👀 spotted by '+esc(catWho(x.by)):'')+
+      (x.ts?'<br><span style="color:#888">'+new Date(x.ts).toLocaleDateString()+'</span>':''));
     pts.push([x.lat,x.lng]);
   });
   try{ _catMap.fitBounds(pts,{padding:[44,44],maxZoom:16}); }catch(e){}
-  if(note) note.innerHTML='🐾 <b>'+located.length+'</b> cat'+(located.length===1?'':'s')+' mapped — tap a pin to see the kitty!';
+  const nC=Object.keys(catCountries({log:located})).length;
+  if(note) note.innerHTML='🐾 <b>'+located.length+'</b> cat'+(located.length===1?'':'s')+' mapped'+(nC>1?(' across <b>'+nC+'</b> countries 🌍'):'')+' — tap a pin to see the kitty!';
+}
+/* ===== quick-log FAB: spot a cat from anywhere in the app ===== */
+function updateCatFab(){ const f=document.getElementById('catFab'); if(!f) return;
+  const loginUp=(()=>{ const s=document.getElementById('loginScreen'); return s&&!s.classList.contains('hidden'); })();
+  if(currentProfile && !loginUp) f.classList.remove('hidden'); else f.classList.add('hidden'); }
+let _catQStep={stage:'type',type:null};
+function openCatQuick(){ const m=document.getElementById('catQuickModal'); if(!m) return;
+  _catQStep={stage:'type',type:null}; modalCapture(); m.classList.remove('hidden'); renderCatQuick();
+  setTimeout(()=>{ const b=m.querySelector('.catc-typebtn'); if(b) b.focus(); },40); sfx('tap'); }
+function closeCatQuick(){ const m=document.getElementById('catQuickModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
+function renderCatQuick(){ const body=document.getElementById('catQuickBody'), title=document.getElementById('catQuickTitle'); if(!body) return;
+  if(_catQStep.stage==='type'){ if(title) title.innerHTML='🐱 Spotted a cat?';
+    body.innerHTML=`<p class="catquick-sub">Add it to the World Cat Atlas — what did you spot?</p>
+      <div class="catc-choices">
+        <button class="catc-typebtn" type="button" onclick="catQType('kit')"><span class="ct-ico">🐱</span><span class="ct-nm">Kitten</span><span class="ct-pts">2 points</span></button>
+        <button class="catc-typebtn" type="button" onclick="catQType('big')"><span class="ct-ico">🐈</span><span class="ct-nm">Big cat</span><span class="ct-pts">1 point</span></button>
+      </div>`; return; }
+  if(_catQStep.stage==='color'){ if(title) title.innerHTML='🎨 What colour?';
+    body.innerHTML=`<p class="catquick-sub">What colour was the ${_catQStep.type==='kit'?'kitten':'cat'}?</p>
+      <div class="catc-colors">${CAT_COLORS.map(c=>`<button class="catc-colorbtn" type="button" onclick="catQColor('${c.id}')" aria-label="${esc(c.name)}"><span class="catc-sw lg" style="background:${c.sw}"></span><span class="catc-cn">${esc(c.name)}</span></button>`).join('')}</div>
+      <button class="btn-text" type="button" onclick="catQBack()">‹ Back</button>`; return; }
+  if(_catQStep.stage==='done'){ if(title) title.innerHTML='🎉 Logged!';
+    const o=catData(), total=(o.big||0)+(o.kit||0), pts=catPoints(o);
+    body.innerHTML=`<div class="catquick-done">
+      <div class="cqd-big">${_catQStep.type==='kit'?'🐱':'🐈'}</div>
+      <p class="catquick-sub" style="margin:0 0 8px">${esc(catColorName(_catQStep.color))} ${_catQStep.type==='kit'?'kitten':'big cat'} added to the atlas!${_catQStep.where?' 📍':''}</p>
+      <div class="cqd-tot">🐾 ${total} cat${total===1?'':'s'} in the World Cat Atlas</div>
+      <div class="cqd-pts">🏆 ${pts} cat points${_catQStep.where?'':' · turn on location to pin it on the map'}</div>
+      <div class="catquick-actions">
+        <button class="btn btn-yellow" type="button" onclick="catQAgain()">➕ Log another cat</button>
+        <button class="btn btn-teal" type="button" onclick="closeCatQuick();openCatMap()">🌍 See the World Cat Atlas</button>
+      </div></div>`; return; }
+}
+function catQType(t){ _catQStep={stage:'color',type:t}; sfx('tap'); renderCatQuick(); setTimeout(()=>{ const b=document.querySelector('#catQuickBody .catc-colorbtn'); if(b) b.focus(); },30); }
+function catQBack(){ _catQStep={stage:'type',type:_catQStep.type}; renderCatQuick(); }
+function catQAgain(){ _catQStep={stage:'type',type:null}; renderCatQuick(); }
+function catQColor(c){ const type=_catQStep.type; if(!type) return;
+  const id=catLogSighting(type,c,{country:(currentDest&&currentDest.country)||''});
+  _catQStep={stage:'done',type:type,color:c,where:false};
+  sfx('good'); renderCatQuick();
+  toast((type==='kit'?'🐱':'🐈')+' '+catColorName(c)+' '+(type==='kit'?'kitten':'cat')+' logged! +'+(type==='kit'?2:1)+' points');
+  if(!reduceMotion) confetti();
+  refreshCatBoard(); checkAchievements();
+  /* pin it where we are, then refresh the done screen if still open */
+  if(navigator.geolocation){ try{ navigator.geolocation.getCurrentPosition(function(pos){
+    try{ const o=worldCats(); const e=o.log.find(x=>x.id===id); if(e&&pos&&pos.coords){ e.lat=pos.coords.latitude; e.lng=pos.coords.longitude; saveWorldCats(o);
+      if(_catQStep.stage==='done'){ _catQStep.where=true; renderCatQuick(); }
+      refreshCatBoard(); if(_catMapOpen) renderCatMarkers(); } }catch(e){}
+  }, function(){}, {enableHighAccuracy:true,timeout:12000,maximumAge:60000}); }catch(e){} }
 }
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
@@ -7764,8 +7897,8 @@ function setAvatar(id,av){ try{localStorage.setItem('globie_avatar_'+id,av);}cat
 function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) return;
   s.classList.remove('hidden');
   document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false;
-  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); }
-function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); }
+  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); updateCatFab(); }
+function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); updateCatFab(); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(nameFor(p.id))+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
@@ -7773,7 +7906,7 @@ function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.
   renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(map) initMap(); }
 function profileName(){ return currentProfile?nameFor(currentProfile):''; }
 function signIn(id){ const pid=placeFromHash();   /* capture before showView clears the hash */
-  currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); poppieI=0; poppieSpeak(); showView('upcoming');
+  currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); updateCatFab(); poppieI=0; poppieSpeak(); showView('upcoming');
   showSplash(()=>{ setTimeout(()=>{ if(pid && typeof DESTS!=='undefined' && DESTS.some(d=>d.id===pid)){ openDest(pid); } else { maybeOnboard(); } },180); }); }
 let _splashTimers=[], _splashCb=null;
 function showSplash(cb){
