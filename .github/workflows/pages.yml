@@ -10,15 +10,14 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment, newest wins
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  # Build job runs WITHOUT the github-pages environment so it can start even
-  # before Pages has ever been turned on, and enable Pages itself.
-  build:
+  # Single job, no `environment:` gate (which was rejecting main at setup).
+  # configure-pages self-enables Pages; deploy-pages publishes the artifact.
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,15 +29,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
-
-  # Deploy job carries the environment; by now Pages is enabled so it resolves.
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
