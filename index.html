@@ -8044,7 +8044,7 @@ function renderCatAtlas(){
     <div class="catx-actions">
       <button class="btn btn-yellow" type="button" onclick="openCatQuick()">🐱 Spotted a cat!</button>
       <button class="btn btn-teal" type="button" onclick="openCatMap()">🌍 Open the map${s.located?` (${s.located})`:''}</button>
-      ${s.photos?`<button class="btn btn-grape" type="button" onclick="openCatSlide()">📸 Slideshow (${s.photos})</button>`:''}
+      <button class="btn btn-grape" type="button" onclick="openCatSlide()">📸 Slideshow${s.photos?` (${s.photos})`:''}</button>
     </div>`;
   return host.innerHTML = header + catxLeaderboard(s) + catxDex(s) + catxByCountry(s) + catxFeed(s) + catxStatsCard(s) + catxBadges();
 }
