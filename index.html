@@ -1217,6 +1217,42 @@ html.night .catx-stat{box-shadow:var(--shadow-sm)}
 html.night .catx-coat,html.night .catx-feed-it,html.night .catx-badge{background:var(--surface-2);border-color:var(--line-2)}
 html.night .catx-badge.got{background:var(--surface)}
 html.night .catx-empty{background:var(--surface);border-color:var(--line-2)}
+/* —— cat photo slideshow —— */
+.catslide{position:fixed;inset:0;z-index:5700;display:flex;flex-direction:column;align-items:center;
+  background:radial-gradient(120% 90% at 50% 0%,#2a2440,#15131f 70%);color:#fff}
+.catslide.hidden{display:none}
+.catslide-top{display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;box-sizing:border-box}
+.catslide-title{font-family:var(--display);font-weight:800;font-size:1.1rem}
+.catslide-count{font-weight:800;opacity:.7;font-size:.85rem}
+.catslide-top .story-close{position:static;margin-left:auto;width:42px;height:42px;background:rgba(255,255,255,.14);color:#fff}
+.catslide-top .story-close:hover{background:rgba(255,255,255,.26)}
+.catslide-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:0 8px;box-sizing:border-box}
+.catslide-frame{position:relative;flex:1;height:100%;display:flex;align-items:center;justify-content:center;min-width:0}
+.catslide-img{max-width:100%;max-height:100%;border-radius:18px;object-fit:contain;
+  box-shadow:0 24px 60px -18px rgba(0,0,0,.7);background:#000}
+.catslide-img.kb{animation:catKenBurns 8s ease-out both}
+@keyframes catKenBurns{from{transform:scale(1) translateY(0)}to{transform:scale(1.08) translateY(-1.5%)}}
+@media(prefers-reduced-motion:reduce){.catslide-img.kb{animation:none}}
+.catslide-cap{position:absolute;left:0;right:0;bottom:0;padding:30px 18px 14px;border-radius:0 0 18px 18px;
+  background:linear-gradient(transparent,rgba(0,0,0,.78));display:flex;flex-direction:column;gap:3px;text-align:left}
+.catslide-cap b{font-family:var(--display);font-size:1.15rem}
+.catslide-cap span{font-weight:700;opacity:.9;font-size:.9rem}
+.catslide-nav{flex:none;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.16);color:#fff;font-size:1.7rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s}
+.catslide-nav:hover{background:rgba(255,255,255,.3);transform:scale(1.08)}
+.catslide-nav:active{transform:scale(.92)}
+.catslide-bar{width:min(680px,92%);height:5px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden;margin:14px 0 0}
+.catslide-bar-fill{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--coral));border-radius:999px}
+.catslide-controls{display:flex;align-items:center;gap:16px;margin:12px 0 4px}
+.catslide-ctl{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.16);color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:.15s}
+.catslide-ctl.play{width:58px;height:58px;font-size:1.5rem;background:linear-gradient(180deg,#ffe08a,var(--yellow));color:#5a3d00;box-shadow:0 6px 0 0 rgba(0,0,0,.25)}
+.catslide-ctl:hover{background:rgba(255,255,255,.3);transform:scale(1.06)}
+.catslide-ctl.play:hover{filter:brightness(1.04);transform:scale(1.04)}
+.catslide-ctl:active{transform:scale(.92)}
+.catslide-dots{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:min(680px,92%);padding:8px 0 16px}
+.catslide-dot{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.3);padding:0;transition:.15s}
+.catslide-dot.on{background:var(--yellow);transform:scale(1.35)}
+@media(max-width:620px){.catslide-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3}.catslide-nav.prev{left:6px}.catslide-nav.next{right:6px}.catslide-stage{padding:0}.catslide-title{font-size:1rem}}
 /* —— Yummy food cards (photo-forward) —— */
 .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:6px}
 .foodcard{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:.18s}
@@ -1719,6 +1755,30 @@ create policy "atlas all" on atlas_sync
     <h3 id="catQuickTitle" class="catquick-title">🐱 Spotted a cat?</h3>
     <div id="catQuickBody"></div>
   </div>
+</div>
+
+<!-- cat photo slideshow -->
+<div id="catSlideModal" class="catslide hidden" role="dialog" aria-modal="true" aria-label="Cat photo slideshow">
+  <div class="catslide-top">
+    <span class="catslide-title">📸 Cat Photo Slideshow</span>
+    <span class="catslide-count" id="catSlideCount"></span>
+    <button class="story-close" type="button" onclick="closeCatSlide()" aria-label="Close slideshow">✕</button>
+  </div>
+  <div class="catslide-stage">
+    <button class="catslide-nav prev" type="button" onclick="catSlidePrev()" aria-label="Previous photo">‹</button>
+    <div class="catslide-frame">
+      <img id="catSlideImg" class="catslide-img" alt="A cat photo" src="">
+      <div class="catslide-cap" id="catSlideCap"></div>
+    </div>
+    <button class="catslide-nav next" type="button" onclick="catSlideNext()" aria-label="Next photo">›</button>
+  </div>
+  <div class="catslide-bar"><span class="catslide-bar-fill" id="catSlideBar"></span></div>
+  <div class="catslide-controls">
+    <button class="catslide-ctl" type="button" onclick="catSlidePrev()" aria-label="Previous">⏮</button>
+    <button class="catslide-ctl play" id="catSlidePlay" type="button" onclick="catSlideToggle()" aria-label="Play or pause">⏸</button>
+    <button class="catslide-ctl" type="button" onclick="catSlideNext()" aria-label="Next">⏭</button>
+  </div>
+  <div class="catslide-dots" id="catSlideDots"></div>
 </div>
 
 <main id="main" tabindex="-1">
@@ -5832,10 +5892,18 @@ function poppieEgg(){ const o=document.getElementById('eggOverlay'); if(!o) retu
 function closeEgg(){ const o=document.getElementById('eggOverlay'); if(o&&!o.classList.contains('hidden')){ o.classList.add('hidden'); modalRestore(); } }
 document.addEventListener('click',e=>{ if(e.target.closest('.egg')) return;
   if(e.target.closest('.poppie-pic,.poppie-peek,.cd-poppie,.dhero-poppie')){ e.preventDefault(); e.stopPropagation(); poppieEgg(); } });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); }
+document.addEventListener('keydown',e=>{
+  const slide=document.getElementById('catSlideModal');
+  if(slide && !slide.classList.contains('hidden')){
+    if(e.key==='ArrowRight'){ e.preventDefault(); catSlideNext(); return; }
+    if(e.key==='ArrowLeft'){ e.preventDefault(); catSlidePrev(); return; }
+    if(e.key===' '){ e.preventDefault(); catSlideToggle(); return; }
+    if(e.key==='Escape'){ closeCatSlide(); return; }
+  }
+  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 /* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
-const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal';
+const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal';
 function topOpenModal(){ const open=[...document.querySelectorAll(MODAL_SEL)].filter(m=>!m.classList.contains('hidden')); return open[open.length-1]||null; }
 function focusablesIn(m){ return [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null||el===document.activeElement); }
 document.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
@@ -7976,6 +8044,7 @@ function renderCatAtlas(){
     <div class="catx-actions">
       <button class="btn btn-yellow" type="button" onclick="openCatQuick()">🐱 Spotted a cat!</button>
       <button class="btn btn-teal" type="button" onclick="openCatMap()">🌍 Open the map${s.located?` (${s.located})`:''}</button>
+      ${s.photos?`<button class="btn btn-grape" type="button" onclick="openCatSlide()">📸 Slideshow (${s.photos})</button>`:''}
     </div>`;
   return host.innerHTML = header + catxLeaderboard(s) + catxDex(s) + catxByCountry(s) + catxFeed(s) + catxStatsCard(s) + catxBadges();
 }
@@ -8037,6 +8106,58 @@ function catxBadges(){
         <span class="catx-badge-nm">${esc(a.nm)}</span>
         <span class="catx-badge-st">${have?'✓ earned':(pr?(Math.min(pr.have,pr.need)+'/'+pr.need):'locked')}</span></div>`;}).join('')}</div></div>`;
 }
+/* ====================================================================
+   CAT PHOTO SLIDESHOW — auto-playing gallery of every cat photo
+   ==================================================================== */
+let _catSlide={items:[],i:0,timer:null,playing:false};
+const CAT_SLIDE_MS=4000;
+function catSlideItems(){
+  const o=worldCats(); const out=[];
+  (o.log||[]).forEach(x=>{ if(x.hasPhoto){ const ph=getCatPhoto(x.id); if(ph) out.push({x:x,ph:ph}); } });
+  out.sort((a,b)=>(b.x.ts||0)-(a.x.ts||0));   /* newest first */
+  return out;
+}
+function openCatSlide(){
+  const items=catSlideItems();
+  if(!items.length){ toast('No cat photos yet — snap one when you log a cat! 📷'); return; }
+  _catSlide.items=items; _catSlide.i=0;
+  const m=document.getElementById('catSlideModal'); if(!m) return;
+  modalCapture(); m.classList.remove('hidden');
+  catSlideRenderDots(); catSlideShow(0); catSlidePlay();
+  setTimeout(()=>{ const c=m.querySelector('.catslide-ctl.play'); if(c) c.focus(); },40);
+}
+function closeCatSlide(){ const m=document.getElementById('catSlideModal'); if(m&&!m.classList.contains('hidden')){ catSlidePause(); m.classList.add('hidden'); modalRestore(); } }
+function catSlideShow(i){
+  const items=_catSlide.items; if(!items.length) return;
+  _catSlide.i=((i%items.length)+items.length)%items.length;
+  const it=items[_catSlide.i], x=it.x;
+  const img=document.getElementById('catSlideImg'), cap=document.getElementById('catSlideCap'), cnt=document.getElementById('catSlideCount');
+  if(img){ img.classList.remove('kb'); img.src=it.ph; void img.offsetWidth; img.classList.add('kb'); }
+  const date=x.ts?new Date(x.ts).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'';
+  const meta=[x.country?('📍 '+esc(x.country)):'', x.by?('👀 '+esc(catWho(x.by))):'', date].filter(Boolean).join(' · ');
+  if(cap) cap.innerHTML=`<b>${x.t==='kit'?'🐱':'🐈'} ${esc(catColorName(x.c))} ${x.t==='kit'?'kitten':'big cat'}</b>${meta?`<span>${meta}</span>`:''}`;
+  if(cnt) cnt.textContent=(_catSlide.i+1)+' / '+items.length;
+  const dots=document.querySelectorAll('#catSlideDots .catslide-dot');
+  dots.forEach((d,di)=>d.classList.toggle('on',di===_catSlide.i));
+  catSlideRestartBar();
+}
+function catSlideRenderDots(){
+  const host=document.getElementById('catSlideDots'); if(!host) return;
+  const n=_catSlide.items.length;
+  host.innerHTML = n<=30 ? _catSlide.items.map((it,i)=>`<button class="catslide-dot" type="button" onclick="catSlideGo(${i})" aria-label="Photo ${i+1}"></button>`).join('') : '';
+}
+function catSlideGo(i){ catSlideShow(i); if(_catSlide.playing) catSlidePlay(); }
+function catSlideNext(){ catSlideShow(_catSlide.i+1); if(_catSlide.playing) catSlidePlay(); }
+function catSlidePrev(){ catSlideShow(_catSlide.i-1); if(_catSlide.playing) catSlidePlay(); }
+function catSlidePlay(){ catSlidePause(); _catSlide.playing=true; const b=document.getElementById('catSlidePlay'); if(b){b.textContent='⏸';b.setAttribute('aria-label','Pause');}
+  catSlideRestartBar(); _catSlide.timer=setInterval(()=>catSlideShow(_catSlide.i+1),CAT_SLIDE_MS); }
+function catSlidePause(){ if(_catSlide.timer){ clearInterval(_catSlide.timer); _catSlide.timer=null; } _catSlide.playing=false; const b=document.getElementById('catSlidePlay'); if(b){b.textContent='▶';b.setAttribute('aria-label','Play');}
+  const bar=document.getElementById('catSlideBar'); if(bar){ bar.style.transition='none'; bar.style.width=getComputedStyle(bar).width; } }
+function catSlideToggle(){ if(_catSlide.playing) catSlidePause(); else catSlidePlay(); }
+function catSlideRestartBar(){ const bar=document.getElementById('catSlideBar'); if(!bar) return;
+  bar.style.transition='none'; bar.style.width='0%'; void bar.offsetWidth;
+  if(_catSlide.playing && !reduceMotion){ bar.style.transition='width '+CAT_SLIDE_MS+'ms linear'; bar.style.width='100%'; }
+  else { bar.style.width=_catSlide.playing?'100%':'0%'; } }
 function quizPanelHTML(d){
   const best=quizBest[d.id], total=buildQuizPool(d).pool.length;
   return `<div class="quiz"><h3 class="blockhead">🧠 Test your explorer smarts</h3>
