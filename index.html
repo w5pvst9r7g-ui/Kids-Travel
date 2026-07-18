@@ -1299,6 +1299,57 @@ html.night .catx-empty{background:var(--surface);border-color:var(--line-2)}
 .rfx-cardx:active{transform:translateY(1px) scale(.98)}
 .rfx-emo{font-size:2.3rem;line-height:1.15;filter:drop-shadow(0 3px 4px rgba(30,45,70,.18));transition:transform .2s}
 .rfx-cardx:hover .rfx-emo{transform:scale(1.12) rotate(-4deg)}
+/* —— GO-style art box: solid silhouette until caught, photo once caught —— */
+.rfx-art{position:relative;width:100%;aspect-ratio:4/3;border-radius:11px;overflow:hidden;margin-bottom:4px;
+  background:radial-gradient(90% 90% at 50% 30%,hsl(var(--rh,200) 72% 88%),hsl(var(--rh,200) 58% 72%));
+  display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -10px 18px rgba(10,40,80,.14)}
+.rfx-art .rfx-sil{width:74%;height:74%}
+.rfx-sil path{fill:#26323e}
+.rfx-art.locked{background:radial-gradient(90% 90% at 50% 30%,hsl(var(--rh,200) 22% 86%),hsl(var(--rh,200) 16% 72%))}
+.rfx-art.locked .rfx-sil path{fill:#3a4654;opacity:.85}
+.rfx-art .rfx-emo{font-size:2.3rem}
+.rfx-art .rfx-emo.sil{filter:brightness(0);opacity:.45}
+.rfx-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rfx-art img.failed{display:none}
+.rfx-pwr{position:absolute;top:5px;right:6px;z-index:2;font-family:var(--display);font-weight:800;font-size:.66rem;letter-spacing:.04em;color:#fff;background:rgba(16,42,72,.72);padding:2px 8px;border-radius:99px;backdrop-filter:blur(2px)}
+/* —— GO-style "Nearby" mystery tray —— */
+.rfx-near-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:10px}
+.rfx-near-cell{position:relative;aspect-ratio:1;border-radius:var(--r);border:2px solid var(--line);cursor:pointer;overflow:hidden;
+  background:radial-gradient(100% 100% at 50% 38%,hsl(var(--rh,200) 55% 88%),hsl(var(--rh,200) 45% 70%));
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--clay);transition:transform .16s}
+.rfx-near-cell:hover{transform:translateY(-3px)}
+.rfx-near-cell .rfx-sil{width:62%;height:62%;position:relative;z-index:1}
+.rfx-near-cell .rfx-sil path{fill:#2c3947;opacity:.9}
+.rfx-near-cell .rfx-emo.sil.near{font-size:1.9rem;filter:brightness(0);opacity:.5;position:relative;z-index:1}
+.rfx-near-ring{position:absolute;inset:0;pointer-events:none}
+.rfx-near-ring::before,.rfx-near-ring::after{content:"";position:absolute;left:50%;top:50%;width:66%;aspect-ratio:1;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.75);transform:translate(-50%,-50%) scale(.5);opacity:0;animation:rfxPing 2.6s ease-out infinite}
+.rfx-near-ring::after{animation-delay:1.3s}
+@keyframes rfxPing{0%{transform:translate(-50%,-50%) scale(.45);opacity:.9}70%{opacity:.25}100%{transform:translate(-50%,-50%) scale(1.25);opacity:0}}
+.rfx-near-tier{position:absolute;bottom:6px;right:6px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+/* —— GO-style encounter rings on the catch splash —— */
+.rfx-catch-rings{position:absolute;inset:-90px;pointer-events:none}
+.rfx-catch-rings i{position:absolute;left:50%;top:50%;width:230px;height:230px;border-radius:50%;border:3px solid rgba(255,255,255,.5);
+  transform:translate(-50%,-50%) scale(.4);opacity:0;animation:rfxPing 1.9s ease-out infinite}
+.rfx-catch-rings i:nth-child(2){animation-delay:.45s}
+.rfx-catch-rings i:nth-child(3){animation-delay:.9s}
+.rfx-catch-pwr{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.12em;color:#fff;opacity:.9;text-shadow:0 2px 5px rgba(0,0,0,.4)}
+.rfx-catch-art{position:relative;width:190px;height:140px;display:flex;align-items:center;justify-content:center;animation:catFabIn .55s cubic-bezier(.34,1.6,.6,1) both}
+.rfx-catch-art .rfx-sil{width:100%;height:100%}
+.rfx-catch-art .rfx-sil path{fill:#fff;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
+/* —— TCG art silhouettes —— */
+.tcg-art .rfx-sil{position:absolute;inset:10%;width:80%;height:80%}
+.tcg-art .rfx-sil path{fill:#26323e;opacity:.9}
+.tcg-art .rfx-sil.sil path{fill:#1d2833;opacity:.6}
+.tcg-art img.ld~.rfx-sil{display:none}
+html.night .rfx-sil path{fill:#dfe8f2}
+html.night .rfx-art{background:radial-gradient(90% 90% at 50% 30%,hsl(var(--rh,200) 30% 30%),hsl(var(--rh,200) 26% 20%))}
+html.night .rfx-art.locked{background:radial-gradient(90% 90% at 50% 30%,hsl(var(--rh,200) 12% 26%),hsl(var(--rh,200) 10% 18%))}
+html.night .rfx-art.locked .rfx-sil path,html.night .rfx-near-cell .rfx-sil path{fill:#c8d4e2}
+html.night .rfx-art .rfx-emo.sil,html.night .rfx-near-cell .rfx-emo.sil.near{filter:brightness(0) invert(1);opacity:.5}
+html.night .rfx-near-cell{background:radial-gradient(100% 100% at 50% 38%,hsl(var(--rh,200) 26% 30%),hsl(var(--rh,200) 22% 20%));border-color:var(--line-2)}
+html.night .tcg-art .rfx-sil path{fill:#1d2833}
+@media(prefers-reduced-motion:reduce){.rfx-near-ring::before,.rfx-near-ring::after,.rfx-catch-rings i,.rfx-catch-art{animation:none}}
 .rfx-cnm{font-family:var(--display);font-weight:800;font-size:.9rem;color:var(--ink);line-height:1.15}
 .rfx-cnick{font-family:var(--hand);font-size:1.02rem;font-weight:700;color:var(--ink-2);line-height:1.05}
 .rfx-tier{font-size:.72rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:2.5px 10px;border-radius:99px;color:#fff;margin-top:3px}
@@ -8973,6 +9024,16 @@ const REEF_CARDS={
   crow:        {ty:'island', hp:45,  mv:[['Croissant Heist',40,'Breakfast is never safe'],['Pirate Caw',10,'Announces the raid']]}
 };
 const REEF_RARITY={c:'●',u:'◆',r:'★',l:'🌟'};
+/* GO-style "combat power" for the card corner — derived, never stored */
+function reefPwr(sp){ const c=REEF_CARDS[sp]; return c?c.hp+c.mv[0][1]+c.mv[1][1]:0; }
+/* —— realistic solid silhouettes (Pokémon-GO style), single path each,
+   viewBox 0 0 120 80. Filled in by the silhouette library; any species
+   without a path falls back to the emoji treatment. —— */
+const REEF_SIL={};
+function reefSilSVG(sp,cls){
+  const d=REEF_SIL[sp]; if(!d) return '';
+  return `<svg class="rfx-sil${cls?' '+cls:''}" viewBox="0 0 120 80" aria-hidden="true" focusable="false"><path d="${d}"/></svg>`;
+}
 /* photos ride the same curated Wikimedia pipeline as PLACE_PHOTOS (wmURL +
    imgFail fallback chain). Offline / never-loads → the emoji art stays. */
 function reefKind(sp,k){ const s=REEF_SP_BY_ID[sp]; return (s&&s.kinds&&k)?s.kinds.find(x=>x.id===k)||null:null; }
@@ -9215,15 +9276,39 @@ function rfxCard(x,s,mine){
     return `<span class="rfx-chip${crown===id?' crown':''}" style="--pc:${p.color}" title="${esc(nameFor(id))}${crown===id?' — first in the family! 👑':''}">${p.emoji}</span>`;}).join('');
   const nk=x.kinds&&x.kinds.length?Object.keys(s.kindsFound[x.id]||{}).length:0;
   const kindChip=x.kinds&&x.kinds.length?`<span class="rfx-xn kinds" title="exact kinds identified by the family">🔬 ${nk}/${x.kinds.length} kinds</span>`:'';
+  const sil=reefSilSVG(x.id);
+  const art=`<span class="rfx-art${seen?'':' locked'}" aria-hidden="true">
+      ${sil||`<span class="rfx-emo${seen?'':' sil'}">${x.em}</span>`}
+      ${seen&&x.ph&&x.ph.length?rfxPhotoImg(x.ph.slice(0,1),'',200):''}
+      ${seen?`<span class="rfx-pwr">PWR ${reefPwr(x.id)}</span>`:''}
+    </span>`;
   return `<button type="button" class="rfx-cardx${seen?'':' locked'}${holo}" style="--rh:${x.hue}" onclick="openReefLog('${x.id}')"
       aria-label="${esc(x.nm)}, ${esc(x.nick)} — ${REEF_TIERS[x.tier].nm}${seen?' — spotted by you! '+esc(x.fact):' — not spotted by you yet'}">
-    <span class="rfx-emo" aria-hidden="true">${x.em}</span>
+    ${art}
     <span class="rfx-cnm">${esc(x.nm)}</span>
     <span class="rfx-cnick">“${esc(x.nick)}”</span>
     ${rfxTierPill(x.tier)}${x.shiny?'<span class="rfx-shinytag">✨ SHINY</span>':''}
     ${seen?`<span class="rfx-fact">${esc(x.fact)}</span><span class="rfx-cfoot">${n?`<span class="rfx-xn">×${n}</span>`:''}${kindChip}${chips}</span>`
           :`<span class="rfx-fact hidden-fact">❓ Spot it to unlock its secret!</span>${(chips||kindChip)?`<span class="rfx-cfoot">${kindChip}${chips}</span>`:''}`}
   </button>`;
+}
+/* GO-style "Nearby" tray: 6 mystery silhouettes the signed-in kid hasn't
+   caught yet — commons first, deterministic daily rotation. Tap = study
+   its card, then go hunt the real one. */
+function rfxNearby(s){
+  const mine=rfxMySpecies(s);
+  const un=REEF_SPECIES.filter(x=>!mine.has(x.id));
+  if(!un.length) return '';
+  const day=Math.floor(Date.now()/86400000);
+  const rank={c:0,u:1,r:2,l:3};
+  const score=x=>{ let h=0; const str=x.id+day; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))|0; return rank[x.tier]*1000+(h&511); };
+  const pick=un.slice().sort((a,b)=>score(a)-score(b)).slice(0,6);
+  return `<div class="rfx-card rfx-near"><h3 class="rfx-h">🧭 On the reef near you <span class="rfx-hsub">tap a mystery shape to study it — then go find it!</span></h3>
+    <div class="rfx-near-row">${pick.map(x=>`<button type="button" class="rfx-near-cell" style="--rh:${x.hue}" onclick="openReefCard('${x.id}')" aria-label="Mystery creature — ${REEF_TIERS[x.tier].nm}">
+      <span class="rfx-near-ring" aria-hidden="true"></span>
+      ${reefSilSVG(x.id,'near')||`<span class="rfx-emo sil near" aria-hidden="true">${x.em}</span>`}
+      <span class="rfx-near-tier rfx-t-${x.tier}" aria-hidden="true"></span>
+    </button>`).join('')}</div></div>`;
 }
 function rfxFeed(s){
   const recent=s.log.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,20);
@@ -9264,7 +9349,7 @@ function renderReefDex(){
       <button class="btn btn-yellow" type="button" onclick="openReefLog()">🤿 I spotted something!</button>
       <button class="btn btn-ghost" type="button" onclick="reefHowTo()">📖 How to play</button>
     </div>`+
-    rfxDex(s)+rfxFeed(s)+rfxBadges();
+    rfxNearby(s)+rfxDex(s)+rfxFeed(s)+rfxBadges();
 }
 function reefHowTo(){
   openReefLog(); const body=document.getElementById('reefLogBody'); if(!body) return;
@@ -9411,11 +9496,15 @@ function rfxCatchSplash(g){
   if(reduceMotion) return;
   const el=document.getElementById('reefSplash'); if(!el) return;
   const label=g.sp.tier==='l'?'★ LEGENDARY! ★':(g.sp.shiny?'✨ SHINY! ✨':(g.sp.tier==='r'?'★ RARE! ★':'👑 FAMILY FIRST!'));
+  const sil=reefSilSVG(g.sp.id,'catch');
   el.innerHTML=`<div class="rfx-catch-in" style="--rh:${g.sp.hue}"><div class="rfx-catch-rays"></div>
-    <div class="rfx-catch-emo">${g.sp.em}</div><div class="rfx-catch-label">${label}</div>
-    <div class="rfx-catch-nm">${esc(g.sp.nm)}</div></div>`;
+    <div class="rfx-catch-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="rfx-catch-pwr">PWR ${reefPwr(g.sp.id)}</div>
+    ${sil?`<div class="rfx-catch-art">${sil}</div>`:`<div class="rfx-catch-emo">${g.sp.em}</div>`}
+    <div class="rfx-catch-label">${label}</div>
+    <div class="rfx-catch-nm">${esc(g.kind?g.kind.nm:g.sp.nm)} — caught!</div></div>`;
   el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show');
-  setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hidden'); el.innerHTML=''; },1700);
+  setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hidden'); el.innerHTML=''; },1900);
 }
 
 /* ===== the trading-card viewer ===== */
@@ -9439,7 +9528,7 @@ function renderReefCard(){
   host.innerHTML=`
   <div class="tcg${holo?' holo':''}${seen?'':' tlocked'}" style="--tc:${ty.col};--rh:${x.hue}">
     <div class="tcg-top"><span class="tcg-nm">${esc(x.nm)}</span><span class="tcg-hp">HP ${c.hp}<span class="tcg-ty" title="${esc(ty.nm)} type">${ty.em}</span></span></div>
-    <div class="tcg-art">${seen&&x.ph?rfxPhotoImg(x.ph,x.nm,560):''}<span class="tcg-artemo${seen?'':' sil'}" aria-hidden="true">${x.em}</span>${holo?'<span class="tcg-sheen" aria-hidden="true"></span>':''}</div>
+    <div class="tcg-art">${seen&&x.ph?rfxPhotoImg(x.ph,x.nm,560):''}${reefSilSVG(x.id,'tcg'+(seen?'':' sil'))||`<span class="tcg-artemo${seen?'':' sil'}" aria-hidden="true">${x.em}</span>`}${holo?'<span class="tcg-sheen" aria-hidden="true"></span>':''}</div>
     <div class="tcg-sub">“${esc(x.nick)}” · ${esc(ty.nm)} type · ${REEF_TIERS[x.tier].nm}${x.shiny?' ✨':''}</div>
     <div class="tcg-moves">
       ${c.mv.map(mv=>seen?`<div class="tcg-mv"><span class="tcg-mv-e" aria-hidden="true">${ty.em}</span><div class="tcg-mv-tx"><b>${esc(mv[0])}</b><span>${esc(mv[2]||'')}</span></div><span class="tcg-mv-pw">${mv[1]}</span></div>`
