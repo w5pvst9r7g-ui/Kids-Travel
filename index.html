@@ -1544,6 +1544,7 @@ html.night .msg-quick button,html.night .msg-emojis{background:var(--surface-2)}
       <button data-view="upcoming">🔜 Upcoming</button>
       <button class="active" data-view="explore">Explore</button>
       <button data-view="cats">🐱 Cats</button>
+      <button data-view="reef" class="reefnav hidden">🤿 Reef</button>
       <button data-view="map">Atlas Map</button>
       <button data-view="trips">Journal</button>
       <button data-view="messages">💌 Mail<span class="msg-badge" id="msgBadgeTop" aria-hidden="true"></span></button>
@@ -1761,6 +1762,17 @@ create policy "atlas all" on atlas_sync
   <span class="cat-fab-emo" aria-hidden="true">🐱</span><span class="cat-fab-plus" aria-hidden="true">＋</span>
 </button>
 <input id="catPhotoInput" type="file" accept="image/*" capture="environment" class="sr-only" onchange="onCatPhotoPicked(this)" aria-hidden="true" tabindex="-1">
+<button id="reefFab" class="reef-fab hidden" type="button" onclick="openReefLog()" aria-label="Log a Reef Dex sighting" title="Spotted a sea creature? Log it!">
+  <span class="reef-fab-emo" aria-hidden="true">🤿</span><span class="reef-fab-plus" aria-hidden="true">＋</span>
+</button>
+<div id="reefLogModal" class="amodal hidden" role="dialog" aria-modal="true" aria-labelledby="reefLogTitle" onclick="if(event.target.id==='reefLogModal')closeReefLog()">
+  <div class="amodal-card reeflog-card">
+    <button class="story-close" type="button" onclick="closeReefLog()" aria-label="Close">✕</button>
+    <h3 id="reefLogTitle" class="reeflog-title">🤿 Spotted something?</h3>
+    <div id="reefLogBody"></div>
+  </div>
+</div>
+<div id="reefSplash" class="rfx-catch hidden" aria-hidden="true"></div>
 <div id="catQuickModal" class="amodal hidden" role="dialog" aria-modal="true" aria-labelledby="catQuickTitle" onclick="if(event.target.id==='catQuickModal')closeCatQuick()">
   <div class="amodal-card catquick-card">
     <button class="story-close" type="button" onclick="closeCatQuick()" aria-label="Close">✕</button>
@@ -1824,6 +1836,13 @@ create policy "atlas all" on atlas_sync
       <span class="cat-banner-emo" aria-hidden="true">🐱</span>
       <span class="cat-banner-tx"><b>Poppy's Cat Atlas</b><span id="catBannerSub">Spot cats anywhere in the world — log them, photograph them, collect every coat!</span></span>
       <span class="cat-banner-paws" aria-hidden="true">🐾</span>
+      <span class="cat-banner-go" aria-hidden="true">→</span>
+    </button>
+
+    <button type="button" class="cat-banner reef-banner reveal hidden" id="reefBanner" onclick="sfx('tap');showView('reef')" aria-label="Open the Reef Dex">
+      <span class="cat-banner-emo" aria-hidden="true">🤿</span>
+      <span class="cat-banner-tx"><b>Reef Dex — Kandima Creature Hunt</b><span id="reefBannerSub">42 creatures live around Kandima. Spot them, log them, catch ’em all!</span></span>
+      <span class="cat-banner-paws" aria-hidden="true">🐠</span>
       <span class="cat-banner-go" aria-hidden="true">→</span>
     </button>
 
@@ -1914,6 +1933,13 @@ create policy "atlas all" on atlas_sync
     <div class="section-head"><div><span class="eyebrow">Spot · log · collect</span><h2>🐱 World Cat Atlas</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
     <p class="lead" style="max-width:700px;margin:-6px 0 16px">Every cat your family spots, anywhere in the world — photographed, mapped and collected. Tap the floating 🐱 button to log one from anywhere!</p>
     <div id="catAtlasBody"></div>
+  </section>
+
+  <!-- ===================== REEF DEX (Maldives) ===================== -->
+  <section id="reef" class="view">
+    <div class="section-head"><div><span class="eyebrow teal">Spot · log · win</span><h2>🤿 Reef Dex</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
+    <p class="lead" style="max-width:700px;margin:-6px 0 16px">The Great Kandima Creature Hunt! 42 amazing creatures live around the island. Spot them, log them, out-explore each other — can your family catch ’em all?</p>
+    <div id="reefDexBody"></div>
   </section>
 
   <!-- ===================== WORLD / COUNTRIES ===================== -->
@@ -2008,6 +2034,7 @@ create policy "atlas all" on atlas_sync
   <button class="active" data-view="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="16.2,7.8 11,11 7.8,16.2 13,13" fill="currentColor" stroke="none"/></svg>Explore</button>
   <button data-view="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3z"/><path d="M9 3v15M15 6v15"/></svg>Map</button>
   <button data-view="cats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5 7.5 8M19 3.5 16.5 8"/><path d="M4.6 9.5a7.4 6.5 0 0 1 14.8 0v3.2a7.4 7 0 0 1-14.8 0z"/><path d="M9.3 12h.01M14.7 12h.01"/><path d="M12 14.2v1.4M9.6 15l-1.8.6M14.4 15l1.8.6M9.8 16.2 12 15.6l2.2.6"/></svg>Cats</button>
+  <button data-view="reef" class="reefnav hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12c2-3.5 5-5.5 9-5.5 2.5 0 4.5 1 6 2.5-1.5 1.5-3.5 2.5-6 2.5-4 0-7-2-9-5.5"transform="translate(0 6) scale(1 .9)"/><path d="M2.5 13.5 6.5 12l-4-1.5c.5 1 .5 2 0 3z"/><circle cx="17.5" cy="12.6" r=".9" fill="currentColor" stroke="none"/></svg>Reef</button>
   <button data-view="trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg>Journal</button>
   <button data-view="messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>Mail<span class="msg-badge" id="msgBadgeTab" aria-hidden="true"></span></button>
   <button data-view="badges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>Badges</button>
@@ -5918,10 +5945,10 @@ document.addEventListener('keydown',e=>{
     if(e.key===' '){ e.preventDefault(); catSlideToggle(); return; }
     if(e.key==='Escape'){ closeCatSlide(); return; }
   }
-  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); }
+  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); if(typeof closeReefLog==='function')closeReefLog(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 /* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
-const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal';
+const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal, #reefLogModal';
 function topOpenModal(){ const open=[...document.querySelectorAll(MODAL_SEL)].filter(m=>!m.classList.contains('hidden')); return open[open.length-1]||null; }
 function focusablesIn(m){ return [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null||el===document.activeElement); }
 document.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
@@ -6109,7 +6136,7 @@ let activeView='explore';
 /* keep the browser tab / history entry meaningful as you move around */
 function setDocTitle(label){ try{ document.title = label ? (label+" · Poppy's Atlas") : "Poppy's Atlas — A Kids' Travel Adventure"; }catch(e){} }
 function showView(v){
-  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail',world:'world-view',messages:'messages',cats:'cats'};
+  const ids={explore:'explore',upcoming:'upcoming',map:'map-view',trips:'trips',badges:'badges',packing:'packing-view',detail:'detail',world:'world-view',messages:'messages',cats:'cats',reef:'reef'};
   activeView=v;
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   (document.getElementById(ids[v])||document.getElementById('explore')).classList.add('active');
@@ -6120,7 +6147,9 @@ function showView(v){
   if(v==='world') renderWorld();
   if(v==='messages') renderMessages();
   if(v==='cats') renderCatAtlas();
-  if(v!=='detail'){ const VT={explore:'Explore',upcoming:'Upcoming',map:'Atlas Map',trips:'Journal',badges:'Badges',packing:'Packing',world:'Countries of the World',messages:'Mail',cats:'Cat Atlas'}; setDocTitle(VT[v]);
+  if(v==='reef') renderReefDex();
+  try{ updateReefNav(); }catch(e){}
+  if(v!=='detail'){ const VT={explore:'Explore',upcoming:'Upcoming',map:'Atlas Map',trips:'Journal',badges:'Badges',packing:'Packing',world:'Countries of the World',messages:'Mail',cats:'Cat Atlas',reef:'Reef Dex'}; setDocTitle(VT[v]);
     if((location.hash||'').indexOf('#place/')===0){ try{ history.replaceState(history.state,'', location.pathname+location.search); }catch(e){} } }
   if(v==='map'){ updateFlyBtn(); setTimeout(()=>{ try{initMap();}catch(e){ const el=document.getElementById('map'); el.className='maperr'; el.innerHTML='<div class="maperr-in"><div class="maperr-ico" aria-hidden="true">🗺️</div><h3>Hmm, the map hiccuped</h3><p>Something went wrong loading the map.</p><button class="btn btn-teal" onclick="initMap()">↻ Try again</button></div>'; } },90); }
   window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
@@ -6289,7 +6318,8 @@ function renderUpcoming(){
     nowCards.push(cardHTML(d,`<span class="t soon now">✈️ Happening now!</span>`)); });
   planned.forEach(t=>{ const d=DESTS.find(x=>x.id===t.destId); if(!d||seen.has(d.id)) return; seen.add(d.id);
     const dys=daysUntil(t); const lab=dys==null?'Coming up':(dys===0?'Today!':`in ${dys} sleep${dys===1?'':'s'}`);
-    cards.push(cardHTML(d,`<span class="t soon">🔜 ${lab}</span>`)); });
+    const big=d.id==='maldives'&&dys!=null&&dys<=30?' big-trip':'';   /* the headline trip gets a wave-pulse chip */
+    cards.push(cardHTML(d,`<span class="t soon${big}">🔜 ${lab}</span>`)); });
   let html='';
   if(nowCards.length) html+=`<div class="section-head" style="margin-top:8px"><div><span class="eyebrow teal">Right now</span><h3 style="font-size:1.4rem">Happening now ✈️</h3></div></div><div class="deck">${nowCards.join('')}</div>`;
   if(cards.length) html+=`<div class="section-head" style="margin-top:${nowCards.length?'24px':'8px'}"><div><span class="eyebrow">Every booked adventure</span><h3 style="font-size:1.4rem">All our upcoming trips</h3></div></div><div class="deck">${cards.join('')}</div>`;
@@ -6397,6 +6427,7 @@ function openDest(id){
   const visChip=visYears.length?`<div class="visited-chip">✓ You've been here · ${visYears.join(', ')}</div>`:'';
   document.getElementById('dhero').innerHTML=`
     <div class="bg" style="${frameStyle(th)}"><div class="frame" style="position:absolute;inset:0;${frameStyle(th)}">${sticker(d.emoji)}${dpic(d.id,'hero',d.photos[0][2],1280,760,d.name,d.photos[0][0],true)}</div></div>
+    ${d.id==='maldives'?'<div class="sea-shimmer" aria-hidden="true"></div>':''}
     <div class="scrim"></div>
     <div class="inner"><span class="reg">${d.flag} ${d.country} · ${regionEmoji[d.region]||''} ${d.region}</span><h1>${d.name}</h1>${visChip}</div>
     <img class="dhero-poppie" loading="lazy" alt="" src="poppie-walk.png">`;
@@ -6404,6 +6435,7 @@ function openDest(id){
 
   const tabs=[['get','✈️ Getting there'],['info','🌍 The country'],['photos','📸 Photos'],['see','🏛️ What to see'],['kids','🎢 Fun stuff to do'],['food','🍽️ Yummy food'],['cat','🐾 Local cat'],['lang','🗣️ Talk like a local'],['quiz','🧠 Quiz']];
   if(d.country==='Morocco') tabs.splice(7,0,['catcount','🐱 Cat counter']);   /* Morocco-only cat-spotting game */
+  if(d.id==='maldives') tabs.splice(1,0,['reef','🤿 Reef Dex']);              /* Maldives-only creature hunt */
   const dt=document.getElementById('dtabs'); dt.setAttribute('role','tablist'); dt.setAttribute('aria-label','Sections about '+d.name);
   dt.innerHTML=tabs.map((t,i)=>`<button role="tab" id="tab-${t[0]}" aria-controls="panel-${t[0]}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" class="${i===0?'active':''}" data-p="${t[0]}">${t[1]}</button>`).join('');
 
@@ -6493,6 +6525,7 @@ function openDest(id){
       </div></div>`).join(''),
     food:foodPanelHTML(d),
     catcount:(d.country==='Morocco'?catCounterHTML(d):''),
+    reef:(d.id==='maldives'?reefPanelHTML(d):''),
     quiz:quizPanelHTML(d)
   };
   document.getElementById('panels').innerHTML=tabs.map((t,i)=>`<div class="panel ${i===0?'active':''}" id="panel-${t[0]}" role="tabpanel" aria-labelledby="tab-${t[0]}" tabindex="0" ${i!==0?'hidden':''}>${panels[t[0]]}</div>`).join('');
@@ -8379,16 +8412,16 @@ function setAvatar(id,av){ try{localStorage.setItem('globie_avatar_'+id,av);}cat
 function showLogin(){ const s=document.getElementById('loginScreen'); if(!s) return;
   s.classList.remove('hidden');
   document.getElementById('pinPad').hidden=true; document.getElementById('profilePick').hidden=false;
-  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); updateCatFab(); }
-function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); updateCatFab(); }
+  document.getElementById('pinInput').value=''; document.getElementById('pinErr').textContent=''; renderProfilePick(); updateCatFab(); updateReefNav(); }
+function hideLogin(){ const s=document.getElementById('loginScreen'); if(s) s.classList.add('hidden'); updateCatFab(); updateReefNav(); }
 function updateProfileChip(){ const c=document.getElementById('profileChip'); if(!c) return; const p=PROFILES.find(x=>x.id===currentProfile);
   if(p){ c.style.display='inline-flex'; c.innerHTML=avatarHTML(avatarFor(p.id))+' '+esc(nameFor(p.id))+' <span aria-hidden="true" style="opacity:.55">⇄</span>'; } else c.style.display='none'; }
 function dobYear(){ const p=PROFILES.find(x=>x.id===currentProfile); return (p&&p.dob)||0; }
 function applyProfileData(){ const dy=dobYear(); trips=loadTrips().filter(t=>!t.year||t.year>=dy); reconcileTrips(); unlockedAch=loadAch(); quizBest=loadQuizBest(); packState=loadPack(); catsRead=loadCatsRead(); triedFoods=loadTriedFoods(); storiesRead=loadStoriesRead(); wishlist=loadWish(); celebratedTrip=null;
-  renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(typeof updateCatBanner==='function') updateCatBanner(); if(map) initMap(); }
+  renderFeatured(); renderFilters(); renderGrid(); renderUpcoming(); renderJournalFilters(); renderPassport(); renderStats(); checkAchievements({silent:true}); if(typeof updateCatBanner==='function') updateCatBanner(); if(typeof reefUIRefresh==='function') reefUIRefresh(); if(map) initMap(); }
 function profileName(){ return currentProfile?nameFor(currentProfile):''; }
 function signIn(id){ const pid=placeFromHash();   /* capture before showView clears the hash */
-  currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); updateCatFab(); poppieI=0; poppieSpeak(); showView('upcoming');
+  currentProfile=id; applyProfileData(); updateProfileChip(); updateMsgBadge(); hideLogin(); updateCatFab(); updateReefNav(); updateReefBanner(); poppieI=0; poppieSpeak(); showView('upcoming');
   showSplash(()=>{ setTimeout(()=>{ if(pid && typeof DESTS!=='undefined' && DESTS.some(d=>d.id===pid)){ openDest(pid); } else { maybeOnboard(); } },180); }); }
 let _splashTimers=[], _splashCb=null;
 function showSplash(cb){
@@ -8660,6 +8693,290 @@ function reefUnlocked(){
     const now=Date.now();
     return now>=d.getTime()-30*86400000 && now<=end.getTime();
   }catch(e){ return false; }
+}
+/* Reef nav tab (both navs) + the trip-time quick-log FAB */
+function updateReefNav(){
+  try{
+    const on=reefUnlocked();
+    document.querySelectorAll('.reefnav').forEach(b=>b.classList.toggle('hidden',!on));
+    const f=document.getElementById('reefFab');
+    if(f){ const s=document.getElementById('loginScreen');
+      const loginUp=s&&!s.classList.contains('hidden');
+      const t=reefTrip();
+      f.classList.toggle('hidden', !(currentProfile && !loginUp && t && isUnderway(t))); }
+  }catch(e){}
+}
+/* keep every reef surface in sync after a change */
+function reefUIRefresh(){
+  try{
+    updateReefNav(); updateReefBanner();
+    if(typeof activeView!=='undefined' && activeView==='reef') renderReefDex();
+    if(currentDest && currentDest.id==='maldives'){ const p=document.getElementById('panel-reef'); if(p) p.innerHTML=reefPanelHTML(currentDest); }
+  }catch(e){}
+}
+/* live subtitle on the Explore banner */
+function updateReefBanner(){
+  const w=document.getElementById('reefBanner'); if(!w) return;
+  w.classList.toggle('hidden',!reefUnlocked());
+  const el=document.getElementById('reefBannerSub'); if(!el) return;
+  const s=reefStats();
+  if(!s.total){ const t=reefTrip(); const dd=t?daysUntil(t):null;
+    el.textContent=(dd&&dd>0)?('42 creatures are waiting at Kandima — '+dd+' sleep'+(dd===1?'':'s')+' to go! Learn them before you fly.')
+      :'42 creatures live around Kandima. Spot them, log them, catch ’em all!';
+    return; }
+  const kids=PROFILES.map(p=>({p:p,k:s.byKid[p.id]})).sort((a,b)=>b.k.species-a.k.species);
+  const lead=(kids[0].k.species>kids[1].k.species)?(nameFor(kids[0].p.id)+' leads '+kids[0].k.species+'–'+kids[1].k.species+'!'):'All square — it’s a tie!';
+  el.textContent='Family '+s.speciesCount+'/'+REEF_SPECIES.length+' · '+lead;
+}
+
+/* ====================================================================
+   THE REEF DEX PAGE — hero, head-to-head, Pokédex grid, feed, badges
+   ==================================================================== */
+function rfxTierPill(t){ const ti=REEF_TIERS[t]; return `<span class="rfx-tier rfx-t-${t}">${ti.nm}</span>`; }
+/* per-(species,kid) first-log entry ids — so the feed can show what scored */
+function rfxFirstLogIds(log){
+  const best={};
+  log.forEach(x=>{ const k=x.sp+'|'+x.by; if(!best[k]||x.ts<best[k].ts) best[k]=x; });
+  return new Set(Object.keys(best).map(k=>best[k].id));
+}
+function rfxMySpecies(s){
+  const me=currentProfile||'guest'; const set=new Set();
+  s.log.forEach(x=>{ if(x.by===me) set.add(x.sp); }); return set;
+}
+function rfxHero(s,compact){
+  const me=currentProfile||'guest';
+  const k=s.byKid[me]||{points:0,species:0};
+  const rank=reefRank(k.points), next=reefNextRank(k.points);
+  const t=reefTrip(); const dd=t?daysUntil(t):null; const under=t&&isUnderway(t);
+  let line='';
+  if(under){ const day=Math.floor((Date.now()-tripDate(t).getTime())/86400000)+1; line='🏝️ Day '+day+' of the adventure — the reef is OPEN!'; }
+  else if(dd&&dd>0){ line='🛫 '+dd+' sleep'+(dd===1?'':'s')+' until the reef!'; }
+  else if(s.total){ line='🌊 What a hunt that was — the Dex remembers everything.'; }
+  return `<div class="rfx-hero${compact?' compact':''}">
+    <div class="rfx-waves" aria-hidden="true"></div>
+    <div class="rfx-bubbles" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="rfx-hero-in">
+      <div class="rfx-hero-rank"><span class="rfx-hero-e" aria-hidden="true">${rank.e}</span>
+        <div><div class="rfx-hero-t">You’re a <b>${esc(rank.t)}</b>!</div>
+        <div class="rfx-hero-sub">${next?('Score '+(next.n-k.points)+' more point'+(next.n-k.points===1?'':'s')+' to become '+esc(next.t)+' '+next.e):'Top rank — the ocean bows to you! 🎉'}</div></div></div>
+      <div class="rfx-hero-prog">
+        <div class="rfx-prog-row"><span>👨‍👩‍👧‍👦 Family</span><span class="rfx-prog-bar"><span style="width:${Math.round(s.speciesCount/REEF_SPECIES.length*100)}%"></span></span><b>${s.speciesCount}/${REEF_SPECIES.length}</b></div>
+        <div class="rfx-prog-row"><span>🫵 You</span><span class="rfx-prog-bar"><span style="width:${Math.round((s.byKid[me]?s.byKid[me].species:0)/REEF_SPECIES.length*100)}%"></span></span><b>${s.byKid[me]?s.byKid[me].species:0}/${REEF_SPECIES.length}</b></div>
+      </div>
+      ${line?`<div class="rfx-hero-line">${line}</div>`:''}
+    </div></div>`;
+}
+function rfxVersus(s){
+  const a=PROFILES[0], b=PROFILES[1];
+  const ka=s.byKid[a.id]||{species:0,points:0,firsts:0,n:0}, kb=s.byKid[b.id]||{species:0,points:0,firsts:0,n:0};
+  const tot=ka.species+kb.species;
+  const pa=tot?Math.round(ka.species/tot*100):50;
+  const kg=s.byKid.guest;
+  const cell=(p,k)=>`<div class="rfx-vs-kid${p.id===currentProfile?' me':''}">
+      <span class="rfx-vs-ava" style="--pc:${p.color}">${p.emoji}</span>
+      <b class="rfx-vs-nm">${esc(nameFor(p.id))}${p.id===currentProfile?' <span class="rfx-you">you</span>':''}</b>
+      <span class="rfx-vs-big">${k.species}</span><span class="rfx-vs-lbl">creatures</span>
+      <span class="rfx-vs-meta">🏆 ${k.points} pts · 👑 ${k.firsts} first${k.firsts===1?'':'s'}</span>
+    </div>`;
+  return `<div class="rfx-card rfx-vs"><h3 class="rfx-h">⚔️ The Great Creature Race</h3>
+    <div class="rfx-vs-grid">${cell(a,ka)}<div class="rfx-vs-mid">VS</div>${cell(b,kb)}</div>
+    <div class="rfx-vs-bar" role="img" aria-label="${esc(nameFor(a.id))} ${ka.species} creatures vs ${esc(nameFor(b.id))} ${kb.species}">
+      <span class="rfx-vs-fa" style="width:${pa}%;--pc:${a.color}"></span><span class="rfx-vs-fb" style="--pc:${b.color}"></span>
+    </div>
+    ${tot===0?'<p class="rfx-vs-tip">Nobody has spotted anything yet… the race starts at the first splash! 🏁</p>':''}
+    ${kg&&kg.n?`<p class="rfx-vs-guest">🧑 a guest has logged ${kg.n} sighting${kg.n===1?'':'s'} too (guests cheer from the beach — no points)</p>`:''}
+  </div>`;
+}
+function rfxProgress(s){
+  return `<div class="rfx-tprog">${Object.keys(REEF_TIERS).map(t=>{
+    const total=REEF_SPECIES.filter(x=>x.tier===t).length;
+    return `<span class="rfx-tchip rfx-t-${t}"><b>${s.tiers[t]||0}</b>/${total} ${REEF_TIERS[t].nm}</span>`;}).join('')}</div>`;
+}
+function rfxDex(s,compact){
+  const mine=rfxMySpecies(s);
+  const groups=REEF_GROUPS.map(g=>{
+    const sp=REEF_SPECIES.filter(x=>x.g===g[0]);
+    const found=sp.filter(x=>mine.has(x.id)).length;
+    return `<div class="rfx-group">
+      <h4 class="rfx-gh">${g[2]} ${esc(g[1])} <span class="rfx-ghsub">you: ${found}/${sp.length}</span></h4>
+      <p class="rfx-gtip">${esc(g[3])}</p>
+      <div class="rfx-grid">${sp.map(x=>rfxCard(x,s,mine)).join('')}</div>
+    </div>`;}).join('');
+  return `<div class="rfx-card"><h3 class="rfx-h">📖 The Dex <span class="rfx-hsub">tap a creature to log it</span></h3>${rfxProgress(s)}${groups}</div>`;
+}
+function rfxCard(x,s,mine){
+  const seen=mine.has(x.id); const n=s.species[x.id]||0;
+  const holo=(x.tier==='l'||x.shiny)?' holo':'';
+  const crown=s.firstBy[x.id];
+  const chips=(s.spotters[x.id]?[...s.spotters[x.id]]:[]).map(id=>{
+    const p=PROFILES.find(pp=>pp.id===id);
+    if(!p) return `<span class="rfx-chip guest" title="a guest">🧑</span>`;
+    return `<span class="rfx-chip${crown===id?' crown':''}" style="--pc:${p.color}" title="${esc(nameFor(id))}${crown===id?' — first in the family! 👑':''}">${p.emoji}</span>`;}).join('');
+  return `<button type="button" class="rfx-cardx${seen?'':' locked'}${holo}" style="--rh:${x.hue}" onclick="openReefLog('${x.id}')"
+      aria-label="${esc(x.nm)} — ${REEF_TIERS[x.tier].nm}${seen?'':' — not spotted by you yet'}">
+    <span class="rfx-emo" aria-hidden="true">${x.em}</span>
+    <span class="rfx-cnm">${esc(x.nm)}</span>
+    <span class="rfx-cnick">“${esc(x.nick)}”</span>
+    ${rfxTierPill(x.tier)}${x.shiny?'<span class="rfx-shinytag">✨ SHINY</span>':''}
+    ${seen?`<span class="rfx-fact">${x.fact}</span><span class="rfx-cfoot">${n?`<span class="rfx-xn">×${n}</span>`:''}${chips}</span>`
+          :`<span class="rfx-fact hidden-fact">❓ Spot it to unlock its secret!</span>${chips?`<span class="rfx-cfoot">${chips}</span>`:''}`}
+  </button>`;
+}
+function rfxFeed(s){
+  const recent=s.log.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,20);
+  if(!recent.length) return '';
+  const firsts=rfxFirstLogIds(s.log);
+  return `<div class="rfx-card"><h3 class="rfx-h">🕘 Latest sightings</h3>
+    <div class="rfx-feed">${recent.map(x=>{ const sp=REEF_SP_BY_ID[x.sp]; if(!sp) return '';
+      const isKid=PROFILES.some(p=>p.id===x.by);
+      const scored=firsts.has(x.id)&&isKid;
+      const crowned=s.firstBy[x.sp]===x.by && scored;
+      const pts=scored?REEF_TIERS[sp.tier].pts+(crowned?1:0):0;
+      const d=x.ts?new Date(x.ts).toLocaleDateString():'';
+      return `<div class="rfx-feed-it" style="--rh:${sp.hue}">
+        <span class="rfx-feed-e">${sp.em}</span>
+        <div class="rfx-feed-tx"><b>${esc(catWho(x.by))} spotted “${esc(sp.nick)}”</b>
+          <span class="rfx-feed-meta">${esc(sp.nm)}${pts?' · +'+pts+' pts':''}${crowned?' · 👑 family first!':''}${d?' · '+d:''}</span></div>
+        ${sp.tier==='l'?'<span class="rfx-feed-l" title="Legendary">🌟</span>':''}
+      </div>`;}).join('')}</div></div>`;
+}
+function rfxBadges(){
+  const ids=['reef_first','reef_dex10','reef_dex25','reef_dexall','reef_shark','reef_legend','reef_gold5','reef_pts50','reef_groups'];
+  const c=achContext();
+  const items=ACHIEVEMENTS.filter(a=>ids.indexOf(a.id)>=0);
+  const got=items.filter(a=>unlockedAch.has(a.id)).length;
+  return `<div class="rfx-card"><h3 class="rfx-h">🏅 Reef badges <span class="rfx-hsub">${got}/${items.length}</span></h3>
+    <div class="catx-badges">${items.map(a=>{ const have=unlockedAch.has(a.id); const pr=badgeProgress(a,c);
+      return `<div class="catx-badge${have?' got':''}" title="${esc(a.ds)}">
+        <span class="catx-badge-e">${a.em}</span>
+        <span class="catx-badge-nm">${esc(a.nm)}</span>
+        <span class="catx-badge-st">${have?'✓ earned':(pr?(Math.min(pr.have,pr.need)+'/'+pr.need):'locked')}</span></div>`;}).join('')}</div></div>`;
+}
+function renderReefDex(){
+  const host=document.getElementById('reefDexBody'); if(!host) return;
+  const s=reefStats();
+  host.innerHTML=rfxHero(s)+rfxVersus(s)+
+    `<div class="rfx-actions">
+      <button class="btn btn-yellow" type="button" onclick="openReefLog()">🤿 I spotted something!</button>
+      <button class="btn btn-ghost" type="button" onclick="reefHowTo()">📖 How to play</button>
+    </div>`+
+    rfxDex(s)+rfxFeed(s)+rfxBadges();
+}
+function reefHowTo(){
+  openReefLog(); const body=document.getElementById('reefLogBody'); if(!body) return;
+  _reefStep={stage:'help'};
+  const title=document.getElementById('reefLogTitle'); if(title) title.innerHTML='📖 How to play';
+  body.innerHTML=`<div class="reeflog-help">
+    <p>🤿 <b>Spot a creature</b> for real — snorkelling, on the beach, from the boat or around the island.</p>
+    <p>📖 <b>Log it!</b> The first time YOU spot a species it goes into your Dex and scores its points: <b>Common 1 · Uncommon 2 · Rare 5 · Legendary 10</b>.</p>
+    <p>👑 <b>Family first!</b> The FIRST explorer in the family to find a species gets a crown on it forever, plus 1 bonus point.</p>
+    <p>⚔️ <b>The race:</b> whoever discovers the most creatures leads the Great Creature Race. Repeat sightings are brilliant for the feed, but each species only scores once.</p>
+    <p>⚠️ <b>Ocean rules:</b> look, never touch. Some creatures (like the lionfish and titan triggerfish) have their own rules on their cards — read them!</p>
+    <button class="btn btn-teal" type="button" onclick="renderReefLog()">🐠 Got it — to the creatures!</button>
+  </div>`;
+}
+
+/* ===== the log modal: pick → confirm → celebrate ===== */
+let _reefStep={stage:'pick',sp:null};
+function openReefLog(sp){
+  const m=document.getElementById('reefLogModal'); if(!m) return;
+  _reefStep=sp?{stage:'confirm',sp:sp}:{stage:'pick',sp:null};
+  modalCapture(); m.classList.remove('hidden'); renderReefLog();
+  setTimeout(()=>{ const b=m.querySelector('.reeflog-sp,.btn'); if(b) b.focus(); },40); sfx('tap');
+}
+function closeReefLog(){ const m=document.getElementById('reefLogModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
+function renderReefLog(){
+  const body=document.getElementById('reefLogBody'), title=document.getElementById('reefLogTitle'); if(!body) return;
+  if(!_reefStep||!_reefStep.stage||_reefStep.stage==='help') _reefStep={stage:'pick',sp:null};
+  const me=currentProfile||'guest';
+  if(_reefStep.stage==='pick'){
+    if(title) title.innerHTML='🤿 Spotted something?';
+    const mine=rfxMySpecies(reefStats());
+    body.innerHTML=`<p class="reeflog-sub">Brilliant! What did you find, ${esc(catWho(me))}?</p>`+
+      REEF_GROUPS.map(g=>`<div class="reeflog-g"><h4>${g[2]} ${esc(g[1])}</h4><div class="reeflog-grid">`+
+        REEF_SPECIES.filter(x=>x.g===g[0]).map(x=>{
+          const today=reefLoggedToday(x.id,me);
+          return `<button type="button" class="reeflog-sp${today?' today':''}${mine.has(x.id)?' seen':''}" style="--rh:${x.hue}" ${today?'disabled':''} onclick="reefPick('${x.id}')" aria-label="${esc(x.nm)}${today?' — already logged today':''}">
+            <span class="rl-em">${x.em}</span><span class="rl-nm">${esc(x.nm)}</span>${today?'<span class="rl-today">✓ today</span>':''}</button>`;}).join('')+
+      `</div></div>`).join('');
+    return;
+  }
+  if(_reefStep.stage==='confirm'){
+    const x=REEF_SP_BY_ID[_reefStep.sp]; if(!x){ _reefStep={stage:'pick',sp:null}; return renderReefLog(); }
+    if(title) title.innerHTML=x.em+' '+esc(x.nm);
+    const s=reefStats(); const mine=rfxMySpecies(s);
+    const isKid=PROFILES.some(p=>p.id===me);
+    const personalNew=!mine.has(x.id);
+    const familyFirst=isKid&&!s.firstBy[x.id];
+    const today=reefLoggedToday(x.id,me);
+    const pts=(personalNew&&isKid)?REEF_TIERS[x.tier].pts+(familyFirst?1:0):0;
+    body.innerHTML=`<div class="reeflog-confirm" style="--rh:${x.hue}">
+      <div class="rc-emo${x.tier==='l'||x.shiny?' holo':''}">${x.em}</div>
+      <div class="rc-nick">“${esc(x.nick)}”</div>
+      <div class="rc-tier">${rfxTierPill(x.tier)}${x.shiny?'<span class="rfx-shinytag">✨ SHINY</span>':''}</div>
+      ${today?`<p class="rc-pts muted">You already logged this one today — try again tomorrow, or pick something new!</p>`
+        :pts?`<p class="rc-pts">${familyFirst?'👑 <b>Nobody in the family has found this yet — be the FIRST!</b><br>':''}Worth <b>+${pts} point${pts===1?'':'s'}</b> for you${familyFirst?' (includes the +1 crown bonus)':''}</p>`
+        :personalNew?`<p class="rc-pts">A brand-new creature for your Dex!</p>`
+        :`<p class="rc-pts muted">Already in your Dex — logging it again is just for glory (and the feed) 😄</p>`}
+      <div class="reeflog-actions">
+        ${today?'':`<button class="btn btn-yellow" type="button" onclick="reefConfirm('${x.id}')">🤿 Yes — I spotted it!</button>`}
+        <button class="btn-text" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">‹ Back to the list</button>
+      </div></div>`;
+    return;
+  }
+  if(_reefStep.stage==='done'){
+    const g=_reefStep.gains; const x=g.sp;
+    if(title) title.innerHTML='🎉 Logged!';
+    const s=reefStats(); const k=s.byKid[me]||{points:0,species:0};
+    body.innerHTML=`<div class="reeflog-done" style="--rh:${x.hue}">
+      <div class="rc-emo big${x.tier==='l'||x.shiny?' holo':''}">${x.em}</div>
+      <p class="rd-head">${g.familyFirst?'👑 FAMILY FIRST! ':''}${g.personalNew?esc(x.nm)+' joins your Dex!':'Another '+esc(x.nm)+' for the feed!'}</p>
+      <p class="rd-fact">${x.fact}</p>
+      ${g.pts?`<div class="rd-pts">+${g.pts} point${g.pts===1?'':'s'} → you have <b>${k.points}</b></div>`:''}
+      <div class="rd-tot">📖 Your Dex: <b>${k.species}/${REEF_SPECIES.length}</b> · Family: <b>${s.speciesCount}/${REEF_SPECIES.length}</b></div>
+      <div class="reeflog-actions">
+        <button class="btn btn-yellow" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">➕ Log another</button>
+        <button class="btn btn-teal" type="button" onclick="closeReefLog();showView('reef')">📖 See the Reef Dex</button>
+      </div></div>`;
+    return;
+  }
+}
+function reefPick(sp){ _reefStep={stage:'confirm',sp:sp}; sfx('tap'); renderReefLog(); }
+function reefConfirm(sp){
+  const g=reefLogSpecies(sp); if(!g) return;
+  _reefStep={stage:'done',sp:sp,gains:g};
+  sfx('good'); renderReefLog();
+  toast(g.sp.em+' '+g.sp.nm+' logged!'+(g.pts?(' +'+g.pts+' point'+(g.pts===1?'':'s')):'')+(g.familyFirst?' 👑':''));
+  if(!reduceMotion) confetti();
+  if(g.personalNew&&(g.sp.tier==='l'||g.sp.tier==='r'||g.familyFirst)) rfxCatchSplash(g);
+  reefUIRefresh(); checkAchievements();
+}
+/* big-catch celebration — transient, click-through, never focusable */
+function rfxCatchSplash(g){
+  if(reduceMotion) return;
+  const el=document.getElementById('reefSplash'); if(!el) return;
+  const label=g.sp.tier==='l'?'★ LEGENDARY! ★':(g.sp.shiny?'✨ SHINY! ✨':(g.sp.tier==='r'?'★ RARE! ★':'👑 FAMILY FIRST!'));
+  el.innerHTML=`<div class="rfx-catch-in" style="--rh:${g.sp.hue}"><div class="rfx-catch-rays"></div>
+    <div class="rfx-catch-emo">${g.sp.em}</div><div class="rfx-catch-label">${label}</div>
+    <div class="rfx-catch-nm">${esc(g.sp.nm)}</div></div>`;
+  el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show');
+  setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hidden'); el.innerHTML=''; },1700);
+}
+
+/* ===== the Maldives destination-page panel (compact reef teaser) ===== */
+function reefPanelHTML(d){
+  const s=reefStats(); const mine=rfxMySpecies(s);
+  const teaseIds=['whaleshark','manta','blacktip','clownfish','napoleon','plankton'];
+  return `<h3 class="blockhead">🤿 Reef Dex — The Great Kandima Creature Hunt</h3>
+    <p class="sub">42 creatures live around Kandima. Spot them for real, log them, and race each other to fill the Dex!</p>
+    ${rfxHero(s,true)}
+    ${rfxVersus(s)}
+    <div class="rfx-group"><h4 class="rfx-gh">🌟 The ones everyone dreams of</h4>
+      <div class="rfx-grid tease">${teaseIds.map(id=>rfxCard(REEF_SP_BY_ID[id],s,mine)).join('')}</div></div>
+    <div class="rfx-actions">
+      <button class="btn btn-teal" type="button" onclick="showView('reef')">📖 Open the full Reef Dex (${REEF_SPECIES.length} creatures)</button>
+      <button class="btn btn-yellow" type="button" onclick="openReefLog()">🤿 I spotted something!</button>
+    </div>`;
 }
 
 /* =====================================================================
