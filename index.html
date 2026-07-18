@@ -7014,7 +7014,11 @@ function cloudHeaders(c){ return {'apikey':c.key,'Authorization':'Bearer '+c.key
 function cloudGather(){ const out={}; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i);
   if(k && k.indexOf('globie')===0 && k!=='globie_cloud'){ out[k]=localStorage.getItem(k); } } }catch(e){} return out; }
 function cloudApply(payload){ if(!payload||typeof payload!=='object') return 0; let n=0;
-  Object.keys(payload).forEach(k=>{ if(k.indexOf('globie')===0 && k!=='globie_cloud'){ try{localStorage.setItem(k,payload[k]); n++;}catch(e){} } });
+  Object.keys(payload).forEach(k=>{ if(k.indexOf('globie')===0 && k!=='globie_cloud'){ try{
+    /* the shared Reef Dex log is union-merged (by entry id), not overwritten,
+       so restoring on a second device never wipes that device's sightings */
+    const v=(k===REEF_DEX_KEY)?reefCloudMerge(payload[k]):payload[k];
+    localStorage.setItem(k,v); n++;}catch(e){} } });
   return n; }
 function cloudBackup(){ const c=cloudReady(); if(!c){ cloudStatus('Add your Supabase details and Save first.','err'); return; }
   cloudStatus('⬆️ Backing up…');
@@ -8469,6 +8473,168 @@ function saveProfileName(){
   if(setName(currentProfile,ni.value)){ ni.value=nameFor(currentProfile); sfx('good'); toast('Name saved! ✏️'); }
   else { ni.value=nameFor(currentProfile); toast('Please type a name first','error'); }
 }
+/* =====================================================================
+   REEF DEX — The Great Kandima Creature Hunt 🤿
+   A Pokédex-style spotting checklist for the Maldives trip. Sightings live
+   in ONE shared, NON-profile-suffixed key (like the World Cat Atlas) so the
+   whole family fills one logbook; who spotted what rides on `by`.
+   Scoring is a true dex: a species pays its tier points ONCE per kid (their
+   first-ever sighting); repeats are fun + feed only. The family's first
+   spotter of a species earns +1 bonus and a permanent 👑 crown. "First"
+   is DERIVED at read time (min ts per species over kid profiles), never
+   stored — so cloud merges can't corrupt it and guests can't claim it.
+   ===================================================================== */
+const REEF_TIERS={
+  c:{nm:'Common',    pts:1,  col:'#2FA98C'},
+  u:{nm:'Uncommon',  pts:2,  col:'#3E9BDE'},
+  r:{nm:'Rare',      pts:5,  col:'#8A78EA'},
+  l:{nm:'Legendary', pts:10, col:'#E8A21A'}
+};
+/* g: fish=Reef Fish · giants=Ocean Giants · crit=Beach & Reef Critters · land=Island Life */
+const REEF_GROUPS=[
+  ['fish','Reef Fish','🐠','Right off the beach on Kandima’s house reef'],
+  ['giants','Ocean Giants','🐢','Turtles, rays, sharks and the deep-water legends'],
+  ['crit','Beach & Reef Critters','🦀','Look closer — on the sand, the reef and at night'],
+  ['land','Island Life','🦎','Not everything cool is underwater']
+];
+const REEF_SPECIES=[
+  /* —— Reef Fish —— */
+  {id:'clownfish',    nm:'Clownfish',              nick:'The Real-Life Nemo',      em:'🐠', g:'fish',  tier:'c', hue:24,  fact:'The Maldives has its very own kind — the Maldive anemonefish! It hides in a stinging anemone that never stings IT, thanks to a magic slime coat.'},
+  {id:'powderblue',   nm:'Powder-blue surgeonfish',nick:'Blue Blade',              em:'🐟', g:'fish',  tier:'c', hue:200, fact:'Hides a scalpel-sharp spine by its tail and swims in huge powder-blue clouds — a Maldives superstar.'},
+  {id:'parrotfish',   nm:'Parrotfish',             nick:'The Sand Factory',        em:'🦜', g:'fish',  tier:'c', hue:150, fact:'Crunches coral with its beak and poops out soft white sand. The beach you’re standing on? Partly parrotfish poop!'},
+  {id:'moorishidol',  nm:'Moorish idol',           nick:'The Banner Fish',         em:'🎏', g:'fish',  tier:'c', hue:48,  fact:'Trails a long white banner-fin behind it — the wise "Gill" from a famous fish-tank film is one of these.'},
+  {id:'butterflyfish',nm:'Butterflyfish',          nick:'Flutter Buddy',           em:'🦋', g:'fish',  tier:'c', hue:42,  fact:'Swims in loyal pairs and wears a big fake eye near its tail so hunters attack the wrong end.'},
+  {id:'sergeant',     nm:'Sergeant major',         nick:'The Sergeant',            em:'🎖️', g:'fish',  tier:'c', hue:56,  fact:'Wears army stripes like a sergeant’s badge and bravely guards patches of thousands of tiny purple eggs.'},
+  {id:'snapper',      nm:'Bluestripe snapper',     nick:'The Snap Squad',          em:'📸', g:'fish',  tier:'c', hue:50,  fact:'Glowing yellow crowds of them hang around the jetty like they’re queueing for a photo.'},
+  {id:'fusilier',     nm:'Blue fusilier',          nick:'Blue Lightning',          em:'💨', g:'fish',  tier:'c', hue:210, fact:'Rivers of electric blue-and-yellow fish flow past you in their hundreds — blink and they’ve gone.'},
+  {id:'needlefish',   nm:'Needlefish',             nick:'Sky Skimmer',             em:'🪡', g:'fish',  tier:'c', hue:190, fact:'Floats JUST under the surface like a floating silver needle — remember to look up while you snorkel!'},
+  {id:'unicornfish',  nm:'Unicornfish',            nick:'Sea Unicorn',             em:'🦄', g:'fish',  tier:'c', hue:260, fact:'Grows a real horn on its forehead — and scientists still aren’t sure what it’s for.'},
+  {id:'wrasse',       nm:'Cleaner wrasse',         nick:'The Car Wash',            em:'🧼', g:'fish',  tier:'c', hue:180, fact:'Runs a "cleaning station" where big fish queue up to have their teeth and scales nibbled clean.'},
+  {id:'pufferfish',   nm:'Pufferfish',             nick:'Balloon Mode',            em:'🐡', g:'fish',  tier:'c', hue:35,  fact:'Gulps water to inflate into a spiky balloon that nobody wants to swallow. Instant win button!'},
+  {id:'goatfish',     nm:'Goatfish',               nick:'The Whisker Digger',      em:'🥸', g:'fish',  tier:'c', hue:45,  fact:'Digs through the sand with two wiggly chin whiskers called barbels — watch the puffs of sand it leaves behind.'},
+  {id:'triggerfish',  nm:'Titan triggerfish',      nick:'The Reef Boss',           em:'🔱', g:'fish',  tier:'u', hue:80,  fact:'⚠️ Guards a cone of water ABOVE its nest. If one charges you, swim away SIDEWAYS — never straight up!'},
+  {id:'sweetlips',    nm:'Oriental sweetlips',     nick:'Sweetlips',               em:'💋', g:'fish',  tier:'u', hue:330, fact:'Baby sweetlips do a wiggly non-stop dance to trick hunters into thinking they’re poisonous.'},
+  {id:'boxfish',      nm:'Yellow boxfish',         nick:'Pixel Cube',              em:'📦', g:'fish',  tier:'u', hue:52,  fact:'A square, armoured fish! Babies look like tiny yellow dice with black dots.'},
+  {id:'moray',        nm:'Moray eel',              nick:'Grumpy Ribbon',           em:'🐍', g:'fish',  tier:'u', hue:120, fact:'Opens and closes its mouth just to breathe — and hides a SECOND set of jaws in its throat. Really!'},
+  {id:'lionfish',     nm:'Lionfish',               nick:'Look-Don’t-Touch',   em:'🦁', g:'fish',  tier:'u', hue:15,  fact:'⚠️ Those gorgeous fan-fins hide venomous spines. Admire from a distance — never ever touch.'},
+  {id:'flyingfish',   nm:'Flying fish',            nick:'The Glider',              em:'✈️', g:'fish',  tier:'u', hue:205, fact:'Spot it from the boat or the seaplane — it bursts out of the water and glides over 100 metres on wing-fins.'},
+  {id:'batfish',      nm:'Batfish',                nick:'The Curious One',         em:'🥞', g:'fish',  tier:'u', hue:40,  fact:'A big flat pancake of a fish that’s so curious it follows snorkelers around the jetty.'},
+  /* —— Ocean Giants —— */
+  {id:'blacktip',     nm:'Blacktip reef shark',    nick:'Finn the Friendly',       em:'🦈', g:'giants',tier:'c', hue:215, fact:'Baby sharks patrol the ankle-deep lagoon at Kandima, totally relaxed about people. Your first shark will be a COMMON!'},
+  {id:'stingray',     nm:'Stingray',               nick:'The Flappy Pancake',      em:'🪁', g:'giants',tier:'c', hue:230, fact:'Glides past the water villas at dusk like a flying carpet of the sea.'},
+  {id:'hawksbill',    nm:'Hawksbill turtle',       nick:'Old Soul',                em:'🐢', g:'giants',tier:'u', hue:140, fact:'Named for its bird-like beak. Sea turtles have been cruising the oceans since the dinosaurs.'},
+  {id:'eagleray',     nm:'Spotted eagle ray',      nick:'Spotty Glider',           em:'🦅', g:'giants',tier:'u', hue:250, fact:'A polka-dot back and wings up to THREE metres across — as wide as two kids. It flies underwater.'},
+  {id:'dolphin',      nm:'Spinner dolphin',        nick:'The Spinner Squad',       em:'🐬', g:'giants',tier:'u', hue:195, fact:'Leaps out of the sea and corkscrews up to SEVEN spins in one jump. Sunset cruises nearly always find them.'},
+  {id:'napoleon',     nm:'Napoleon wrasse',        nick:'The King',                em:'👑', g:'giants',tier:'r', hue:160, fact:'As big as a kid, with a bump on its head like a crown — and it can change from a girl into a boy!'},
+  {id:'nurseshark',   nm:'Nurse shark',            nick:'The Snoozer',             em:'😴', g:'giants',tier:'r', hue:220, fact:'Sleeps in cosy piles under coral ledges all day, then hoovers up food like a vacuum cleaner at night.'},
+  {id:'manta',        nm:'Manta ray',              nick:'The Mothership',          em:'🛸', g:'giants',tier:'l', hue:265, fact:'Wings wider than a car and the biggest brain of any fish. It does underwater somersaults while it eats!'},
+  {id:'whaleshark',   nm:'Whale shark',            nick:'The Gentle Giant',        em:'🐋', g:'giants',tier:'l', hue:200, fact:'The biggest fish on planet Earth — the size of a bus — and it eats only tiny plankton. The ultimate spot!'},
+  /* —— Beach & Reef Critters —— */
+  {id:'coral',        nm:'Living coral',           nick:'The Reef Builder',        em:'🪸', g:'crit',  tier:'c', hue:350, fact:'Not a plant! Millions of tiny animals building a city, over hundreds of years. Everyone scores this on day one.'},
+  {id:'anemone',      nm:'Sea anemone',            nick:'The Wiggly Garden',       em:'🌸', g:'crit',  tier:'c', hue:320, fact:'Looks like a flower but it’s secretly an animal — and it’s the clownfish’s apartment building.'},
+  {id:'hermitcrab',   nm:'Hermit crab',            nick:'Shell Swapper',           em:'🐚', g:'crit',  tier:'c', hue:30,  fact:'When one finds a bigger shell, crabs line up by size and ALL swap homes at once. A shell-swap party!'},
+  {id:'ghostcrab',    nm:'Ghost crab',             nick:'Beach Ninja',             em:'👻', g:'crit',  tier:'c', hue:60,  fact:'Sprints sideways faster than you can and vanishes into the sand. Bring a torch to the beach at night!'},
+  {id:'starfish',     nm:'Sea star',               nick:'Star Power',              em:'⭐', g:'crit',  tier:'c', hue:45,  fact:'Loses an arm? It just grows a new one. Some can even grow a whole new body from one arm!'},
+  {id:'seacucumber',  nm:'Sea cucumber',           nick:'The Sea Pickle',          em:'🥒', g:'crit',  tier:'c', hue:100, fact:'Hoovers the sand clean all day… and breathes through its bottom. Really. Truly. Its bottom.'},
+  {id:'giantclam',    nm:'Giant clam',             nick:'Rainbow Lips',            em:'💎', g:'crit',  tier:'u', hue:175, fact:'Electric-blue wavy lips peeking out of the reef — and it can live for 100 years.'},
+  {id:'octopus',      nm:'Reef octopus',           nick:'Master of Disguise',      em:'🐙', g:'crit',  tier:'r', hue:300, fact:'Changes its colour AND its skin texture in a blink. Three hearts. Blue blood. Basically an alien.'},
+  {id:'plankton',     nm:'Glowing plankton',       nick:'The Sea Sparkle',         em:'✨', g:'crit',  tier:'r', hue:210, fact:'On some dark nights the waves glow electric blue and the beach turns into stars. The SHINY of the sea!', shiny:1},
+  /* —— Island Life —— */
+  {id:'gecko',        nm:'House gecko',            nick:'Ceiling Walker',          em:'🦎', g:'land',  tier:'c', hue:90,  fact:'Chirps at night and walks upside-down across the ceiling using millions of microscopic toe-hairs.'},
+  {id:'fruitbat',     nm:'Fruit bat',              nick:'The Day Dragon',          em:'🦇', g:'land',  tier:'c', hue:280, fact:'Huge fox-faced bats cruise between the palm trees in broad daylight — they’re everywhere in the Maldives.'},
+  {id:'heron',        nm:'Grey heron',             nick:'The Fisherman',           em:'🦢', g:'land',  tier:'c', hue:205, fact:'Every island has one. It stands statue-still in the shallows… then SPEARS a fish like lightning.'},
+  {id:'koel',         nm:'Asian koel',             nick:'The Invisible Alarm Clock',em:'🎵', g:'land', tier:'u', hue:0,   fact:'You’ll HEAR its loud "ko-EL! ko-EL!" all over the island — but it hides in the leaves. Spotting the singer is the real challenge.'}
+];
+const REEF_SP_BY_ID={}; REEF_SPECIES.forEach(s=>{ REEF_SP_BY_ID[s.id]=s; });
+/* snorkel-rank ladder on a kid's PERSONAL points (max ≈ 92 + first-bonuses) */
+const REEF_RANKS=[
+  {n:0,  t:'Beach Peeker',        e:'🩴'},
+  {n:5,  t:'Rock-Pool Ranger',    e:'🐚'},
+  {n:15, t:'Snorkel Scout',       e:'🤿'},
+  {n:30, t:'Lagoon Explorer',     e:'🐠'},
+  {n:45, t:'Reef Ranger',         e:'🐢'},
+  {n:60, t:'Shark Friend',        e:'🦈'},
+  {n:75, t:'Deep-Blue Detective', e:'🐬'},
+  {n:90, t:'Ocean Legend',        e:'🌊'}
+];
+function reefRank(p){ let r=REEF_RANKS[0]; REEF_RANKS.forEach(x=>{ if(p>=x.n) r=x; }); return r; }
+function reefNextRank(p){ return REEF_RANKS.find(x=>x.n>p)||null; }
+
+const REEF_DEX_KEY='globie_atlas_reefdex_v1';
+function reefDex(){
+  try{ const s=localStorage.getItem(REEF_DEX_KEY);
+    if(s){ const o=JSON.parse(s); o.log=(Array.isArray(o.log)?o.log:[]).filter(x=>x&&REEF_SP_BY_ID[x.sp]); return o; } }catch(e){}
+  return {log:[]};
+}
+function saveReefDex(o){ try{ localStorage.setItem(REEF_DEX_KEY,JSON.stringify(o)); }catch(e){} }
+/* cloud-restore helper: union-merge the incoming reef log with this device's
+   (by entry id) instead of overwriting — two devices can both keep logging. */
+function reefCloudMerge(raw){
+  try{
+    const inc=JSON.parse(raw); const incLog=(inc&&Array.isArray(inc.log))?inc.log:[];
+    const mine=reefDex(); const seen=new Set(incLog.map(x=>x&&x.id).filter(Boolean));
+    mine.log.forEach(x=>{ if(x&&x.id&&!seen.has(x.id)) incLog.push(x); });
+    return JSON.stringify({log:incLog});
+  }catch(e){ return raw; }
+}
+/* each explorer can log each species once per calendar day (feed hygiene —
+   repeats never score anyway, points are once-per-kid-per-species) */
+function reefLoggedToday(sp,by){
+  const day=new Date().toDateString();
+  return reefDex().log.some(x=>x.sp===sp && x.by===by && new Date(x.ts).toDateString()===day);
+}
+/* the one roll-up everything reads: per-kid points/species/firsts derived
+   fresh from the shared log every time (nothing competitive is stored) */
+function reefStats(){
+  const o=reefDex(); const kidIds=PROFILES.map(p=>p.id);
+  const counts={}, spotters={}, firstTs={}, firstBy={};
+  const byKid={}; kidIds.concat(['guest']).forEach(id=>{ byKid[id]={n:0,species:new Set(),points:0,firsts:0}; });
+  o.log.forEach(x=>{
+    counts[x.sp]=(counts[x.sp]||0)+1;
+    (spotters[x.sp]=spotters[x.sp]||new Set()).add(x.by);
+    const k=byKid[x.by]||(byKid[x.by]={n:0,species:new Set(),points:0,firsts:0});
+    k.n++; k.species.add(x.sp);
+    if(kidIds.indexOf(x.by)>=0 && (firstTs[x.sp]===undefined || x.ts<firstTs[x.sp])){ firstTs[x.sp]=x.ts; firstBy[x.sp]=x.by; }
+  });
+  Object.keys(byKid).forEach(id=>{ const k=byKid[id];
+    k.species.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(!s) return;
+      if(kidIds.indexOf(id)>=0){ k.points+=REEF_TIERS[s.tier].pts; if(firstBy[sp]===id){ k.points+=1; k.firsts++; } } });
+    k.species=k.species.size; });
+  const familySpecies=Object.keys(counts);
+  const groups={}, tiers={c:0,u:0,r:0,l:0};
+  familySpecies.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(s){ groups[s.g]=(groups[s.g]||0)+1; tiers[s.tier]++; } });
+  let points=0; Object.keys(byKid).forEach(id=>{ points+=byKid[id].points; });
+  return {total:o.log.length, speciesCount:familySpecies.length, species:counts, spotters:spotters,
+          firstBy:firstBy, byKid:byKid, groups:groups, tiers:tiers, points:points, log:o.log};
+}
+/* append a sighting; returns what the celebration UI needs */
+function reefLogSpecies(sp){
+  const s=REEF_SP_BY_ID[sp]; if(!s) return null;
+  const by=currentProfile||'guest'; const o=reefDex(); const ts=Date.now();
+  const isKid=PROFILES.some(p=>p.id===by);
+  const personalNew=!o.log.some(x=>x.sp===sp&&x.by===by);
+  const familyFirst=isKid && !o.log.some(x=>x.sp===sp&&PROFILES.some(p=>p.id===x.by));
+  const e={id:'r'+ts+'_'+by+'_'+Math.random().toString(36).slice(2,6), sp:sp, ts:ts, by:by};
+  o.log.push(e); saveReefDex(o);
+  const pts=(personalNew&&isKid)?(REEF_TIERS[s.tier].pts+(familyFirst?1:0)):0;
+  return {entry:e, sp:s, pts:pts, personalNew:personalNew, familyFirst:familyFirst};
+}
+/* —— trip gate: the Reef tab appears 30 days before departure, stays for the
+   whole trip, and lives forever once anything has been logged —— */
+function reefTrip(){
+  try{ const t=(typeof trips!=='undefined'&&trips&&trips.find(x=>x&&x.id==='t27'))||SEED_TRIPS.find(x=>x.id==='t27');
+    return t||null; }catch(e){ return null; }
+}
+function reefUnlocked(){
+  try{
+    if(reefDex().log.length) return true;
+    const t=reefTrip(); if(!t) return false;
+    const d=tripDate(t), end=tripEndDate(t); if(!d||!end) return false;
+    const now=Date.now();
+    return now>=d.getTime()-30*86400000 && now<=end.getTime();
+  }catch(e){ return false; }
+}
+
 /* =====================================================================
    MESSAGES — send a fellow explorer a note, emojis or a voice note.
    Stored in one shared key (starts with "globie_" so Cloud sync carries
