@@ -1229,6 +1229,189 @@ html.night .catx-stat{box-shadow:var(--shadow-sm)}
 html.night .catx-coat,html.night .catx-feed-it,html.night .catx-badge{background:var(--surface-2);border-color:var(--line-2)}
 html.night .catx-badge.got{background:var(--surface)}
 html.night .catx-empty{background:var(--surface);border-color:var(--line-2)}
+
+/* ===================== REEF DEX (Maldives creature hunt) ===================== */
+/* the ocean hero — layered gradient sea, drifting waves, rising bubbles */
+.rfx-hero{position:relative;overflow:hidden;border-radius:var(--r-lg);margin:6px 0 16px;padding:22px 22px 26px;color:#fff;
+  background:linear-gradient(178deg,#37c3e8 0%,#1799d6 32%,#0b6fc0 62%,#084b96 100%);
+  border:2px solid rgba(255,255,255,.25);box-shadow:var(--shadow),inset 0 -14px 30px rgba(4,32,72,.35),inset 0 2px 0 rgba(255,255,255,.35)}
+.rfx-hero.compact{padding:16px 18px 20px;margin:4px 0 14px}
+.rfx-waves{position:absolute;inset:-40% -60% auto;height:120%;pointer-events:none;opacity:.5;
+  background:radial-gradient(58% 42% at 30% 90%,rgba(255,255,255,.28),transparent 62%),radial-gradient(50% 38% at 72% 96%,rgba(255,255,255,.2),transparent 60%);
+  animation:rfxDrift 13s ease-in-out infinite alternate}
+@keyframes rfxDrift{from{transform:translateX(-3%) translateY(0)}to{transform:translateX(3%) translateY(4%)}}
+.rfx-bubbles{position:absolute;inset:0;pointer-events:none}
+.rfx-bubbles i{position:absolute;bottom:-14px;width:9px;height:9px;border-radius:50%;border:2px solid rgba(255,255,255,.55);opacity:0;
+  animation:rfxRise 7s linear infinite}
+.rfx-bubbles i:nth-child(1){left:14%;animation-delay:0s}
+.rfx-bubbles i:nth-child(2){left:52%;width:6px;height:6px;animation-delay:2.4s}
+.rfx-bubbles i:nth-child(3){left:83%;width:12px;height:12px;animation-delay:4.6s}
+@keyframes rfxRise{0%{transform:translateY(0) translateX(0);opacity:0}12%{opacity:.85}88%{opacity:.5}100%{transform:translateY(-190px) translateX(14px);opacity:0}}
+.rfx-hero-in{position:relative;display:flex;flex-direction:column;gap:12px}
+.rfx-hero-rank{display:flex;align-items:center;gap:14px}
+.rfx-hero-e{font-size:2.6rem;line-height:1;filter:drop-shadow(0 3px 5px rgba(2,32,64,.4))}
+.rfx-hero-t{font-family:var(--display);font-size:1.32rem;text-shadow:0 2px 4px rgba(2,32,64,.35)}
+.rfx-hero-sub{font-weight:700;font-size:.92rem;opacity:.94}
+.rfx-hero-prog{display:flex;flex-direction:column;gap:6px;max-width:480px}
+.rfx-prog-row{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.9rem}
+.rfx-prog-row>span:first-child{flex:none;width:86px}
+.rfx-prog-bar{flex:1;height:12px;border-radius:99px;background:rgba(3,32,70,.35);overflow:hidden;box-shadow:inset 0 1px 3px rgba(2,20,48,.5)}
+.rfx-prog-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffd76a,#ffb13d);box-shadow:0 0 8px rgba(255,200,90,.55);transition:width .5s cubic-bezier(.34,1.3,.6,1)}
+.rfx-hero-line{font-family:var(--hand);font-size:1.3rem;font-weight:700;text-shadow:0 2px 4px rgba(2,32,64,.35)}
+/* cards share the catx look */
+.rfx-card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:18px 18px 16px;margin:0 0 16px}
+.rfx-h{font-family:var(--display);font-size:1.15rem;margin:0 0 12px;color:var(--ink)}
+.rfx-hsub{font-size:.82rem;font-weight:800;color:var(--muted);margin-left:6px}
+.rfx-actions{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+/* —— the head-to-head Creature Race —— */
+.rfx-vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-bottom:12px}
+.rfx-vs-kid{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px;border-radius:var(--r);background:var(--surface-2);border:2px solid var(--line);box-shadow:var(--clay)}
+.rfx-vs-kid.me{border-color:var(--teal)}
+.rfx-vs-ava{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:#fff;border:3px solid var(--pc,#ccc);box-shadow:0 3px 8px rgba(30,45,70,.18);margin-bottom:4px}
+.rfx-vs-nm{font-family:var(--display);font-size:1rem;color:var(--ink)}
+.rfx-you{display:inline-block;background:var(--teal);color:#fff;border-radius:99px;font-size:.62rem;font-weight:900;padding:2px 7px;vertical-align:2px;letter-spacing:.03em}
+.rfx-vs-big{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;color:var(--ink)}
+.rfx-vs-lbl{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.rfx-vs-meta{font-size:.82rem;font-weight:800;color:var(--ink-2);margin-top:3px}
+.rfx-vs-mid{align-self:center;font-family:var(--display);font-weight:800;font-size:1.1rem;color:var(--coral);background:var(--surface);border:2px solid var(--line);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;box-shadow:var(--clay)}
+.rfx-vs-bar{display:flex;height:16px;border-radius:99px;overflow:hidden;background:var(--surface-2);border:2px solid var(--line);box-shadow:inset 0 2px 4px rgba(30,45,70,.12)}
+.rfx-vs-fa,.rfx-vs-fb{display:block;height:100%;background:var(--pc);transition:width .6s cubic-bezier(.34,1.3,.6,1)}
+.rfx-vs-fb{flex:1}
+.rfx-vs-tip,.rfx-vs-guest{margin:10px 2px 0;font-family:var(--hand);font-size:1.12rem;font-weight:700;color:var(--ink-2)}
+.rfx-vs-guest{font-size:.98rem;font-family:var(--sans);font-weight:700;color:var(--muted)}
+/* —— tier progress chips —— */
+.rfx-tprog{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.rfx-tchip{font-weight:900;font-size:.8rem;padding:5px 11px;border-radius:99px;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.rfx-tchip b{font-size:.92rem}
+.rfx-t-c{background:#2FA98C}.rfx-t-u{background:#3E9BDE}.rfx-t-r{background:#8A78EA}.rfx-t-l{background:linear-gradient(120deg,#E8A21A,#F5C445);color:#5a3d00}
+/* —— the dex grid —— */
+.rfx-group{margin:4px 0 14px}
+.rfx-gh{font-family:var(--display);font-size:1.02rem;color:var(--ink);margin:10px 0 2px}
+.rfx-ghsub{font-size:.78rem;font-weight:800;color:var(--muted);margin-left:6px}
+.rfx-gtip{margin:0 0 10px;font-size:.85rem;font-weight:700;color:var(--muted)}
+.rfx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.rfx-grid.tease{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.rfx-cardx{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:14px 10px 12px;
+  border-radius:var(--r);border:2px solid var(--line);cursor:pointer;font-family:var(--sans);overflow:hidden;
+  background:linear-gradient(180deg,hsl(var(--rh,200) 78% 94%),var(--surface) 58%);box-shadow:var(--clay);
+  transition:transform .18s cubic-bezier(.34,1.5,.6,1),box-shadow .18s}
+.rfx-cardx:hover{transform:translateY(-3px)}
+.rfx-cardx:active{transform:translateY(1px) scale(.98)}
+.rfx-emo{font-size:2.3rem;line-height:1.15;filter:drop-shadow(0 3px 4px rgba(30,45,70,.18));transition:transform .2s}
+.rfx-cardx:hover .rfx-emo{transform:scale(1.12) rotate(-4deg)}
+.rfx-cnm{font-family:var(--display);font-weight:800;font-size:.9rem;color:var(--ink);line-height:1.15}
+.rfx-cnick{font-family:var(--hand);font-size:1.02rem;font-weight:700;color:var(--ink-2);line-height:1.05}
+.rfx-tier{font-size:.66rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:2.5px 9px;border-radius:99px;color:#fff;margin-top:3px}
+.rfx-shinytag{font-size:.64rem;font-weight:900;letter-spacing:.05em;padding:2.5px 8px;border-radius:99px;margin-top:3px;background:linear-gradient(100deg,#6ee7f8,#c3b4fa,#f8c1e4);color:#3b2a63}
+.rfx-fact{font-size:.78rem;font-weight:700;color:var(--ink-2);line-height:1.3;margin-top:5px}
+.rfx-fact.hidden-fact{color:var(--muted);font-style:italic}
+.rfx-cfoot{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px;min-height:24px}
+.rfx-xn{font-size:.74rem;font-weight:900;color:var(--muted);background:var(--surface-2);border:1.5px solid var(--line);padding:1.5px 7px;border-radius:99px}
+.rfx-chip{position:relative;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;background:#fff;border:2px solid var(--pc,#bbb);box-shadow:0 1px 3px rgba(30,45,70,.2)}
+.rfx-chip.guest{border-color:#bbb;filter:grayscale(.4)}
+.rfx-chip.crown{border-color:#E8A21A;box-shadow:0 0 0 2px rgba(232,162,26,.35),0 1px 3px rgba(30,45,70,.2)}
+.rfx-chip.crown::after{content:"👑";position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:.62rem;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+/* locked = you haven't found it yet: silhouette + muted card */
+.rfx-cardx.locked{background:linear-gradient(180deg,hsl(var(--rh,200) 16% 93%),var(--surface-2) 58%)}
+.rfx-cardx.locked .rfx-emo{filter:brightness(0);opacity:.42}
+.rfx-cardx.locked .rfx-cnm{color:var(--ink-2)}
+/* Legendary & Shiny cards glow on the shelf — compositable sweep only */
+.rfx-cardx.holo{border-color:#E8C25A}
+.rfx-cardx.holo::after{content:"";position:absolute;inset:-40% -80%;pointer-events:none;
+  background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);
+  transform:translateX(-60%);animation:rfxHolo 3.4s ease-in-out infinite}
+@keyframes rfxHolo{0%,55%{transform:translateX(-60%)}85%,100%{transform:translateX(60%)}}
+/* —— feed —— */
+.rfx-feed{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.rfx-feed-it{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:var(--r-sm);background:var(--surface-2);border:1.5px solid var(--line)}
+.rfx-feed-e{font-size:1.5rem;line-height:1;flex:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(180deg,hsl(var(--rh,200) 78% 92%),hsl(var(--rh,200) 60% 84%))}
+.rfx-feed-tx{display:flex;flex-direction:column;min-width:0}
+.rfx-feed-tx b{font-size:.92rem;color:var(--ink)}
+.rfx-feed-meta{font-size:.78rem;font-weight:700;color:var(--muted)}
+.rfx-feed-l{margin-left:auto;flex:none}
+/* —— log modal —— */
+.reeflog-card{max-width:640px;width:min(94vw,640px);max-height:86vh;overflow-y:auto}
+.reeflog-title{font-family:var(--display);margin:0 34px 6px 0}
+.reeflog-sub{font-weight:700;color:var(--ink-2);margin:0 0 12px}
+.reeflog-g h4{font-family:var(--display);font-size:.95rem;color:var(--ink);margin:12px 0 8px}
+.reeflog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.reeflog-sp{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-radius:var(--r-sm);
+  border:2px solid var(--line);cursor:pointer;background:linear-gradient(180deg,hsl(var(--rh,200) 78% 95%),var(--surface) 70%);
+  font-family:var(--sans);box-shadow:0 3px 0 0 var(--line);transition:transform .15s}
+.reeflog-sp:hover{transform:translateY(-2px)}
+.reeflog-sp:active{transform:translateY(1px)}
+.reeflog-sp .rl-em{font-size:1.6rem;line-height:1.1}
+.reeflog-sp .rl-nm{font-weight:800;font-size:.72rem;color:var(--ink);line-height:1.1;text-align:center}
+.reeflog-sp.seen{border-color:var(--teal)}
+.reeflog-sp.today{opacity:.55;cursor:default}
+.reeflog-sp .rl-today{font-size:.62rem;font-weight:900;color:var(--green-d)}
+.reeflog-confirm,.reeflog-done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:6px 2px}
+.rc-emo{font-size:4rem;line-height:1.1;filter:drop-shadow(0 5px 8px rgba(30,45,70,.25));animation:catFabIn .5s cubic-bezier(.34,1.5,.6,1) both}
+.rc-emo.big{font-size:4.6rem}
+.rc-nick{font-family:var(--hand);font-size:1.5rem;font-weight:700;color:var(--ink-2)}
+.rc-tier{display:flex;gap:6px;align-items:center}
+.rc-pts{font-weight:800;color:var(--ink);margin:8px 0 2px;line-height:1.45}
+.rc-pts.muted{color:var(--muted)}
+.reeflog-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px;width:100%}
+.reeflog-actions .btn{width:100%}
+.rd-head{font-family:var(--display);font-size:1.15rem;color:var(--ink);margin:2px 0}
+.rd-fact{font-size:.9rem;font-weight:700;color:var(--ink-2);line-height:1.4;max-width:420px;margin:0}
+.rd-pts{font-family:var(--display);font-size:1.1rem;color:var(--teal-d);margin-top:6px}
+.rd-tot{font-weight:800;color:var(--ink-2);font-size:.92rem}
+.reeflog-help p{font-size:.94rem;font-weight:700;color:var(--ink-2);line-height:1.5;margin:0 0 10px;text-align:left}
+.reeflog-help .btn{width:100%;margin-top:4px}
+/* —— big-catch splash (transient, click-through) —— */
+.rfx-catch{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 45%,rgba(8,44,96,.55),rgba(5,20,48,.82));opacity:0;transition:opacity .25s}
+.rfx-catch.hidden{display:none}
+.rfx-catch.show{opacity:1}
+.rfx-catch-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff}
+.rfx-catch-rays{position:absolute;inset:-130px;border-radius:50%;pointer-events:none;opacity:.5;
+  background:conic-gradient(rgba(255,255,255,.0) 0 14deg,rgba(255,255,255,.28) 14deg 22deg,rgba(255,255,255,0) 22deg 40deg,rgba(255,255,255,.28) 40deg 48deg,rgba(255,255,255,0) 48deg 66deg,rgba(255,255,255,.28) 66deg 74deg,rgba(255,255,255,0) 74deg 92deg,rgba(255,255,255,.28) 92deg 100deg,rgba(255,255,255,0) 100deg 118deg,rgba(255,255,255,.28) 118deg 126deg,rgba(255,255,255,0) 126deg 144deg,rgba(255,255,255,.28) 144deg 152deg,rgba(255,255,255,0) 152deg 170deg,rgba(255,255,255,.28) 170deg 178deg,rgba(255,255,255,0) 178deg 196deg,rgba(255,255,255,.28) 196deg 204deg,rgba(255,255,255,0) 204deg 222deg,rgba(255,255,255,.28) 222deg 230deg,rgba(255,255,255,0) 230deg 248deg,rgba(255,255,255,.28) 248deg 256deg,rgba(255,255,255,0) 256deg 274deg,rgba(255,255,255,.28) 274deg 282deg,rgba(255,255,255,0) 282deg 300deg,rgba(255,255,255,.28) 300deg 308deg,rgba(255,255,255,0) 308deg 326deg,rgba(255,255,255,.28) 326deg 334deg,rgba(255,255,255,0) 334deg 352deg,rgba(255,255,255,.28) 352deg 360deg);
+  mask-image:radial-gradient(closest-side,rgba(0,0,0,.9),transparent);-webkit-mask-image:radial-gradient(closest-side,rgba(0,0,0,.9),transparent);
+  animation:rfxSpin 6s linear infinite}
+@keyframes rfxSpin{to{transform:rotate(360deg)}}
+.rfx-catch-emo{font-size:6rem;line-height:1.1;filter:drop-shadow(0 8px 16px rgba(0,0,0,.4));animation:catFabIn .55s cubic-bezier(.34,1.6,.6,1) both}
+.rfx-catch-label{font-family:var(--display);font-weight:800;font-size:1.6rem;letter-spacing:.06em;color:#ffd76a;text-shadow:0 3px 8px rgba(0,0,0,.45)}
+.rfx-catch-nm{font-weight:800;font-size:1.05rem;opacity:.95}
+/* —— trip-time reef FAB (stacked above the cat FAB) —— */
+.reef-fab{position:fixed;right:18px;bottom:calc(var(--nav-h,64px) + 16px + 74px);z-index:5200;width:62px;height:62px;border:none;border-radius:50%;cursor:pointer;
+  background:linear-gradient(180deg,#4fd0e8,#1799d6);box-shadow:0 6px 0 0 #0b6fc0, 0 14px 22px -10px rgba(38,50,74,.5), inset 0 2px 0 rgba(255,255,255,.55);
+  display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.34,1.5,.6,1),box-shadow .2s;animation:catFabIn .4s cubic-bezier(.34,1.5,.6,1) both}
+.reef-fab.hidden{display:none}
+.reef-fab .reef-fab-emo{font-size:1.9rem;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.reef-fab .reef-fab-plus{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:var(--yellow);color:#5a3d00;font-weight:900;font-size:.95rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.reef-fab:hover{transform:translateY(-3px) scale(1.05);filter:brightness(1.03)}
+.reef-fab:active{transform:translateY(2px) scale(.96)}
+/* —— Explore banner variant + upcoming chip pulse + hero shimmer —— */
+.reef-banner{background:linear-gradient(120deg,#d9f4fb,#c8ecf9 55%,#d3f1ef)}
+.reef-banner.hidden{display:none}
+.dcard .t.soon.big-trip{background:linear-gradient(90deg,var(--teal),#46B3F0,var(--teal));background-size:200% 100%;color:#fff;animation:rfxPulse 2.6s ease-in-out infinite}
+@keyframes rfxPulse{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+.sea-shimmer{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+  background:radial-gradient(42% 30% at 22% 18%,rgba(255,255,255,.55),transparent 65%),radial-gradient(36% 26% at 74% 34%,rgba(255,255,255,.4),transparent 60%),radial-gradient(30% 24% at 46% 70%,rgba(255,255,255,.35),transparent 60%);
+  animation:rfxDrift 9s ease-in-out infinite alternate}
+/* —— night mode —— */
+html.night .rfx-card{background:var(--surface);border-color:var(--line-2)}
+html.night .rfx-hero{border-color:rgba(255,255,255,.12);filter:brightness(.9) saturate(.92)}
+html.night .rfx-vs-kid,html.night .rfx-vs-mid,html.night .rfx-vs-bar{background:var(--surface-2);border-color:var(--line-2)}
+html.night .rfx-vs-ava,html.night .rfx-chip{background:var(--surface-2)}
+html.night .rfx-cardx{background:linear-gradient(180deg,hsl(var(--rh,200) 32% 24%),var(--surface) 58%);border-color:var(--line-2)}
+html.night .rfx-cardx.locked{background:linear-gradient(180deg,hsl(var(--rh,200) 10% 20%),var(--surface-2) 58%)}
+html.night .rfx-cardx.locked .rfx-emo{filter:brightness(0) invert(1);opacity:.4}
+html.night .rfx-feed-it,html.night .rfx-xn{background:var(--surface-2);border-color:var(--line-2)}
+html.night .rfx-feed-e{background:linear-gradient(180deg,hsl(var(--rh,200) 34% 30%),hsl(var(--rh,200) 30% 24%))}
+html.night .reeflog-sp{background:linear-gradient(180deg,hsl(var(--rh,200) 32% 24%),var(--surface) 70%);border-color:var(--line-2);box-shadow:0 3px 0 0 var(--line-2)}
+html.night .reef-banner{background:linear-gradient(120deg,#173a4a,#14323f 55%,#173f44)}
+/* —— calm mode: kill every reef animation —— */
+@media(prefers-reduced-motion:reduce){
+  .rfx-waves,.rfx-bubbles i,.rfx-cardx.holo::after,.rfx-catch-rays,.rfx-catch-emo,.rc-emo,.reef-fab,.sea-shimmer{animation:none}
+  .dcard .t.soon.big-trip{animation:none;background:var(--teal);}
+  .rfx-prog-bar span,.rfx-vs-fa,.rfx-vs-fb{transition:none}
+}
+/* —— 8 tabs need a squeeze on small phones —— */
+@media(max-width:400px){.tabbar button{font-size:.6rem;letter-spacing:-.01em;padding-left:0;padding-right:0}}
+
 /* —— cat photo slideshow —— */
 .catslide{position:fixed;inset:0;z-index:5700;display:flex;flex-direction:column;align-items:center;
   background:radial-gradient(120% 90% at 50% 0%,#2a2440,#15131f 70%);color:#fff}
