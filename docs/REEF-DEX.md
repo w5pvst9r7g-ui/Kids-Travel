@@ -66,10 +66,11 @@ section; renderers directly after; CSS after the cat-atlas block).
 
 ## Achievements
 
-9 badges `reef_*` in `ACHIEVEMENTS[]`; context fields (`reefSpecies`,
-`reefMine`, `reefMyPoints`, `reefMyFirsts`, `reefSharks`, `reefLegendaries`,
-`reefMyGroups`, `reefTotal`) come from `achContext()`; every badge has a
-`badgeProgress` P-table entry.
+12 badges `reef_*` in `ACHIEVEMENTS[]` (incl. the 🔬 expert-ID pair and the
+Region Champion all-5-regions badge); context fields (`reefSpecies`,
+`reefMine`, `reefMyPoints`, `reefMyFirsts`, `reefMyKinds`, `reefSharks`,
+`reefLegendaries`, `reefMyGroups`, `reefTotal`) come from `achContext()`;
+every badge has a `badgeProgress` P-table entry.
 
 ## Tests
 
