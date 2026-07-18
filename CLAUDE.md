@@ -72,9 +72,12 @@ git push origin claude/kids-travel-app-NXWkh:main   # mirror → triggers deploy
 - **Self-hosted fonts** in `fonts/` (Baloo 2 / Nunito / Caveat) — no Google Fonts
   `<link>` (the smoke test enforces this) so it works offline.
 - **Per-profile storage:** `dataKey(base) => 'globie_atlas_'+base+'_v9_'+(currentProfile||'guest')`.
-  Cat sightings are the exception — a **shared** key (see docs/CAT-ATLAS.md).
+  Two exceptions use **shared** keys: cat sightings (docs/CAT-ATLAS.md) and
+  Reef Dex sightings (`globie_atlas_reefdex_v1`, docs/REEF-DEX.md — scoring is
+  derived at read time; cloud restore union-merges this key).
 - **Views** (`showView(v)`): explore, upcoming, map, trips(Journal), badges,
-  messages(Mail), **cats** (Cat Atlas), world, packing, detail. Nav lives in
+  messages(Mail), **cats** (Cat Atlas), **reef** (Reef Dex — date/log-gated via
+  `reefUnlocked()`, docs/REEF-DEX.md), world, packing, detail. Nav lives in
   `nav.top` (desktop) + `.tabbar` (mobile) — keep both in sync when adding a view.
 - **Modals** use `modalCapture`/`modalRestore` (focus return), `MODAL_SEL` (focus
   trap + registry), and an Escape handler. Register any new modal in all three.
@@ -115,3 +118,8 @@ The **World Cat Atlas** grew into a headline feature: shared cross-trip/cross-ki
 cat sightings, a quick-log FAB, a dedicated top-level **Cats** view (leaderboard,
 coat-collection "Catdex", by-country, feed, stats, badges), photo capture with map
 thumbnails, and a full-screen photo **slideshow**. Full spec in docs/CAT-ATLAS.md.
+
+For the Jul–Aug 2026 Kandima trip the **Reef Dex** joined it as the second big
+game: a 42-species marine-spotting Pokédex with per-kid reveal, once-per-kid
+scoring, family-first crowns and a head-to-head race view. Spec in
+docs/REEF-DEX.md.

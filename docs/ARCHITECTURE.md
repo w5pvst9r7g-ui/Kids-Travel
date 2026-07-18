@@ -19,7 +19,8 @@ grep the named symbols).
 
 `showView(v)` maps a view key → section id and calls the right render fn. Keys:
 `explore, upcoming, map, trips (Journal), badges, messages (Mail), cats (Cat Atlas),
-world, packing, detail`. **Two nav bars** must both carry every top-level view:
+reef (Reef Dex — gated by reefUnlocked(), see REEF-DEX.md), world, packing, detail`.
+**Two nav bars** must both carry every top-level view:
 `nav.top` (desktop, text buttons) and `.tabbar` (mobile, SVG-icon buttons). Titles
 per view come from the `VT` map in `showView`.
 
@@ -39,6 +40,9 @@ tab/history sensible; back-button support via the `_kt` layer stack (`ktOpen`/`k
 - **Achievements** — `ACHIEVEMENTS[]` tested against `achContext()`;
   `badgeProgress()` drives progress bars; `checkAchievements()` toasts + confetti.
 - **Cat sightings** — a **shared** store (not profile-suffixed). See CAT-ATLAS.md.
+- **Reef Dex sightings** — the second shared store (`globie_atlas_reefdex_v1`);
+  scoring is derived at read time, cloud restore union-merges by entry id.
+  See REEF-DEX.md.
 
 ## Maps (Leaflet)
 
