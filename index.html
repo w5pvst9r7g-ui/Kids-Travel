@@ -1419,7 +1419,10 @@ html.night .tcg-art .rfx-sil path{fill:#1d2833}
 .rfx-photoemo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.75}
 .rc-kindhead{font-family:var(--display);font-size:1rem;color:var(--ink);margin:14px 0 2px;align-self:flex-start}
 .rc-kindhead .rc-kindsub{display:block;font-family:var(--sans);font-weight:700;font-size:.78rem;color:var(--muted)}
-.rfx-kindrow{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 10px;width:100%;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.rfx-kindwrap{position:relative;width:100%}
+.rfx-kindwrap::after{content:"";position:absolute;top:0;right:0;bottom:10px;width:34px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--surface));border-radius:0 var(--r-sm) var(--r-sm) 0}
+.rfx-kindrow{display:flex;gap:10px;overflow-x:auto;padding:8px 30px 10px 2px;width:100%;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
 .rfx-kindcard{position:relative;flex:none;width:138px;display:flex;flex-direction:column;gap:3px;padding:8px 8px 9px;scroll-snap-align:start;
   border-radius:var(--r-sm);border:2.5px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--sans);text-align:left;
   box-shadow:0 3px 0 0 var(--line);transition:transform .15s,border-color .15s}
@@ -6252,7 +6255,11 @@ document.addEventListener('keydown',e=>{
     if(e.key===' '){ e.preventDefault(); catSlideToggle(); return; }
     if(e.key==='Escape'){ closeCatSlide(); return; }
   }
-  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); if(typeof closeReefLog==='function')closeReefLog(); if(typeof closeReefCard==='function')closeReefCard(); }
+  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; }
+    /* the trading card stacks ON TOP of the log modal — Esc peels one layer */
+    const _rc=document.getElementById('reefCardModal');
+    if(_rc && !_rc.classList.contains('hidden')){ closeReefCard(); return; }
+    closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); if(typeof closeReefLog==='function')closeReefLog(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 /* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
 const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal, #reefLogModal, #reefCardModal';
@@ -9380,6 +9387,9 @@ function closeReefLog(){ const m=document.getElementById('reefLogModal'); if(m&&
 function renderReefLog(){
   const body=document.getElementById('reefLogBody'), title=document.getElementById('reefLogTitle'); if(!body) return;
   if(!_reefStep||!_reefStep.stage||_reefStep.stage==='help') _reefStep={stage:'pick',sp:null};
+  /* the kind row is a horizontal scroller — keep its position across the
+     innerHTML rebuild so tapping a far-right kind doesn't snap it away */
+  const prevRow=body.querySelector('.rfx-kindrow'); const prevScroll=prevRow?prevRow.scrollLeft:0;
   const me=currentProfile||'guest';
   if(_reefStep.stage==='pick'){
     if(title) title.innerHTML='🤿 Spotted something?';
@@ -9413,8 +9423,15 @@ function renderReefLog(){
     if(_reefStep.kind===undefined) _reefStep.kind=plainUsed&&kinds.length?null:'';
     if(_reefStep.kind===null){ const free=kinds.find(kk=>!reefLoggedToday(x.id,me,kk.id)); _reefStep.kind=free?free.id:''; }
     const kf=s.kindsFound[x.id]||{};
-    const kindRow=kinds.length?`<div class="rc-kindhead">🔬 Which one exactly? <span class="rc-kindsub">look at the photos — new IDs grow your expert score</span></div>
-      <div class="rfx-kindrow">
+    /* "Not sure" leads the row — it's the default answer and must be visible
+       on a phone without scrolling (review finding) */
+    const kindRow=kinds.length?`<div class="rc-kindhead">🔬 Which one exactly? <span class="rc-kindsub">look at the photos — new IDs grow your expert score · swipe for more →</span></div>
+      <div class="rfx-kindwrap"><div class="rfx-kindrow">
+        <button type="button" class="rfx-kindcard notsure${_reefStep.kind===''?' sel':''}" ${plainUsed?'disabled':''} onclick="reefKindPick('')" aria-pressed="${_reefStep.kind===''}">
+          <span class="rfx-kindpic plain"><span class="rfx-kindemo" aria-hidden="true">🤷</span></span>
+          <span class="rfx-kindnm">Not sure</span><span class="rfx-kindnote">just a ${esc(x.nm.toLowerCase())}!</span>
+          ${plainUsed?'<span class="rl-today">✓ today</span>':''}
+        </button>
         ${kinds.map(kk=>{ const used=reefLoggedToday(x.id,me,kk.id); const found=kf[kk.id]; const sel=_reefStep.kind===kk.id;
           return `<button type="button" class="rfx-kindcard${sel?' sel':''}${found?' found':''}" ${used?'disabled':''} onclick="reefKindPick('${kk.id}')" aria-pressed="${sel}" aria-label="${esc(kk.nm)}${found?' — already in the family Dex':''}${used?' — logged today':''}">
             <span class="rfx-kindpic" style="--rh:${x.hue}"><span class="rfx-kindemo" aria-hidden="true">${x.em}</span>${rfxPhotoImg(kk.photos,kk.nm,420)}</span>
@@ -9422,12 +9439,7 @@ function renderReefLog(){
             <span class="rfx-kindnote">${esc(kk.note||'')}</span>
             ${found?`<span class="rfx-kindtick" title="found by the family">✓</span>`:''}${used?'<span class="rl-today">✓ today</span>':''}
           </button>`;}).join('')}
-        <button type="button" class="rfx-kindcard notsure${_reefStep.kind===''?' sel':''}" ${plainUsed?'disabled':''} onclick="reefKindPick('')" aria-pressed="${_reefStep.kind===''}">
-          <span class="rfx-kindpic plain"><span class="rfx-kindemo" aria-hidden="true">🤷</span></span>
-          <span class="rfx-kindnm">Not sure</span><span class="rfx-kindnote">just a ${esc(x.nm.toLowerCase())}!</span>
-          ${plainUsed?'<span class="rl-today">✓ today</span>':''}
-        </button>
-      </div>`:'';
+      </div></div>`:'';
     const chosenUsed=_reefStep.kind===''?plainUsed:reefLoggedToday(x.id,me,_reefStep.kind);
     const allUsed=plainUsed&&(!kinds.length||kinds.every(kk=>reefLoggedToday(x.id,me,kk.id)));
     body.innerHTML=`<div class="reeflog-confirm" style="--rh:${x.hue}">
@@ -9445,6 +9457,7 @@ function renderReefLog(){
         <button class="btn btn-grape" type="button" onclick="openReefCard('${x.id}')">🎴 See its trading card</button>
         <button class="btn-text" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">‹ Back to the list</button>
       </div></div>`;
+    const row=body.querySelector('.rfx-kindrow'); if(row&&prevScroll) row.scrollLeft=prevScroll;
     reefLogFocus();
     return;
   }
@@ -9474,7 +9487,10 @@ function renderReefLog(){
 function reefLogFocus(){
   setTimeout(()=>{ const m=document.getElementById('reefLogModal');
     if(!m||m.classList.contains('hidden')) return;
-    const b=m.querySelector('.reeflog-sp:not([disabled]),.btn,.btn-text'); if(b) b.focus(); },40);
+    /* after a kind tap, focus the selected kind card (keeps the scroller
+       where the kid is looking); otherwise the first enabled control */
+    const b=m.querySelector('.rfx-kindcard.sel:not([disabled])')||m.querySelector('.reeflog-sp:not([disabled]),.btn,.btn-text');
+    if(b) b.focus({preventScroll:false}); },40);
 }
 function reefPick(sp){ _reefStep={stage:'confirm',sp:sp}; sfx('tap'); renderReefLog(); }
 function reefKindPick(k){ _reefStep.kind=k; sfx('tap'); renderReefLog(); }
@@ -9511,11 +9527,17 @@ function rfxCatchSplash(g){
 let _reefCardSp=null;
 function openReefCard(sp){
   const m=document.getElementById('reefCardModal'); if(!m||!REEF_SP_BY_ID[sp]) return;
-  _reefCardSp=sp; if(m.classList.contains('hidden')) modalCapture();
+  /* when stacked on the log modal, keep the ORIGINAL focus-return target
+     (modalCapture is a single slot, not a stack) */
+  const log=document.getElementById('reefLogModal'); const logOpen=log&&!log.classList.contains('hidden');
+  _reefCardSp=sp; if(m.classList.contains('hidden')&&!logOpen) modalCapture();
   m.classList.remove('hidden'); renderReefCard(); sfx('tap');
   setTimeout(()=>{ const b=m.querySelector('.btn'); if(b) b.focus(); },40);
 }
-function closeReefCard(){ const m=document.getElementById('reefCardModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
+function closeReefCard(){ const m=document.getElementById('reefCardModal'); if(m&&!m.classList.contains('hidden')){
+  m.classList.add('hidden');
+  const log=document.getElementById('reefLogModal');
+  if(log&&!log.classList.contains('hidden')) reefLogFocus(); else modalRestore(); } }
 function renderReefCard(){
   const host=document.getElementById('reefCardBody'); if(!host||!_reefCardSp) return;
   const x=REEF_SP_BY_ID[_reefCardSp]; if(!x) return;
