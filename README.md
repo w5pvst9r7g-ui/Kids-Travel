@@ -4,7 +4,7 @@ A polished, offline-capable **travel atlas web app for kids**, guided by **Poppy
 tuxedo cat. Countdowns to the next trip, photo guides, fun-fact quizzes, local-cat stories,
 an interactive flight-path map and a passport of every adventure.
 
-**Live:** https://w5pvst9r7g-ui.github.io/kids-travel/
+**Live:** https://w5pvst9r7g-ui.github.io/Kids-Travel/
 
 It's a single, dependency-free **`index.html`** — no build step and no server. Open the file
 in any modern browser, or deploy the folder to any static host.
@@ -31,7 +31,13 @@ in any modern browser, or deploy the folder to any static host.
   server or sign-up, Send hands the note to the share sheet as a **postcard** — a link (text/
   emoji) or a small file (voice notes too); the other explorer taps it and it drops into their
   Mail. Postcards also ride along with Cloud sync if it's enabled.
-- **🏅 Badges** — 45 reconciling explorer badges with progress bars and a "closest to earn"
+- **🐱 World Cat Atlas** — a headline cat-spotting game: a floating quick-log button
+  logs a cat from anywhere (type → coat colour → GPS pin → photo), all into **one
+  shared atlas** across every trip and both kids. A dedicated **Cats** view collects
+  it all — rank, family leaderboard, a 9-coat "Catdex" collection, cats-by-country,
+  a recent-sightings feed, stats, and cat badges — plus a world map of photo-thumbnail
+  pins and a full-screen **photo slideshow**.
+- **🏅 Badges** — 58 reconciling explorer badges with progress bars and a "closest to earn"
   nudge; a **Countries of the World** page (visited list + top-5 to-go by size/population/
   popularity/beauty, and a continents-collected strip).
 - **Per-kid profiles** — Jean-Luc & Hailey, PIN-gated (default `1985`, changeable in Settings →
@@ -62,6 +68,8 @@ poppie*.png/jpg Poppy mascot art (optimised)
 test/           smoke test suite (no deps)
 streams/        source data modules folded into index.html (reference only)
 TODO.md         living roadmap / changelog
+CLAUDE.md       working memory for AI-assisted development (start here)
+docs/           ARCHITECTURE.md + CAT-ATLAS.md (technical deep-dives)
 ```
 
 ## Develop & test
@@ -79,8 +87,10 @@ it on every push and pull request.
 
 ## Deploy
 
-Any static host. For **GitHub Pages**: serve the `main` branch root; the app is `index.html`
-at the repo root and uses only relative paths, so it works from a project subpath.
+Any static host. **GitHub Pages is automated:** `.github/workflows/pages.yml` publishes
+the repo on every push to `main` (it self-enables Pages, so no Settings toggle is
+needed). The app is `index.html` at the repo root and uses only relative paths, so it
+works from a project subpath.
 
 ## Cross-device cloud sync (optional)
 
