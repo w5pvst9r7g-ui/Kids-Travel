@@ -1390,6 +1390,43 @@ html.night .rfx-photo,html.night .rfx-kindpic{background:linear-gradient(160deg,
 html.night .rfx-kindcard{background:var(--surface);border-color:var(--line-2);box-shadow:0 3px 0 0 var(--line-2)}
 html.night .rfx-kindcard.sel{border-color:var(--teal);box-shadow:0 3px 0 0 var(--teal),0 0 0 3px rgba(31,159,208,.3)}
 html.night .rfx-xn.kinds{background:#1c3450;border-color:#2b4d74;color:#8fc3ee}
+/* —— the trading card (original TCG-style design) —— */
+.reefcard-card{max-width:398px;width:min(94vw,398px);max-height:92vh;overflow-y:auto}
+.tcg{position:relative;width:100%;border-radius:20px;padding:16px 14px 12px;display:flex;flex-direction:column;gap:9px;color:#22303e;
+  background:linear-gradient(180deg,#fbfcf8,#eef2f6 70%,#e7ecf2);
+  box-shadow:inset 0 0 0 7px var(--tc,#2270AD),inset 0 0 0 9px rgba(255,255,255,.55),var(--shadow);
+  font-family:var(--sans)}
+.tcg.holo{box-shadow:inset 0 0 0 7px #E8C25A,inset 0 0 0 9px rgba(255,255,255,.6),0 10px 30px -12px rgba(212,160,23,.55)}
+.tcg-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 4px}
+.tcg-nm{font-family:var(--display);font-weight:800;font-size:1.25rem;color:#1c2733}
+.tcg-hp{font-family:var(--display);font-weight:800;font-size:1.05rem;color:#c62828;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tcg-ty{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--tc,#2270AD);font-size:.95rem;box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.4)}
+.tcg-art{position:relative;width:100%;aspect-ratio:16/10;border-radius:10px;overflow:hidden;
+  background:linear-gradient(160deg,hsl(var(--rh,200) 72% 86%),hsl(var(--rh,200) 58% 68%));
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),inset 0 -14px 24px rgba(10,40,80,.18)}
+.tcg-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tcg-art img.failed{display:none}
+.tcg-artemo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4.4rem;filter:drop-shadow(0 5px 8px rgba(10,40,80,.3))}
+.tcg-art img.ld~.tcg-artemo,.tcg-art img.ld+.tcg-artemo{display:none}
+.tcg-artemo.sil{filter:brightness(0);opacity:.5}
+.tcg-sheen{position:absolute;inset:-60% -90%;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(-60%);animation:rfxHolo 3.2s ease-in-out infinite}
+.tcg-sub{font-family:var(--hand);font-weight:700;font-size:1.1rem;color:#41525f;text-align:center}
+.tcg-moves{display:flex;flex-direction:column;gap:7px}
+.tcg-mv{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.75);box-shadow:inset 0 0 0 1.5px rgba(34,48,62,.14)}
+.tcg-mv.locked{opacity:.75}
+.tcg-mv-e{flex:none;width:26px;height:26px;border-radius:50%;background:var(--tc,#2270AD);display:flex;align-items:center;justify-content:center;font-size:.8rem;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tcg-mv.locked .tcg-mv-e{background:#8a99a8}
+.tcg-mv-tx{display:flex;flex-direction:column;min-width:0;flex:1}
+.tcg-mv-tx b{font-family:var(--display);font-size:.95rem;color:#1c2733;line-height:1.15}
+.tcg-mv-tx span{font-size:.75rem;font-weight:700;color:#5b6b7a;line-height:1.25}
+.tcg-mv-pw{font-family:var(--display);font-weight:800;font-size:1.35rem;color:#1c2733;flex:none}
+.tcg-flavor{font-size:.78rem;font-weight:700;font-style:italic;color:#4c5c6b;line-height:1.4;padding:0 4px;border-top:1.5px dashed rgba(34,48,62,.2);padding-top:8px}
+.tcg-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.72rem;font-weight:900;color:#5b6b7a;padding:0 4px}
+.tcg-rar{color:var(--tc,#2270AD);font-size:.9rem}
+.tcg.tlocked{filter:saturate(.55)}
+.tcg-hint{font-weight:700;color:var(--muted);text-align:center;font-size:.9rem;margin:0}
+.rfx-gen{display:inline-block;background:var(--grape,#7C6CF4);color:#fff;border-radius:99px;font-size:.64rem;font-weight:900;letter-spacing:.05em;padding:2.5px 9px;vertical-align:2px}
+@media(prefers-reduced-motion:reduce){.tcg-sheen{animation:none}}
 /* —— big-catch splash (transient, click-through) —— */
 .rfx-catch{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;pointer-events:none;
   background:radial-gradient(60% 60% at 50% 45%,rgba(8,44,96,.55),rgba(5,20,48,.82));opacity:0;transition:opacity .25s}
@@ -1985,6 +2022,12 @@ create policy "atlas all" on atlas_sync
     <div id="reefLogBody" aria-live="polite"></div>
   </div>
 </div>
+<div id="reefCardModal" class="amodal hidden" role="dialog" aria-modal="true" aria-label="Creature trading card" onclick="if(event.target.id==='reefCardModal')closeReefCard()">
+  <div class="amodal-card reefcard-card">
+    <button class="story-close" type="button" onclick="closeReefCard()" aria-label="Close">✕</button>
+    <div id="reefCardBody"></div>
+  </div>
+</div>
 <div id="reefSplash" class="rfx-catch hidden" aria-hidden="true"></div>
 <div id="catQuickModal" class="amodal hidden" role="dialog" aria-modal="true" aria-labelledby="catQuickTitle" onclick="if(event.target.id==='catQuickModal')closeCatQuick()">
   <div class="amodal-card catquick-card">
@@ -2054,7 +2097,7 @@ create policy "atlas all" on atlas_sync
 
     <button type="button" class="cat-banner reef-banner reveal hidden" id="reefBanner" onclick="sfx('tap');showView('reef')" aria-label="Open the Reef Dex">
       <span class="cat-banner-emo" aria-hidden="true">🤿</span>
-      <span class="cat-banner-tx"><b>Reef Dex — Kandima Creature Hunt</b><span id="reefBannerSub">42 creatures live around Kandima. Spot them, log them, catch ’em all!</span></span>
+      <span class="cat-banner-tx"><b>Reef Dex — Kandima Creature Hunt</b><span id="reefBannerSub">63 creatures live around Kandima. Spot them, log them, catch ’em all!</span></span>
       <span class="cat-banner-paws" aria-hidden="true">🐠</span>
       <span class="cat-banner-go" aria-hidden="true">→</span>
     </button>
@@ -2151,7 +2194,7 @@ create policy "atlas all" on atlas_sync
   <!-- ===================== REEF DEX (Maldives) ===================== -->
   <section id="reef" class="view">
     <div class="section-head"><div><span class="eyebrow teal">Spot · log · win</span><h2>🤿 Reef Dex</h2></div><img class="poppie-peek" loading="lazy" alt="" src="poppie-yay.png"></div>
-    <p class="lead" style="max-width:700px;margin:-6px 0 16px">The Great Kandima Creature Hunt! 42 amazing creatures live around the island. Spot them, log them, out-explore each other — can your family catch ’em all?</p>
+    <p class="lead" style="max-width:700px;margin:-6px 0 16px">The Great Kandima Creature Hunt! 63 amazing creatures across 5 regions — from the famous starters of Lagoonto to the hidden tricksters of Shadowsinn. Spot them, log them, collect their cards — can your family catch ’em all?</p>
     <div id="reefDexBody"></div>
   </section>
 
@@ -6158,10 +6201,10 @@ document.addEventListener('keydown',e=>{
     if(e.key===' '){ e.preventDefault(); catSlideToggle(); return; }
     if(e.key==='Escape'){ closeCatSlide(); return; }
   }
-  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); if(typeof closeReefLog==='function')closeReefLog(); }
+  if(e.key==='Escape'){ if(_confirmCb){ confirmResolve(false); return; } closeEgg(); closeStory(); closeOnboard(); closeCloud(); closeSettings(); closeAvatar(); closeCatMap(); if(typeof closeCatQuick==='function')closeCatQuick(); if(typeof closeCatSlide==='function')closeCatSlide(); if(typeof closeReefLog==='function')closeReefLog(); if(typeof closeReefCard==='function')closeReefCard(); }
   else if(!document.getElementById('storyReader').classList.contains('hidden')){ if(e.key==='ArrowRight')storyGo(1); else if(e.key==='ArrowLeft')storyGo(-1); } });
 /* —— a11y: keep keyboard focus inside whichever overlay is open (focus trap) —— */
-const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal, #reefLogModal';
+const MODAL_SEL='#loginScreen, #onboard, #settingsSheet, #cloudModal, #avatarModal, #storyReader, #lightbox, #eggOverlay, #confirmModal, #pinModal, #postcardModal, #catMapModal, #catQuickModal, #catSlideModal, #reefLogModal, #reefCardModal';
 function topOpenModal(){ const open=[...document.querySelectorAll(MODAL_SEL)].filter(m=>!m.classList.contains('hidden')); return open[open.length-1]||null; }
 function focusablesIn(m){ return [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null||el===document.activeElement); }
 document.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
@@ -7609,12 +7652,13 @@ const ACHIEVEMENTS=[
   {id:'reef_first', em:'🤿',nm:'First Splash',      ds:'Log your first Reef Dex creature',            ac:'#2270AD',test:c=>c.reefMine>=1},
   {id:'reef_dex10', em:'🐠',nm:'Junior Reef Ranger',ds:'The family Reef Dex reaches 10 creatures',    ac:'#1E7F66',test:c=>c.reefSpecies>=10},
   {id:'reef_dex25', em:'🌊',nm:'Reef Explorer',     ds:'The family Reef Dex reaches 25 creatures',    ac:'#2270AD',test:c=>c.reefSpecies>=25},
+  {id:'reef_dex40', em:'🐙',nm:'Creature Collector',ds:'The family Reef Dex reaches 40 creatures',    ac:'#6650C9',test:c=>c.reefSpecies>=40},
   {id:'reef_dexall',em:'🏆',nm:'Reef Dex Master',   ds:'The family completes the whole Reef Dex — every creature!',ac:'#E8A21A',test:c=>c.reefSpecies>=c.reefTotal},
   {id:'reef_shark', em:'🦈',nm:'Shark Spotter',     ds:'Spot any shark yourself',                     ac:'#2270AD',test:c=>c.reefSharks>=1},
   {id:'reef_legend',em:'🌟',nm:'Legend Hunter',     ds:'Spot a Legendary creature yourself',          ac:'#E8A21A',test:c=>c.reefLegendaries>=1},
   {id:'reef_gold5', em:'👑',nm:'Trailblazer',       ds:'Be FIRST in the family to spot 5 creatures',  ac:'#F0A91E',test:c=>c.reefMyFirsts>=5},
   {id:'reef_pts50', em:'💯',nm:'Half-Century Snorkeller',ds:'Score 50 Reef Dex points yourself',      ac:'#6650C9',test:c=>c.reefMyPoints>=50},
-  {id:'reef_groups',em:'🗺️',nm:'Everywhere Explorer',ds:'Spot creatures from all 4 Reef Dex groups',  ac:'#1E7F66',test:c=>c.reefMyGroups>=4},
+  {id:'reef_groups',em:'🗺️',nm:'Region Champion',   ds:'Spot creatures from all 5 Reef Dex regions',  ac:'#1E7F66',test:c=>c.reefMyGroups>=5},
   {id:'reef_kind5', em:'🔬',nm:'Junior Marine Biologist',ds:'Make 5 exact-species IDs yourself',      ac:'#2270AD',test:c=>c.reefMyKinds>=5},
   {id:'reef_kind12',em:'🧬',nm:'Professor of the Reef', ds:'Make 12 exact-species IDs yourself',      ac:'#6650C9',test:c=>c.reefMyKinds>=12}
 ];
@@ -7675,8 +7719,8 @@ function badgeProgress(a,c){
     cat_coats:[c.catCoats,9],cat_world:[c.catCountries,3],cat_photog:[c.catPhotos,1],
     reef_first:[c.reefMine,1],reef_dex10:[c.reefSpecies,10],reef_dex25:[c.reefSpecies,25],
     reef_dexall:[c.reefSpecies,c.reefTotal],reef_shark:[c.reefSharks,1],reef_legend:[c.reefLegendaries,1],
-    reef_gold5:[c.reefMyFirsts,5],reef_pts50:[c.reefMyPoints,50],reef_groups:[c.reefMyGroups,4],
-    reef_kind5:[c.reefMyKinds,5],reef_kind12:[c.reefMyKinds,12]
+    reef_gold5:[c.reefMyFirsts,5],reef_pts50:[c.reefMyPoints,50],reef_groups:[c.reefMyGroups,5],
+    reef_dex40:[c.reefSpecies,40],reef_kind5:[c.reefMyKinds,5],reef_kind12:[c.reefMyKinds,12]
   };
   const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
 }
@@ -8766,62 +8810,169 @@ const REEF_TIERS={
   r:{nm:'Rare',      pts:5,  col:'#6650C9'},
   l:{nm:'Legendary', pts:10, col:'#E8A21A'}
 };
-/* g: fish=Reef Fish · giants=Ocean Giants · crit=Beach & Reef Critters · land=Island Life */
-const REEF_GROUPS=[
-  ['fish','Reef Fish','🐠','Right off the beach on Kandima’s house reef'],
-  ['giants','Ocean Giants','🐢','Turtles, rays, sharks and the deep-water legends'],
-  ['crit','Beach & Reef Critters','🦀','Look closer — on the sand, the reef and at night'],
-  ['land','Island Life','🦎','Not everything cool is underwater']
+/* Pokémon-style REGIONS (generations): g = region id.
+   [id, name, emoji, tagline, genLabel] */
+const REEF_REGIONS=[
+  ['lagoonto','Lagoonto','🏝️','The famous starters — every snorkeler’s first friends','Gen 1'],
+  ['coraljo','Coraljo','🪸','The busy streets of the coral city','Gen 2'],
+  ['deepenn','Deepenn','🌊','The big blue — giants and hunters of the open ocean','Gen 3'],
+  ['shadowsinn','Shadowsinn','🥷','Secrets, tricksters and hidden treasures of the reef','Gen 4'],
+  ['islandova','Islandova','🦎','Dry-land legends of the island','Gen 5']
 ];
 const REEF_SPECIES=[
   /* —— Reef Fish —— */
-  {id:'clownfish',    nm:'Clownfish',              nick:'The Real-Life Nemo',      em:'🐠', g:'fish',  tier:'c', hue:24,  fact:'The Maldives has its very own kind — the Maldive anemonefish! It hides in a stinging anemone that never stings IT, thanks to a magic slime coat.'},
-  {id:'powderblue',   nm:'Powder-blue surgeonfish',nick:'Blue Blade',              em:'🐟', g:'fish',  tier:'c', hue:200, fact:'Hides a scalpel-sharp spine by its tail and swims in huge powder-blue clouds — a Maldives superstar.'},
-  {id:'parrotfish',   nm:'Parrotfish',             nick:'The Sand Factory',        em:'🦜', g:'fish',  tier:'c', hue:150, fact:'Crunches coral with its beak and poops out soft white sand. The beach you’re standing on? Partly parrotfish poop!'},
-  {id:'moorishidol',  nm:'Moorish idol',           nick:'The Banner Fish',         em:'🎏', g:'fish',  tier:'c', hue:48,  fact:'Trails a long white banner-fin behind it — the wise "Gill" from a famous fish-tank film is one of these.'},
-  {id:'butterflyfish',nm:'Butterflyfish',          nick:'Flutter Buddy',           em:'🦋', g:'fish',  tier:'c', hue:42,  fact:'Swims in loyal pairs and wears a big fake eye near its tail so hunters attack the wrong end.'},
-  {id:'sergeant',     nm:'Sergeant major',         nick:'The Sergeant',            em:'🎖️', g:'fish',  tier:'c', hue:56,  fact:'Wears army stripes like a sergeant’s badge and bravely guards patches of thousands of tiny purple eggs.'},
-  {id:'snapper',      nm:'Bluestripe snapper',     nick:'The Snap Squad',          em:'📸', g:'fish',  tier:'c', hue:50,  fact:'Glowing yellow crowds of them hang around the jetty like they’re queueing for a photo.'},
-  {id:'fusilier',     nm:'Blue fusilier',          nick:'Blue Lightning',          em:'💨', g:'fish',  tier:'c', hue:210, fact:'Rivers of electric blue-and-yellow fish flow past you in their hundreds — blink and they’ve gone.'},
-  {id:'needlefish',   nm:'Needlefish',             nick:'Sky Skimmer',             em:'🪡', g:'fish',  tier:'c', hue:190, fact:'Floats JUST under the surface like a floating silver needle — remember to look up while you snorkel!'},
-  {id:'unicornfish',  nm:'Unicornfish',            nick:'Sea Unicorn',             em:'🦄', g:'fish',  tier:'c', hue:260, fact:'Grows a real horn on its forehead — and scientists still aren’t sure what it’s for.'},
-  {id:'wrasse',       nm:'Cleaner wrasse',         nick:'The Car Wash',            em:'🧼', g:'fish',  tier:'c', hue:180, fact:'Runs a "cleaning station" where big fish queue up to have their teeth and scales nibbled clean.'},
-  {id:'pufferfish',   nm:'Pufferfish',             nick:'Balloon Mode',            em:'🐡', g:'fish',  tier:'c', hue:35,  fact:'Gulps water to inflate into a spiky balloon that nobody wants to swallow. Instant win button!'},
-  {id:'goatfish',     nm:'Goatfish',               nick:'The Whisker Digger',      em:'🥸', g:'fish',  tier:'c', hue:45,  fact:'Digs through the sand with two wiggly chin whiskers called barbels — watch the puffs of sand it leaves behind.'},
-  {id:'triggerfish',  nm:'Titan triggerfish',      nick:'The Reef Boss',           em:'🔱', g:'fish',  tier:'u', hue:80,  fact:'⚠️ Guards a cone of water ABOVE its nest. If one charges you, swim away SIDEWAYS — never straight up!'},
-  {id:'sweetlips',    nm:'Oriental sweetlips',     nick:'Sweetlips',               em:'💋', g:'fish',  tier:'u', hue:330, fact:'Baby sweetlips do a wiggly non-stop dance to trick hunters into thinking they’re poisonous.'},
-  {id:'boxfish',      nm:'Yellow boxfish',         nick:'Pixel Cube',              em:'📦', g:'fish',  tier:'u', hue:52,  fact:'A square, armoured fish! Babies look like tiny yellow dice with black dots.'},
-  {id:'moray',        nm:'Moray eel',              nick:'Grumpy Ribbon',           em:'🐍', g:'fish',  tier:'u', hue:120, fact:'Opens and closes its mouth just to breathe — and hides a SECOND set of jaws in its throat. Really!'},
-  {id:'lionfish',     nm:'Lionfish',               nick:'Look-Don’t-Touch',   em:'🦁', g:'fish',  tier:'u', hue:15,  fact:'⚠️ Those gorgeous fan-fins hide venomous spines. Admire from a distance — never ever touch.'},
-  {id:'flyingfish',   nm:'Flying fish',            nick:'The Glider',              em:'🪂', g:'fish',  tier:'u', hue:205, fact:'Spot it from the boat or the seaplane — it bursts out of the water and glides over 100 metres on wing-fins.'},
-  {id:'batfish',      nm:'Batfish',                nick:'The Curious One',         em:'🥞', g:'fish',  tier:'u', hue:40,  fact:'A big flat pancake of a fish that’s so curious it follows snorkelers around the jetty.'},
+  {id:'clownfish',    nm:'Clownfish',              nick:'The Real-Life Nemo',      em:'🐠', g:'lagoonto',  tier:'c', hue:24,  fact:'The Maldives has its very own kind — the Maldive anemonefish! It hides in a stinging anemone that never stings IT, thanks to a magic slime coat.', ph:["Amphiprion nigripes Maldives.jpg"], kinds:[{"id": "maldive", "nm": "Maldive anemonefish", "sci": "Amphiprion nigripes", "note": "Rusty-orange body, one white stripe behind the eye, and black lower fins.", "photos": ["Amphiprion nigripes Maldives.jpg"]}, {"id": "clarks", "nm": "Clark's anemonefish", "sci": "Amphiprion clarkii", "note": "Dark body with two white bands and a bright pale tail.", "photos": ["Amphiprion clarkii.jpg"]}]},
+  {id:'powderblue',   nm:'Powder-blue surgeonfish',nick:'Blue Blade',              em:'🐟', g:'lagoonto',  tier:'c', hue:200, fact:'Hides a scalpel-sharp spine by its tail and swims in huge powder-blue clouds — a Maldives superstar.', ph:["Maldives Surgeonfish, Acanthurus leucosternon.jpg", "Acanthurus leucosternon 01.JPG", "Acanthurus leucosternon.JPG"]},
+  {id:'parrotfish',   nm:'Parrotfish',             nick:'The Sand Factory',        em:'🦜', g:'lagoonto',  tier:'c', hue:150, fact:'Crunches coral with its beak and poops out soft white sand. The beach you’re standing on? Partly parrotfish poop!', ph:["Bicolor parrotfish.JPG", "Chlorurus sordidus by Jaroslaw Barski.jpg"], kinds:[{"id": "bullethead", "nm": "Bullethead Parrotfish", "sci": "Chlorurus sordidus", "note": "Small green parrotfish with a rounded, blunt bullet-shaped snout.", "photos": ["Pez loro (Chlorurus sordidus), mar Rojo, Egipto, 2023-04-18, DD 16.jpg", "Chlorurus sordidus by Jaroslaw Barski.jpg"]}, {"id": "steephead", "nm": "Steephead Parrotfish", "sci": "Chlorurus strongylocephalus", "note": "Big blue-green fish with a steep, almost square forehead.", "photos": ["Chlorurus strongylocephalus 420754124.jpg", "Chlorurus strongylocephalus (Bleeker, 1854).jpg"]}, {"id": "bicolour", "nm": "Bicolour Parrotfish", "sci": "Cetoscarus ocellatus", "note": "Grown-ups are green with pink cheeks; babies are white with an orange stripe.", "photos": ["Spotted parrotfish (Cetoscarus ocellatus) (46727238365).jpg", "Cetoscarus ocellatus Great Barrier Reef.jpg"]}]},
+  {id:'moorishidol',  nm:'Moorish idol',           nick:'The Banner Fish',         em:'🎏', g:'lagoonto',  tier:'c', hue:48,  fact:'Trails a long white banner-fin behind it — the wise "Gill" from a famous fish-tank film is one of these.', ph:["Zanclus cornutus in Kona.jpg", "Zanclus cornutus 1.jpg"], kinds:[{"id": "moorish", "nm": "Moorish idol", "sci": "Zanclus cornutus", "note": "Pointy tube snout and one long streaming fin; usually swims alone or in pairs.", "photos": ["Zanclus cornutus in Kona.jpg", "Zanclus cornutus 1.jpg"]}, {"id": "bannerfish", "nm": "Schooling bannerfish", "sci": "Heniochus diphreutes", "note": "Near-twin but has a short blunt nose, no tube snout, and swims in big schools.", "photos": ["Pennant Bannerfish (Heniochus diphreutes) (3148921825).jpg", "Pennant Bannerfish (Heniochus diphreutes) (3366488725).jpg"]}]},
+  {id:'butterflyfish',nm:'Butterflyfish',          nick:'Flutter Buddy',           em:'🦋', g:'lagoonto',  tier:'c', hue:42,  fact:'Swims in loyal pairs and wears a big fake eye near its tail so hunters attack the wrong end.', ph:["Pez mariposa auriga (Chaetodon auriga), parque nacional Ras Muhammad, Egipto, 2022-03-30, DD 03.jpg", "Indian redfin Butterflyfish - Chaetodon trifasciatus.jpg", "Chaetodon andamanensis Maldives.JPG"], kinds:[{"id": "threadfin", "nm": "Threadfin Butterflyfish", "sci": "Chaetodon auriga", "note": "White body, black eye-stripe, and a long trailing thread on its back fin.", "photos": ["Pez mariposa auriga (Chaetodon auriga), parque nacional Ras Muhammad, Egipto, 2022-03-30, DD 03.jpg"]}, {"id": "teardrop", "nm": "Teardrop Butterflyfish", "sci": "Chaetodon interruptus", "note": "Bright plain yellow with one round black spot like a teardrop on its side.", "photos": ["Indian teardrop Butterflyfish - Chaetodon interruptus.jpg"]}, {"id": "longnose", "nm": "Longnose Butterflyfish", "sci": "Forcipiger flavissimus", "note": "Yellow fish with a super-long pointy snout for poking into coral cracks.", "photos": ["Pez mariposa hocicona (Forcipiger flavissimus), Anilao, Filipinas, 2023-08-25, DD 194.jpg"]}, {"id": "melon", "nm": "Melon Butterflyfish", "sci": "Chaetodon trifasciatus", "note": "Purple pinstripes on the body with an orange edge along the tail.", "photos": ["Indian redfin Butterflyfish - Chaetodon trifasciatus.jpg"]}, {"id": "vagabond", "nm": "Vagabond Butterflyfish", "sci": "Chaetodon vagabundus", "note": "White with two sets of slanted lines that meet in a V, plus a dark tail band.", "photos": ["Chaetodon vagabundus.jpg"]}]},
+  {id:'sergeant',     nm:'Sergeant major',         nick:'The Sergeant',            em:'🎖️', g:'lagoonto',  tier:'c', hue:56,  fact:'Wears army stripes like a sergeant’s badge and bravely guards patches of thousands of tiny purple eggs.', ph:["Indo-pacific sergeant (Abudefduf vaigiensis) (31571158618).jpg", "Abudefduf vaigiensis Iran.jpg"]},
+  {id:'snapper',      nm:'Bluestripe snapper',     nick:'The Snap Squad',          em:'📸', g:'coraljo',  tier:'c', hue:50,  fact:'Glowing yellow crowds of them hang around the jetty like they’re queueing for a photo.', ph:["Kasmira snapper.JPG", "Lutjanus kasmira.jpg", "Lutjanus kasmira school.jpg"]},
+  {id:'fusilier',     nm:'Blue fusilier',          nick:'Blue Lightning',          em:'💨', g:'coraljo',  tier:'c', hue:210, fact:'Rivers of electric blue-and-yellow fish flow past you in their hundreds — blink and they’ve gone.', ph:["Lunar fusilier (Caesio lunaris) (47613974412).jpg", "School of lunar fusilier at Elphinstone.JPG"], kinds:[{"id": "blueyellow", "nm": "Blue-and-yellow fusilier", "sci": "Caesio teres", "note": "Bright blue body with a big yellow patch over its back and tail.", "photos": ["Caesio teres and Caesio caerulaurea.jpg"]}, {"id": "lunar", "nm": "Neon (lunar) fusilier", "sci": "Caesio lunaris", "note": "Almost all silvery-blue, with dark tips on its forked tail.", "photos": ["Lunar fusilier (Caesio lunaris) (47613974412).jpg", "School of lunar fusilier at Elphinstone.JPG"]}]},
+  {id:'needlefish',   nm:'Needlefish',             nick:'Sky Skimmer',             em:'🪡', g:'coraljo',  tier:'c', hue:190, fact:'Floats JUST under the surface like a floating silver needle — remember to look up while you snorkel!', ph:["Tylosurus choram, Red Sea houndfish, Красноморский тилозур.DSCF9988ВЕ.jpg", "Belone belone - Garfish (cropped).jpg"]},
+  {id:'unicornfish',  nm:'Unicornfish',            nick:'Sea Unicorn',             em:'🦄', g:'coraljo',  tier:'c', hue:260, fact:'Grows a real horn on its forehead — and scientists still aren’t sure what it’s for.', ph:["Naso unicornis 1.jpg", "Paletail unicornfish (Naso brevirostris) (44046445004).jpg"], kinds:[{"id": "bluespine", "nm": "Bluespine Unicornfish", "sci": "Naso unicornis", "note": "Grey-blue fish with a long horn on its forehead and two blue tail spikes.", "photos": ["Naso unicornis 1.jpg"]}, {"id": "spotted", "nm": "Spotted Unicornfish", "sci": "Naso brevirostris", "note": "Has a very long pointy horn and tiny dark spots on its face and body.", "photos": ["Paletail unicornfish (Naso brevirostris) (44046445004).jpg", "Paletail unicornfish (Naso brevirostris) (47780681471).jpg"]}, {"id": "orangespine", "nm": "Orangespine Unicornfish", "sci": "Naso lituratus", "note": "No horn! Look for a black mask, orange lips and bright orange tail spikes.", "photos": ["Lipstick or Orangespine Unicornfish (Naso lituratus) (3366489975).jpg"]}]},
+  {id:'wrasse',       nm:'Cleaner wrasse',         nick:'The Car Wash',            em:'🧼', g:'coraljo',  tier:'c', hue:180, fact:'Runs a "cleaning station" where big fish queue up to have their teeth and scales nibbled clean.', ph:["Bluestreak cleaner wrasse (Labroides dimidiatus).jpg", "Cleaner wrasse with a client.JPG"]},
+  {id:'pufferfish',   nm:'Pufferfish',             nick:'Balloon Mode',            em:'🐡', g:'lagoonto',  tier:'c', hue:35,  fact:'Gulps water to inflate into a spiky balloon that nobody wants to swallow. Instant win button!', ph:["Blackspotted puffer (Arothron nigropunctatus) (36581132994).jpg", "Arothron nigropunctatus - Wilhelma 02.jpg"], kinds:[{"id": "blackspotted", "nm": "Blackspotted (dog-faced) puffer", "sci": "Arothron nigropunctatus", "note": "Chubby grey puffer with a sad dog-like face and scattered black spots.", "photos": ["Blackspotted puffer (Arothron nigropunctatus) (36581132994).jpg", "Arothron nigropunctatus - Wilhelma 02.jpg"]}, {"id": "whitespotted", "nm": "White-spotted puffer", "sci": "Arothron hispidus", "note": "Brownish puffer covered in tiny white dots all over its body.", "photos": ["Arothron hispidus (white-spotted puffer fish) at Prague sea aquarium.jpg", "Arothron hispidus 1.jpg"]}, {"id": "porcupinefish", "nm": "Porcupinefish", "sci": "Diodon hystrix", "note": "Big puffer covered in spikes that stick out when it puffs up like a balloon.", "photos": ["Spot-fin porcupinefish (Diodon hystrix) (27597460948).jpg", "TucacasDiodonHystrix.JPG"]}]},
+  {id:'goatfish',     nm:'Goatfish',               nick:'The Whisker Digger',      em:'🥸', g:'coraljo',  tier:'c', hue:45,  fact:'Digs through the sand with two wiggly chin whiskers called barbels — watch the puffs of sand it leaves behind.', ph:["Yellowfin goatfish (Mulloidichthys vanicolensis).jpg", "Yellowfin goatfish.jpg"], kinds:[{"id": "yellowfin", "nm": "Yellowfin goatfish", "sci": "Mulloidichthys vanicolensis", "note": "White body, one yellow stripe, yellow fins, two whiskers on its chin.", "photos": ["Yellowfin goatfish (Mulloidichthys vanicolensis).jpg", "Mulloidichthys vanicolensis - Goldstripe goatfish (11007424234).jpg"]}, {"id": "dashdot", "nm": "Dash-and-dot goatfish", "sci": "Parupeneus barberinus", "note": "Pale fish with a long dark dash and one black dot near its tail.", "photos": ["Parupeneus barberinus.JPG"]}]},
+  {id:'triggerfish',  nm:'Titan triggerfish',      nick:'The Reef Boss',           em:'🔱', g:'coraljo',  tier:'u', hue:80,  fact:'⚠️ Guards a cone of water ABOVE its nest. If one charges you, swim away SIDEWAYS — never straight up!', ph:["Titan Triggerfish Balistoides Viridescens (223271065).jpeg", "Baliste titan (Balistoides viridescens) (Ifremer 00535-64696).jpg"], kinds:[{"id": "titan", "nm": "Titan triggerfish", "sci": "Balistoides viridescens", "note": "Biggest triggerfish, grey-green with a dark moustache; give its sandy nest a wide berth.", "photos": ["Titan Triggerfish Balistoides Viridescens (223271065).jpeg", "Baliste titan (Balistoides viridescens) (Ifremer 00535-64696).jpg"]}, {"id": "picasso", "nm": "Picasso triggerfish", "sci": "Rhinecanthus aculeatus", "note": "Small triggerfish with a painted rainbow face and blue stripes over the eyes.", "photos": ["Lagoon triggerfish Rhinecanthus aculeatus (Picasso triggerfish) (5846787791).jpg", "Picasso.triggerfish.arp.jpg"]}, {"id": "orangelined", "nm": "Orange-lined triggerfish", "sci": "Balistapus undulatus", "note": "Dark green fish covered in bright orange stripes with an orange tail.", "photos": ["Balistapus undulatus.jpg", "Balistapus undulatus (Nausicaä).jpg"]}, {"id": "clown", "nm": "Clown triggerfish", "sci": "Balistoides conspicillum", "note": "Black with big white polka-dots on its belly and a yellow-ringed mouth.", "photos": ["Clown triggerfish (Balistoides conspicillum) (2863776781).jpg", "Clown Triggerfish Balistoides conspicillum Side 1888px.jpg"]}]},
+  {id:'sweetlips',    nm:'Oriental sweetlips',     nick:'Sweetlips',               em:'💋', g:'coraljo',  tier:'u', hue:330, fact:'Baby sweetlips do a wiggly non-stop dance to trick hunters into thinking they’re poisonous.', ph:["Maldives Oriental sweetlips, Plectorhinchus vittatus.jpg", "Bakoko oriental (Plectorhinchus vittatus), Anilao, Filipinas, 2023-08-22, DD 182.jpg", "Orientalische Süßlippe Malediven.JPG"]},
+  {id:'boxfish',      nm:'Yellow boxfish',         nick:'Pixel Cube',              em:'📦', g:'coraljo',  tier:'u', hue:52,  fact:'A square, armoured fish! Babies look like tiny yellow dice with black dots.', ph:["Yellow boxfish (Ostracion cubicus) (40814638873).jpg", "Kofferfisch (Ostracion cubicus) 02.jpg", "Ostracion cubicus.JPG"]},
+  {id:'moray',        nm:'Moray eel',              nick:'Grumpy Ribbon',           em:'🐍', g:'coraljo',  tier:'u', hue:120, fact:'Opens and closes its mouth just to breathe — and hides a SECOND set of jaws in its throat. Really!', ph:["Morena gigante (Gymnothorax javanicus), Ras Katy, Sharm el-Sheij, Egipto, 2022-03-26, DD 83.jpg", "Giant Moray Eel Gymnothorax Javanicus (223119739).jpeg"], kinds:[{"id": "giant", "nm": "Giant moray", "sci": "Gymnothorax javanicus", "note": "Huge plain brownish eel with a small black-speckled head; the biggest moray.", "photos": ["Giant Moray Eel Gymnothorax Javanicus (223119739).jpeg", "Giant moray from the Red Sea.JPG"]}, {"id": "honeycomb", "nm": "Honeycomb moray", "sci": "Gymnothorax favagineus", "note": "White skin covered in black leopard-spots, like a honeycomb or giraffe.", "photos": ["Laced moray (Gymnothorax favagineus).jpg", "Morena leopardo (Gymnothorax favagineus), islas Ad Dimaniyat, Omán, 2024-08-13, DD 84.jpg"]}, {"id": "snowflake", "nm": "Snowflake moray", "sci": "Echidna nebulosa", "note": "Pale eel with two rows of dark blotches and yellow spots; blunt little nose.", "photos": ["Echidna nebulosa.jpg"]}]},
+  {id:'lionfish',     nm:'Lionfish',               nick:'Look-Don’t-Touch',   em:'🦁', g:'coraljo',  tier:'u', hue:15,  fact:'⚠️ Those gorgeous fan-fins hide venomous spines. Admire from a distance — never ever touch.', ph:["Devil firefish or common lionfish (Pterois miles).jpg", "Common lion fish Pterois volitans.jpg"]},
+  {id:'flyingfish',   nm:'Flying fish',            nick:'The Glider',              em:'🪂', g:'deepenn',  tier:'u', hue:205, fact:'Spot it from the boat or the seaplane — it bursts out of the water and glides over 100 metres on wing-fins.', ph:["Pink-wing flying fish.jpg", "Flying Fish Bay of Islands NZ.jpg"]},
+  {id:'batfish',      nm:'Batfish',                nick:'The Curious One',         em:'🥞', g:'coraljo',  tier:'u', hue:40,  fact:'A big flat pancake of a fish that’s so curious it follows snorkelers around the jetty.', ph:["Platax teira 340437649.jpg"], kinds:[{"id": "longfin", "nm": "Longfin batfish", "sci": "Platax teira", "note": "Tall round silver plate with a dark smudge under the belly fin.", "photos": ["Platax teira 340437649.jpg"]}, {"id": "orbic", "nm": "Orbicular batfish", "sci": "Platax orbicularis", "note": "Round brown disc, taller than long, with short fins when grown up.", "photos": ["Platax Orbicularis in the Egyptian Red Sea.jpg"]}]},
   /* —— Ocean Giants —— */
-  {id:'blacktip',     nm:'Blacktip reef shark',    nick:'Finn the Friendly',       em:'🦈', g:'giants',tier:'c', hue:215, fact:'Baby sharks patrol the ankle-deep lagoon at Kandima, totally relaxed about people. Your first shark will be a COMMON!'},
-  {id:'stingray',     nm:'Stingray',               nick:'The Flappy Pancake',      em:'🪁', g:'giants',tier:'c', hue:230, fact:'Glides past the water villas at dusk like a flying carpet of the sea.'},
-  {id:'hawksbill',    nm:'Hawksbill turtle',       nick:'Old Soul',                em:'🐢', g:'giants',tier:'u', hue:140, fact:'Named for its bird-like beak. Sea turtles have been cruising the oceans since the dinosaurs.'},
-  {id:'eagleray',     nm:'Spotted eagle ray',      nick:'Spotty Glider',           em:'🦅', g:'giants',tier:'u', hue:250, fact:'A polka-dot back and wings up to THREE metres across — as wide as two kids. It flies underwater.'},
-  {id:'dolphin',      nm:'Spinner dolphin',        nick:'The Spinner Squad',       em:'🐬', g:'giants',tier:'u', hue:195, fact:'Leaps out of the sea and corkscrews up to SEVEN spins in one jump. Sunset cruises nearly always find them.'},
-  {id:'napoleon',     nm:'Napoleon wrasse',        nick:'The King',                em:'🤴', g:'giants',tier:'r', hue:160, fact:'As big as a kid, with a bump on its head like a crown — and it can change from a girl into a boy!'},
-  {id:'nurseshark',   nm:'Nurse shark',            nick:'The Snoozer',             em:'😴', g:'giants',tier:'r', hue:220, fact:'Sleeps in cosy piles under coral ledges all day, then hoovers up food like a vacuum cleaner at night.'},
-  {id:'manta',        nm:'Manta ray',              nick:'The Mothership',          em:'🛸', g:'giants',tier:'l', hue:265, fact:'Wings wider than a car and the biggest brain of any fish. It does underwater somersaults while it eats!'},
-  {id:'whaleshark',   nm:'Whale shark',            nick:'The Gentle Giant',        em:'🐋', g:'giants',tier:'l', hue:200, fact:'The biggest fish on planet Earth — the size of a bus — and it eats only tiny plankton. The ultimate spot!'},
+  {id:'blacktip',     nm:'Blacktip reef shark',    nick:'Finn the Friendly',       em:'🦈', g:'lagoonto',tier:'c', hue:215, fact:'Baby sharks patrol the ankle-deep lagoon at Kandima, totally relaxed about people. Your first shark will be a COMMON!', ph:["Blacktip reef shark (Carcharhinus melanopterus).jpg", "Blacktip reef shark (Carcharhinus melanopterus) - Pulau Komodo - Indonesia 24.jpg"], kinds:[{"id": "blacktip", "nm": "Blacktip reef shark", "sci": "Carcharhinus melanopterus", "note": "Bold black tips on ALL its fins, like they were dipped in ink.", "photos": ["Blacktip reef shark (Carcharhinus melanopterus).jpg", "Carcharhinus melanopterus2.jpg"]}, {"id": "whitetip", "nm": "Whitetip reef shark", "sci": "Triaenodon obesus", "note": "Skinny body, blunt head, WHITE tips on top fin and tail.", "photos": ["Triaenodon obesus whitetip reef shark.JPG", "White Tip.Reef Shark off the Maldive Islands.JPG"]}, {"id": "grey", "nm": "Grey reef shark", "sci": "Carcharhinus amblyrhynchos", "note": "Plain grey with a thick black edge along the back of its tail fin.", "photos": ["Tiburón gris (Carcharhinus amblyrhynchos), mar Rojo, Egipto, 2023-04-17, DD 86.jpg", "Grey Reef Shark.jpg"]}]},
+  {id:'stingray',     nm:'Stingray',               nick:'The Flappy Pancake',      em:'🪁', g:'lagoonto',tier:'c', hue:230, fact:'Glides past the water villas at dusk like a flying carpet of the sea.', ph:["Taeniura lymma 2.jpg", "Pastinachus sephen2.jpg"], kinds:[{"id": "cowtail", "nm": "Cowtail Stingray", "sci": "Pastinachus sephen", "note": "Dark grey diamond with a thick tail carrying a flat black flag-like flap underneath.", "photos": ["Pastinachus sephen Landaagiraavaru.JPG", "Pastinachus sephen2.jpg"]}, {"id": "pinkwhipray", "nm": "Pink Whipray", "sci": "Pateobatis fai", "note": "Big sandy-pink disc, no spots, with a super-long thin whip tail.", "photos": ["Pink whipray (Pateobatis fai) Moorea.jpg", "Pink whipray (Pateobatis fai) Moorea 2.jpg"]}, {"id": "bluespotted", "nm": "Blue-spotted Ribbontail Ray", "sci": "Taeniura lymma", "note": "Bright yellow-brown with electric-blue spots and blue stripes on the tail.", "photos": ["Taeniura lymma 2.jpg", "Taeniura lymma2a.jpg"]}]},
+  {id:'hawksbill',    nm:'Hawksbill turtle',       nick:'Old Soul',                em:'🐢', g:'lagoonto',tier:'u', hue:140, fact:'Named for its bird-like beak. Sea turtles have been cruising the oceans since the dinosaurs.', ph:["Hawksbill Sea Turtle (Eretmochelys imbricata).jpg", "Hawksbill Turtle BVI.JPG"], kinds:[{"id": "hawksbill", "nm": "Hawksbill Turtle", "sci": "Eretmochelys imbricata", "note": "Pointy bird-like beak and a saw-toothed, overlapping shell edge.", "photos": ["Hawksbill Sea Turtle (Eretmochelys imbricata).jpg", "Hawksbill Turtle (Eretmochelys imbricata) (8477697277).jpg"]}, {"id": "green", "nm": "Green Turtle", "sci": "Chelonia mydas", "note": "Rounder, blunt face and a smooth shell with no jagged back edge.", "photos": ["Green sea turtle (Chelonia mydas) Moorea.jpg", "Green sea turtle FWS 6630.JPG"]}, {"id": "oliveridley", "nm": "Olive Ridley Turtle", "sci": "Lepidochelys olivacea", "note": "Small heart-shaped olive-grey shell; often seen at rescue centres.", "photos": ["Lepidochelys olivacea.jpg", "Penyu lekang.jpg"]}]},
+  {id:'eagleray',     nm:'Spotted eagle ray',      nick:'Spotty Glider',           em:'🦅', g:'deepenn',tier:'u', hue:250, fact:'A polka-dot back and wings up to THREE metres across — as wide as two kids. It flies underwater.', ph:["Spotted Eagle Ray (Aetobatus narinari)2.jpg", "Aetobatus ocellatus kar01.jpg"]},
+  {id:'dolphin',      nm:'Spinner dolphin',        nick:'The Spinner Squad',       em:'🐬', g:'lagoonto',tier:'u', hue:195, fact:'Leaps out of the sea and corkscrews up to SEVEN spins in one jump. Sunset cruises nearly always find them.', ph:["Spinner dolphin jumping.JPG", "A spinner dolphin in the Red Sea.jpg", "Spinner Dolphin Alphonse Atoll 07-2017.jpg"], kinds:[{"id": "spinner", "nm": "Spinner dolphin", "sci": "Stenella longirostris", "note": "Small and slim, spins like a top when it leaps out of the water.", "photos": ["Spinner dolphin jumping.JPG", "A spinner dolphin in the Red Sea.jpg"]}, {"id": "bottlenose", "nm": "Bottlenose dolphin", "sci": "Tursiops truncatus", "note": "Bigger and chunky with a short stubby beak and a smiley curved mouth.", "photos": ["Tursiops truncatus 01.jpg", "Common Bottlenose Dolphin (Tursiops truncatus) - Galapagos (2225816313).jpg"]}]},
+  {id:'napoleon',     nm:'Napoleon wrasse',        nick:'The King',                em:'🤴', g:'deepenn',tier:'r', hue:160, fact:'As big as a kid, with a bump on its head like a crown — and it can change from a girl into a boy!', ph:["Napoleon-fish.jpg", "Pez Napoleón (Cheilinus undulatus), mar Rojo, Egipto, 2023-04-18, DD 13.jpg"]},
+  {id:'nurseshark',   nm:'Nurse shark',            nick:'The Snoozer',             em:'😴', g:'deepenn',tier:'r', hue:220, fact:'Sleeps in cosy piles under coral ledges all day, then hoovers up food like a vacuum cleaner at night.', ph:["Rekiny wąsate, Malediwy.jpg"]},
+  {id:'manta',        nm:'Manta ray',              nick:'The Mothership',          em:'🛸', g:'deepenn',tier:'l', hue:265, fact:'Wings wider than a car and the biggest brain of any fish. It does underwater somersaults while it eats!', ph:["A Flying Manta ray.jpg", "Manta alfredi cruising - journal.pone.0046170.g002A.png"]},
+  {id:'whaleshark',   nm:'Whale shark',            nick:'The Gentle Giant',        em:'🐋', g:'deepenn',tier:'l', hue:200, fact:'The biggest fish on planet Earth — the size of a bus — and it eats only tiny plankton. The ultimate spot!', ph:["Whale Shark AdF.jpg", "Whale Shark (Rhincodon typus) with open mouth in La Paz, Mexico.jpg"]},
   /* —— Beach & Reef Critters —— */
-  {id:'coral',        nm:'Living coral',           nick:'The Reef Builder',        em:'🪸', g:'crit',  tier:'c', hue:350, fact:'Not a plant! Millions of tiny animals building a city, over hundreds of years. Everyone scores this on day one.'},
-  {id:'anemone',      nm:'Sea anemone',            nick:'The Wiggly Garden',       em:'🌸', g:'crit',  tier:'c', hue:320, fact:'Looks like a flower but it’s secretly an animal — and it’s the clownfish’s apartment building.'},
-  {id:'hermitcrab',   nm:'Hermit crab',            nick:'Shell Swapper',           em:'🐚', g:'crit',  tier:'c', hue:30,  fact:'When one finds a bigger shell, crabs line up by size and ALL swap homes at once. A shell-swap party!'},
-  {id:'ghostcrab',    nm:'Ghost crab',             nick:'Beach Ninja',             em:'👻', g:'crit',  tier:'c', hue:60,  fact:'Sprints sideways faster than you can and vanishes into the sand. Bring a torch to the beach at night!'},
-  {id:'starfish',     nm:'Sea star',               nick:'Star Power',              em:'⭐', g:'crit',  tier:'c', hue:45,  fact:'Loses an arm? It just grows a new one. Some can even grow a whole new body from one arm!'},
-  {id:'seacucumber',  nm:'Sea cucumber',           nick:'The Sea Pickle',          em:'🥒', g:'crit',  tier:'c', hue:100, fact:'Hoovers the sand clean all day… and breathes through its bottom. Really. Truly. Its bottom.'},
-  {id:'giantclam',    nm:'Giant clam',             nick:'Rainbow Lips',            em:'💎', g:'crit',  tier:'u', hue:175, fact:'Electric-blue wavy lips peeking out of the reef — and it can live for 100 years.'},
-  {id:'octopus',      nm:'Reef octopus',           nick:'Master of Disguise',      em:'🐙', g:'crit',  tier:'r', hue:300, fact:'Changes its colour AND its skin texture in a blink. Three hearts. Blue blood. Basically an alien.'},
-  {id:'plankton',     nm:'Glowing plankton',       nick:'The Sea Sparkle',         em:'✨', g:'crit',  tier:'r', hue:210, fact:'On some dark nights the waves glow electric blue and the beach turns into stars. The SHINY of the sea!', shiny:1},
+  {id:'coral',        nm:'Living coral',           nick:'The Reef Builder',        em:'🪸', g:'shadowsinn',  tier:'c', hue:350, fact:'Not a plant! Millions of tiny animals building a city, over hundreds of years. Everyone scores this on day one.', ph:["Acropora robusta Maldives.jpg", "Acropora palifera Maldives.jpg", "Acropora monticulosa Maldives.JPG"]},
+  {id:'anemone',      nm:'Sea anemone',            nick:'The Wiggly Garden',       em:'🌸', g:'shadowsinn',  tier:'c', hue:320, fact:'Looks like a flower but it’s secretly an animal — and it’s the clownfish’s apartment building.', ph:["Amphiprion ocellaris (Clown anemonefish) by Nick Hobgood.jpg", "Amphiprion perideraion (Pink anemonefish) in Heteractis magnifica (Magnificent sea anemone).jpg", "Common clown fish and sea anemone.jpg"]},
+  {id:'hermitcrab',   nm:'Hermit crab',            nick:'Shell Swapper',           em:'🐚', g:'lagoonto',  tier:'c', hue:30,  fact:'When one finds a bigger shell, crabs line up by size and ALL swap homes at once. A shell-swap party!', ph:["Howland Island NWR and hermit crab (5123997614).jpg", "Bernard l'Hermite.jpg", "HermitCrab NOAA.jpg"]},
+  {id:'ghostcrab',    nm:'Ghost crab',             nick:'Beach Ninja',             em:'👻', g:'shadowsinn',  tier:'c', hue:60,  fact:'Sprints sideways faster than you can and vanishes into the sand. Bring a torch to the beach at night!', ph:["Ocypode-ceratophthalma-horned-ghost-crab-krabi-thailand.jpg", "Horned Ghost Crab (8626790684).jpg", "Ghost crab ocypode.jpg"]},
+  {id:'starfish',     nm:'Sea star',               nick:'Star Power',              em:'⭐', g:'lagoonto',  tier:'c', hue:45,  fact:'Loses an arm? It just grows a new one. Some can even grow a whole new body from one arm!', ph:["Blue Linckia Starfish.JPG", "Culcita novaeguineae.JPG"], kinds:[{"id": "blue", "nm": "Blue sea star", "sci": "Linckia laevigata", "note": "Bright royal-blue with 5 long skinny arms, like a bendy blue starfish.", "photos": ["Blue Linckia Starfish.JPG", "Bintang Laut biru.jpg"]}, {"id": "cushion", "nm": "Cushion star", "sci": "Culcita novaeguineae", "note": "Fat puffy pillow shape - hardly any arms, like a chunky pentagon pincushion.", "photos": ["Culcita novaeguineae.JPG", "CulcitanovguineaeJI1.jpg"]}, {"id": "cot", "nm": "Crown-of-thorns star", "sci": "Acanthaster planci", "note": "Covered in long sharp spikes - LOOK, don't touch! The spines sting.", "photos": ["Crown of Thorns Starfish (5457578925).jpg", "PMNM - Crown Of Thorns Starfish Closeup (27081351113).jpg"]}]},
+  {id:'seacucumber',  nm:'Sea cucumber',           nick:'The Sea Pickle',          em:'🥒', g:'shadowsinn',  tier:'c', hue:100, fact:'Hoovers the sand clean all day… and breathes through its bottom. Really. Truly. Its bottom.', ph:["Holothuria atra.jpg", "Holothuria whitmaei (19260385).jpg"]},
+  {id:'giantclam',    nm:'Giant clam',             nick:'Rainbow Lips',            em:'💎', g:'shadowsinn',  tier:'u', hue:175, fact:'Electric-blue wavy lips peeking out of the reef — and it can live for 100 years.', ph:["Almeja gigante (Tridacna maxima), Temple, Sharm el-Sheij, Egipto, 2022-03-26, DD 33.jpg", "Tridacna squamosa (Giant clam) with fluted shell.jpg", "Tridacna squamosa (Giant clam) Timor.jpg"]},
+  {id:'octopus',      nm:'Reef octopus',           nick:'Master of Disguise',      em:'🐙', g:'shadowsinn',  tier:'r', hue:300, fact:'Changes its colour AND its skin texture in a blink. Three hearts. Blue blood. Basically an alien.', ph:["Octopus cyanea Maldives.JPG", "Day octopus Octopus cyanea, Maui Ocean Centre 4390.jpg"]},
+  {id:'plankton',     nm:'Glowing plankton',       nick:'The Sea Sparkle',         em:'✨', g:'shadowsinn',  tier:'r', hue:210, fact:'On some dark nights the waves glow electric blue and the beach turns into stars. The SHINY of the sea!', shiny:1, ph:["Blue Tide- Noctiluca.jpeg", "Dinoflagellate bioluminescence 2.jpg", "Bioluminescent dinoflagellates.jpg"]},
   /* —— Island Life —— */
-  {id:'gecko',        nm:'House gecko',            nick:'Ceiling Walker',          em:'🦎', g:'land',  tier:'c', hue:90,  fact:'Chirps at night and walks upside-down across the ceiling using millions of microscopic toe-hairs.'},
-  {id:'fruitbat',     nm:'Fruit bat',              nick:'The Day Dragon',          em:'🦇', g:'land',  tier:'c', hue:280, fact:'Huge fox-faced bats cruise between the palm trees in broad daylight — they’re everywhere in the Maldives.'},
-  {id:'heron',        nm:'Grey heron',             nick:'The Fisherman',           em:'🦢', g:'land',  tier:'c', hue:205, fact:'Every island has one. It stands statue-still in the shallows… then SPEARS a fish like lightning.'},
-  {id:'koel',         nm:'Asian koel',             nick:'The Invisible Alarm Clock',em:'🎵', g:'land', tier:'u', hue:0,   fact:'You’ll HEAR its loud "ko-EL! ko-EL!" all over the island — but it hides in the leaves. Spotting the singer is the real challenge.'}
+  {id:'gecko',        nm:'House gecko',            nick:'Ceiling Walker',          em:'🦎', g:'islandova',  tier:'c', hue:90,  fact:'Chirps at night and walks upside-down across the ceiling using millions of microscopic toe-hairs.', ph:["Hemidactylus frenatus.jpg", "Common House Gecko (Hemidactylus frenatus), Kent Ridge Campus, National University of Singapore - 20070202.jpg", "Successful cockroach hunting of the common house gecko (Hemidactylus frenatus).jpg"]},
+  {id:'fruitbat',     nm:'Fruit bat',              nick:'The Day Dragon',          em:'🦇', g:'islandova',  tier:'c', hue:280, fact:'Huge fox-faced bats cruise between the palm trees in broad daylight — they’re everywhere in the Maldives.', ph:["Indian Flying Fox (Pteropus giganteus) Kolkata West Bengal India 27042013.png"]},
+  {id:'heron',        nm:'Grey heron',             nick:'The Fisherman',           em:'🦢', g:'islandova',  tier:'c', hue:205, fact:'Every island has one. It stands statue-still in the shallows… then SPEARS a fish like lightning.', ph:["Ardea cinerea (Grey heron) diving into the water to catch a fish.jpg", "Grey Heron (Ardea cinerea), Aswan, Egypt 1.jpg", "Graureiher Ardea cinerea-4883.jpg"]},
+  {id:'koel',         nm:'Asian koel',             nick:'The Invisible Alarm Clock',em:'🎵', g:'islandova', tier:'u', hue:0,   fact:'You’ll HEAR its loud "ko-EL! ko-EL!" all over the island — but it hides in the leaves. Spotting the singer is the real challenge.', ph:["Asian Koel (Eudynamys scolopacea)- Male close up in Kolkata I IMG 7568.jpg", "Asian Koel (Eudynamys scolopacea)- Male in Kolkata Im IMG 7575.jpg"]},
+  /* —— Gen 2 additions (Coraljo) —— */
+  {id:'anthias',      nm:'Sea goldie',        nick:'The Coral Confetti',      em:'🧡', g:'coraljo', tier:'c', hue:25,  fact:'Thousands of tiny orange fish hover over the coral like confetti — and if the boss male vanishes, a girl goldie turns INTO a boy and takes over!', ph:['Pseudanthias squamipinnis male Maldives.JPG','Scalefin anthias (Pseudanthias squamipinnis) (38933806450).jpg']},
+  {id:'squirrelfish', nm:'Squirrelfish',      nick:'The Cave Cherry',         em:'🍒', g:'coraljo', tier:'c', hue:0,   fact:'Cherry-red armour and giant shiny eyes — it hides under ledges all day and patrols at night. Peek into the reef caves!', ph:['Sabre Squirrelfish - Sargocentron spiniferum.jpg','Sargocentron spiniferum.jpg']},
+  {id:'grouper',      nm:'Grouper',           nick:'The Grumpy Statue',       em:'🗿', g:'coraljo', tier:'c', hue:240, fact:'Sits dead still like a grumpy statue — some wear tiny blue polka dots — then gulps its dinner faster than you can blink.', ph:['Cephalopholis argus.JPG','Cephalopholis argus at Kona.jpg']},
+  {id:'angelfish',    nm:'Emperor angelfish', nick:'The Emperor',             em:'🌀', g:'coraljo', tier:'u', hue:220, fact:'Grown-ups wear yellow-and-blue racing stripes, but BABIES wear swirly circles — they look like a totally different fish!', ph:['Pez ángel emperador (Pomacanthus imperator), mar Rojo, Egipto, 2023-04-17, DD 104.jpg','Pez ángel emperador (Pomacanthus imperator), islas Ad Dimaniyat, Omán, 2024-08-14, DD 47.jpg']},
+  {id:'trumpetfish',  nm:'Trumpetfish',       nick:'The Sneaky Straw',        em:'🎺', g:'coraljo', tier:'c', hue:60,  fact:'A fish shaped like a drinking straw! It hides behind bigger fish and drifts up on dinner like a slow-motion ninja.', ph:['Aulostomus chinensis Maldives 2.JPG','Aulostomus chinensis - Poisson-trompette - Aqua Porte Dorée 02.JPG']},
+  /* —— Gen 3 additions (Deepenn) —— */
+  {id:'barracuda',    nm:'Barracuda',         nick:'The Silver Missile',      em:'🗡️', g:'deepenn', tier:'c', hue:210, fact:'A shiny silver torpedo with a serious underbite, hanging dead still near the surface. Fierce face — but it just watches you swim by.', ph:['Sphyraenidae - Sphyraena barracuda (Great barracuda).JPG','Sphyraena barracuda 2.jpg']},
+  {id:'bluetrevally', nm:'Bluefin trevally',  nick:'The Electric Hunter',     em:'💠', g:'deepenn', tier:'c', hue:195, fact:'Flashes electric-blue fins as it rockets along the reef edge — often hunting in a gang.', ph:['Bluefin trevally Caranx melampygus (5834347183).jpg','Caranx melampygus Réunion.JPG']},
+  {id:'gtrevally',    nm:'Giant trevally',    nick:'The Bruiser',             em:'🏋️', g:'deepenn', tier:'r', hue:215, fact:'The rugby player of the sea. GTs are so bold they’ve been filmed leaping out of the water to catch BIRDS in mid-air!', ph:['Caranx ignobilis.jpg']},
+  /* —— Gen 4 additions (Shadowsinn) —— */
+  {id:'cuttlefish',   nm:'Cuttlefish',        nick:'The Hypnotiser',          em:'👽', g:'shadowsinn', tier:'r', hue:290, fact:'Runs rainbow light-shows across its skin to hypnotise crabs, and watches you with W-shaped alien eyes. Possibly the coolest animal in the sea.', ph:['Sepia latimanus (Broadclub cuttlefish).jpg','Broadclub cuttlefish (Sepia latimanus) (16244520322).jpg']},
+  {id:'squid',        nm:'Reef squid',        nick:'The Night Rocket',        em:'🦑', g:'shadowsinn', tier:'u', hue:280, fact:'Hovers in little squadrons near the jetty lights at night, changes colour like a mood ring, and jets away BACKWARDS.', ph:['Sepioteuthis lessoniana (Bigfin reef squid).jpg','Bigfin Reef Squid (Sepioteuthis lessoniana) - GRB.JPG']},
+  {id:'mantis',       nm:'Mantis shrimp',     nick:'The Boxing Champion',     em:'🥊', g:'shadowsinn', tier:'r', hue:15,  fact:'Punches faster than a speeding bullet — so fast the water around its fist boils. It also sees colours humans can’t even imagine.', ph:['Mantis shrimp (Odontodactylus scyllarus).jpg','Odontodactylus scyllarus Réunion.jpg']},
+  {id:'cleanershrimp',nm:'Cleaner shrimp',    nick:'The Tiny Dentist',        em:'🦐', g:'shadowsinn', tier:'u', hue:10,  fact:'Waves its long white antennae like a barber’s pole, then climbs right inside fishes’ mouths to clean their teeth. Nobody ever eats the dentist!', ph:['Lysmata amboinensis Shrimp.jpg']},
+  {id:'nudibranch',   nm:'Nudibranch',        nick:'The Sea-Slug Supermodel', em:'🎨', g:'shadowsinn', tier:'u', hue:315, fact:'A slug — but make it FABULOUS. These finger-sized sea slugs wear the wildest colours on the reef. Photograph it, never touch it.', ph:['Phyllidia varicosa.jpg','Phyllidia varicosa Timor.jpg']},
+  {id:'seahorse',     nm:'Seahorse',          nick:'The Slowest Fish in the Sea', em:'🐴', g:'shadowsinn', tier:'r', hue:45, fact:'Anchors to coral with its curly tail — and it’s the DAD who carries the babies in his tummy pouch. Finding one is legendary luck.', ph:['Hippocampus histrix - Thorny Seahorse.jpg','Hippocampus hystrix (Spiny seahorse).jpg']},
+  {id:'frogfish',     nm:'Frogfish',          nick:'The Master Mimic',        em:'🐸', g:'shadowsinn', tier:'r', hue:95,  fact:'A fish pretending to be a sponge pretending to be a rock — with a built-in fishing rod on its head. Expert-level spotting!', ph:["Commerson's frogfish (Antennarius commerson) in Waikiki Aquarium.JPG",'Ranisapo de Commerson (Antennarius commerson), Zanzíbar, Tanzania, 2024-05-31, DD 10.jpg']},
+  {id:'lobster',      nm:'Spiny lobster',     nick:'The Knight of the Reef',  em:'🦞', g:'shadowsinn', tier:'r', hue:20,  fact:'Hides in reef caves by day with only its long spiky feelers poking out — armoured like a knight, walks like a tank.', ph:['Painted rock lobster (Panulirus versicolor).jpg']},
+  {id:'gardeneel',    nm:'Garden eel',        nick:'The Shy Spaghetti',       em:'🌱', g:'shadowsinn', tier:'u', hue:130, fact:'Hundreds of skinny eels sway out of the sand like a field of spaghetti — tiptoe closer and WHOOP, the whole garden vanishes.', ph:['Spotted garden eel (Heteroconger hassi) (37534978102).jpg','Anguilliformes - Heteroconger hassi - 4.jpg']},
+  {id:'urchin',       nm:'Sea urchin',        nick:'The Sea Hedgehog',        em:'🦔', g:'shadowsinn', tier:'c', hue:260, fact:'⚠️ A living pincushion wedged into the reef. NEVER touch or step on one — shuffle your feet in the shallows and always look down!', ph:['Long-spined black sea urchin (Diadema setosum).jpg','Diadema setosum Oman.JPG']},
+  {id:'jellyfish',    nm:'Moon jellyfish',    nick:'The Ghost Umbrella',      em:'☂️', g:'shadowsinn', tier:'u', hue:200, fact:'⚠️ A see-through umbrella with four glowing rings, pulsing gently along. Beautiful — but jellies sting, so look and never touch.', ph:['Moon Jellies (Aurelia aurita) (7153399193).jpg','Moon jellyfish at Gota Sagher.JPG']},
+  {id:'coneshell',    nm:'Cone shell',        nick:'The Pretty Danger',       em:'🍦', g:'shadowsinn', tier:'u', hue:35,  fact:'⚠️ Beach rule number one: NEVER pick up a cone-shaped shell, even a pretty “empty” one — live cones hide a venomous sting.', ph:['Conus textile (textile cone snail) 5 (31207870446).jpg','Conus textile (textile cone snail) 2 (24425421465).jpg']},
+  /* —— Gen 5 additions (Islandova) —— */
+  {id:'crow',         nm:'House crow',        nick:'The Island Pirate',       em:'🪶', g:'islandova', tier:'c', hue:230, fact:'The cheeky grey-hooded pirate of the island — turn your back at breakfast and it’s off with your croissant.', ph:['House Crow (Corvus splendens)1.JPG','House Crow (Corvus splendens) in Shantinagar, Dhaka, Bangladesh, 17 March 2015.JPG']}
 ];
 const REEF_SP_BY_ID={}; REEF_SPECIES.forEach(s=>{ REEF_SP_BY_ID[s.id]=s; });
+/* —— trading-card system: every creature is a collectible card with a TYPE,
+   HP and two POWERS. Original card design; the vibe is the homage. —— */
+const REEF_TYPES={
+  splash: {nm:'Splash', em:'🌊', col:'#2270AD'},
+  chomp:  {nm:'Chomp',  em:'🦷', col:'#455A64'},
+  zoom:   {nm:'Zoom',   em:'⚡', col:'#C77800'},
+  armor:  {nm:'Armour', em:'🛡️', col:'#5E7286'},
+  toxic:  {nm:'Toxic',  em:'☠️', col:'#6650C9'},
+  stealth:{nm:'Stealth',em:'🥷', col:'#3E4A5E'},
+  leafy:  {nm:'Muncher',em:'🌿', col:'#1E7F66'},
+  mystic: {nm:'Mystic', em:'✨', col:'#A0489B'},
+  island: {nm:'Island', em:'🏝️', col:'#B45309'}
+};
+/* {ty, hp, mv:[[power name, power number, one-liner], ×2]} */
+const REEF_CARDS={
+  clownfish:   {ty:'splash', hp:50,  mv:[['Anemone Shield',30,'Hides in stinging tentacles — totally safe'],['Wiggle Waggle',10,'An adorable dance that confuses everyone']]},
+  powderblue:  {ty:'leafy',  hp:60,  mv:[['Blue Blade Spin',40,'Flicks its scalpel-sharp tail'],['Algae Munch',10,'Mows the reef lawn']]},
+  parrotfish:  {ty:'leafy',  hp:70,  mv:[['Coral Crunch',30,'A beak like bolt cutters'],['Sand Factory',20,'Turns coral into beach']]},
+  moorishidol: {ty:'mystic', hp:50,  mv:[['Banner Wave',20,'Dazzles with its trailing fin'],['Reef Parade',30,'Leads the procession']]},
+  butterflyfish:{ty:'splash',hp:45,  mv:[['False Eye Trick',30,'Enemies attack the wrong end'],['Loyal Pair',20,'Never fights alone']]},
+  sergeant:    {ty:'armor',  hp:40,  mv:[['Egg Guard',30,'Defends the nest fearlessly'],['Stripe Charge',20,'Zebra-striped bravery']]},
+  pufferfish:  {ty:'toxic',  hp:60,  mv:[['Balloon Up',50,'Inflates — try swallowing THAT'],['Spike Bristle',30,'Prickles everywhere']]},
+  blacktip:    {ty:'chomp',  hp:90,  mv:[['Lagoon Patrol',40,'Cruises the ankle-deep shallows'],['Fin Flash',30,'That famous black fin-tip']]},
+  stingray:    {ty:'splash', hp:80,  mv:[['Carpet Glide',40,'Flies like a magic carpet'],['Sand Vanish',30,'Buries itself flat']]},
+  hawksbill:   {ty:'leafy',  hp:110, mv:[['Ancient Shell',50,'Armour since the dinosaurs'],['Sponge Snack',20,'Beak crunches sponges']]},
+  dolphin:     {ty:'zoom',   hp:100, mv:[['Seven Spins',60,'The full corkscrew jump'],['Sonar Ping',30,'Sees with sound']]},
+  hermitcrab:  {ty:'armor',  hp:30,  mv:[['Shell Swap',10,'Upgrades to a bigger home'],['Pinch',20,'Tiny but mighty']]},
+  starfish:    {ty:'mystic', hp:40,  mv:[['Regrow',30,'Loses an arm, grows it back'],['Star Grip',20,'A thousand tiny feet']]},
+  snapper:     {ty:'splash', hp:50,  mv:[['Photo Bomb',20,'Poses in glowing yellow crowds'],['School Rush',30,'A wall of stripes']]},
+  fusilier:    {ty:'zoom',   hp:45,  mv:[['Blue Lightning',40,'A river of fish at top speed'],['Flash Turn',20,'The whole school turns at once']]},
+  needlefish:  {ty:'zoom',   hp:40,  mv:[['Surface Skim',30,'Rides just under the ceiling'],['Needle Dart',30,'Straight as an arrow']]},
+  unicornfish: {ty:'mystic', hp:60,  mv:[['Horn Charge',30,'Nobody knows what the horn does'],['Tail Blade',30,'Surgeon-sharp spines']]},
+  wrasse:      {ty:'splash', hp:35,  mv:[['Car Wash',10,'Cleans the teeth of giants'],['Dance Ticket',20,'Wiggles to advertise the shop']]},
+  goatfish:    {ty:'splash', hp:45,  mv:[['Whisker Dig',20,'Feels dinner under the sand'],['Sand Puff',10,'Leaves little dust clouds']]},
+  triggerfish: {ty:'chomp',  hp:80,  mv:[['Nest Cone Fury',60,'⚠️ Guards a cone to the surface — escape SIDEWAYS'],['Trigger Lock',30,'Locks its fin so nothing can budge it']]},
+  sweetlips:   {ty:'splash', hp:65,  mv:[['Wiggle Dance',20,'The baby pretend-poison dance'],['Big Lips',10,'The poutiest pout in the sea']]},
+  boxfish:     {ty:'armor',  hp:55,  mv:[['Pixel Armour',40,'A cube of solid bone plates'],['Toxin Cloud',30,'Secret chemical defence']]},
+  moray:       {ty:'chomp',  hp:85,  mv:[['Double Jaws',50,'A second set of jaws in its throat'],['Cave Ambush',40,'Strikes from its lair']]},
+  lionfish:    {ty:'toxic',  hp:70,  mv:[['Venom Fans',60,'⚠️ Beautiful spines, real venom'],['Slow Stalk',20,'Herds little fish with its fins']]},
+  batfish:     {ty:'splash', hp:60,  mv:[['Curious Follow',10,'Follows YOU around'],['Pancake Turn',20,'Flat as a plate, turns on a coin']]},
+  anthias:     {ty:'splash', hp:30,  mv:[['Confetti Cloud',20,'Thousands rise like confetti'],['Switcheroo',10,'A girl becomes the new boss boy']]},
+  squirrelfish:{ty:'stealth',hp:45,  mv:[['Night Patrol',30,'Big eyes for midnight missions'],['Cave Peek',10,'Cherry-red and hiding']]},
+  grouper:     {ty:'chomp',  hp:75,  mv:[['Statue Mode',20,'Utterly, totally still'],['Vacuum Gulp',50,'Inhales dinner in a blink']]},
+  angelfish:   {ty:'mystic', hp:65,  mv:[['Royal Stripes',40,'Wears the emperor’s uniform'],['Costume Change',30,'Swirls as a baby, stripes as a grown-up']]},
+  trumpetfish: {ty:'stealth',hp:50,  mv:[['Straw Sneak',30,'Hides behind bigger fish'],['Hover Strike',30,'Drifts down like a falling stick']]},
+  eagleray:    {ty:'splash', hp:110, mv:[['Polka Wings',50,'Three metres of spotted wings'],['Ocean Flight',40,'Flies underwater']]},
+  napoleon:    {ty:'mystic', hp:130, mv:[['Crown Bump',50,'Wears its crown on its forehead'],['King Size',40,'As big as a kid']]},
+  nurseshark:  {ty:'chomp',  hp:100, mv:[['Power Nap',10,'Sleeps in a shark pile'],['Vacuum Mouth',50,'Slurps food like a hoover']]},
+  manta:       {ty:'mystic', hp:150, mv:[['Barrel Roll',70,'Somersaults while it eats'],['Mothership Glide',50,'Wings wider than a car']]},
+  whaleshark:  {ty:'splash', hp:200, mv:[['Gentle Giant',80,'The biggest fish on planet Earth'],['Plankton Hoover',40,'Eats only the tiniest food']]},
+  flyingfish:  {ty:'zoom',   hp:40,  mv:[['Sky Glide',50,'A hundred metres of flight'],['Splash Down',10,'Lands with a plip']]},
+  barracuda:   {ty:'chomp',  hp:85,  mv:[['Silver Missile',60,'Zero to gone in a flash'],['Underbite Stare',20,'Watches you, unblinking']]},
+  bluetrevally:{ty:'zoom',   hp:75,  mv:[['Electric Rush',50,'A blue streak on the hunt'],['Gang Up',30,'Hunts with its crew']]},
+  gtrevally:   {ty:'chomp',  hp:120, mv:[['Bird Snatch',80,'Leaps out to catch BIRDS'],['Bruiser Slam',50,'The rugby tackle of the sea']]},
+  coral:       {ty:'leafy',  hp:90,  mv:[['City Build',30,'Builds the whole reef city'],['Polyp Power',20,'A million tiny builders']]},
+  anemone:     {ty:'toxic',  hp:55,  mv:[['Sting Garden',40,'Wiggly tentacles that zap'],['Best-Friend Pass',10,'Clownfish enter free']]},
+  ghostcrab:   {ty:'zoom',   hp:35,  mv:[['Sideways Sprint',40,'Faster than your run'],['Sand Vanish',20,'Gone. Just gone.']]},
+  seacucumber: {ty:'leafy',  hp:45,  mv:[['Sand Polish',10,'Cleans the seafloor'],['Bottom Breath',10,'Breathes through its behind. Really.']]},
+  giantclam:   {ty:'armor',  hp:95,  mv:[['Shell Slam',40,'Closes like a castle gate'],['Rainbow Lips',20,'An electric-blue smile']]},
+  octopus:     {ty:'stealth',hp:80,  mv:[['Shape Shift',60,'Becomes a rock, a snake, anything'],['Ink Escape',40,'Poof — smoke bomb!']]},
+  plankton:    {ty:'mystic', hp:20,  mv:[['Sea Sparkle',70,'Turns waves into starlight'],['Glow Wave',30,'The beach lights up blue']]},
+  cuttlefish:  {ty:'stealth',hp:70,  mv:[['Hypno Lights',60,'Rainbow ripples that mesmerise'],['Alien Gaze',20,'W-shaped eyes see all']]},
+  squid:       {ty:'zoom',   hp:55,  mv:[['Backwards Jet',40,'Rockets away in reverse'],['Mood Ring',20,'Changes colour with its feelings']]},
+  mantis:      {ty:'chomp',  hp:65,  mv:[['Bullet Punch',90,'The fastest punch on Earth'],['Rainbow Vision',20,'Sees colours we can’t dream of']]},
+  cleanershrimp:{ty:'splash',hp:25,  mv:[['Dental Check',10,'Cleans the teeth of giants'],['Barber-Pole Wave',10,'Advertises with its antennae']]},
+  nudibranch:  {ty:'toxic',  hp:30,  mv:[['Fabulous Warning',30,'Wild colours mean “don’t eat me”'],['Runway Walk',10,'The reef’s supermodel']]},
+  seahorse:    {ty:'stealth',hp:35,  mv:[['Tail Anchor',20,'Holds on through the current'],['Dad Power',30,'Dad carries the babies']]},
+  frogfish:    {ty:'stealth',hp:60,  mv:[['Fishing Rod',50,'Dangles a lure on its head'],['Rock Costume',30,'A sponge? A rock? Nope.']]},
+  lobster:     {ty:'armor',  hp:70,  mv:[['Knight Armour',40,'Full plate mail'],['Feeler Sweep',20,'Spiky antennae radar']]},
+  gardeneel:   {ty:'stealth',hp:30,  mv:[['Spaghetti Field',20,'A lawn of swaying noodles'],['Instant Hide',30,'The whole garden vanishes']]},
+  urchin:      {ty:'toxic',  hp:50,  mv:[['Pincushion',50,'⚠️ Never step — spines everywhere'],['Reef Grip',10,'Wedged in tight']]},
+  jellyfish:   {ty:'toxic',  hp:35,  mv:[['Ghost Pulse',30,'Drifts like a see-through umbrella'],['Sting Ring',30,'⚠️ Look, never touch']]},
+  coneshell:   {ty:'toxic',  hp:45,  mv:[['Harpoon Dart',80,'⚠️ A venomous dart — never pick up cones'],['Pretty Trap',20,'The beauty IS the warning']]},
+  gecko:       {ty:'island', hp:30,  mv:[['Ceiling Walk',20,'Upside-down and loving it'],['Night Chirp',10,'Chirps at the moon']]},
+  fruitbat:    {ty:'island', hp:60,  mv:[['Day Flight',30,'A dragon in the daylight'],['Mango Raid',20,'Fruit feast at dusk']]},
+  heron:       {ty:'island', hp:70,  mv:[['Statue Stand',20,'Still as a lamp post'],['Lightning Spear',50,'Strike! Fish caught.']]},
+  koel:        {ty:'island', hp:40,  mv:[['Invisible Alarm',40,'ko-EL! ko-EL! at dawn'],['Leaf Hide',20,'Heard everywhere, seen nowhere']]},
+  crow:        {ty:'island', hp:45,  mv:[['Croissant Heist',40,'Breakfast is never safe'],['Pirate Caw',10,'Announces the raid']]}
+};
+const REEF_RARITY={c:'●',u:'◆',r:'★',l:'🌟'};
 /* photos ride the same curated Wikimedia pipeline as PLACE_PHOTOS (wmURL +
    imgFail fallback chain). Offline / never-loads → the emoji art stays. */
 function reefKind(sp,k){ const s=REEF_SP_BY_ID[sp]; return (s&&s.kinds&&k)?s.kinds.find(x=>x.id===k)||null:null; }
@@ -8830,18 +8981,18 @@ function rfxPhotoImg(files,alt,w){
   const cands=files.map(f=>wmURL(f,Math.max(w||420,420)));
   return `<img class="fade" loading="lazy" decoding="async" alt="${esc(alt||'')}" src="${cands[0]}" data-fallbacks="${esc(JSON.stringify(cands.slice(1)))}" onload="this.classList.add('ld')" onerror="imgFail(this)">`;
 }
-/* snorkel-rank ladder on a kid's PERSONAL points. Base max = 88 (24×1 + 12×2
-   + 4×5 + 2×10) + family-first bonuses — so the top rank at 85 is reachable
-   by EITHER kid on personal completion alone, even with zero firsts. */
+/* snorkel-rank ladder on a kid's PERSONAL points. Base max = 140 (32×1 +
+   19×2 + 10×5 + 2×10) + family-first bonuses — the top rank at 135 stays
+   reachable by EITHER kid on personal completion alone, even with zero firsts. */
 const REEF_RANKS=[
-  {n:0,  t:'Beach Peeker',        e:'🩴'},
-  {n:5,  t:'Rock-Pool Ranger',    e:'🐚'},
-  {n:15, t:'Snorkel Scout',       e:'🤿'},
-  {n:30, t:'Lagoon Explorer',     e:'🐠'},
-  {n:45, t:'Reef Ranger',         e:'🐢'},
-  {n:60, t:'Shark Buddy',         e:'🦈'},
-  {n:72, t:'Deep-Blue Detective', e:'🐬'},
-  {n:85, t:'Ocean Legend',        e:'🌊'}
+  {n:0,   t:'Beach Peeker',        e:'🩴'},
+  {n:8,   t:'Rock-Pool Ranger',    e:'🐚'},
+  {n:20,  t:'Snorkel Scout',       e:'🤿'},
+  {n:40,  t:'Lagoon Explorer',     e:'🐠'},
+  {n:60,  t:'Reef Ranger',         e:'🐢'},
+  {n:85,  t:'Shark Buddy',         e:'🦈'},
+  {n:110, t:'Deep-Blue Detective', e:'🐬'},
+  {n:135, t:'Ocean Legend',        e:'🌊'}
 ];
 function reefRank(p){ let r=REEF_RANKS[0]; REEF_RANKS.forEach(x=>{ if(p>=x.n) r=x; }); return r; }
 function reefNextRank(p){ return REEF_RANKS.find(x=>x.n>p)||null; }
@@ -9044,15 +9195,15 @@ function rfxProgress(s){
 }
 function rfxDex(s,compact){
   const mine=rfxMySpecies(s);
-  const groups=REEF_GROUPS.map(g=>{
+  const groups=REEF_REGIONS.map(g=>{
     const sp=REEF_SPECIES.filter(x=>x.g===g[0]);
     const found=sp.filter(x=>mine.has(x.id)).length;
     return `<div class="rfx-group">
-      <h4 class="rfx-gh">${g[2]} ${esc(g[1])} <span class="rfx-ghsub">you: ${found}/${sp.length}</span></h4>
+      <h4 class="rfx-gh">${g[2]} The ${esc(g[1])} Region <span class="rfx-gen">${esc(g[4])}</span> <span class="rfx-ghsub">you: ${found}/${sp.length}</span></h4>
       <p class="rfx-gtip">${esc(g[3])}</p>
       <div class="rfx-grid">${sp.map(x=>rfxCard(x,s,mine)).join('')}</div>
     </div>`;}).join('');
-  return `<div class="rfx-card"><h3 class="rfx-h">📖 The Dex <span class="rfx-hsub">tap a creature to log it</span></h3>${rfxProgress(s)}${groups}</div>`;
+  return `<div class="rfx-card"><h3 class="rfx-h">📖 The Dex <span class="rfx-hsub">tap a creature to log it & see its card</span></h3>${rfxProgress(s)}${groups}</div>`;
 }
 function rfxCard(x,s,mine){
   const seen=mine.has(x.id); const n=s.species[x.id]||0;
@@ -9094,7 +9245,7 @@ function rfxFeed(s){
       </div>`;}).join('')}</div></div>`;
 }
 function rfxBadges(){
-  const ids=['reef_first','reef_dex10','reef_dex25','reef_dexall','reef_shark','reef_legend','reef_gold5','reef_pts50','reef_groups','reef_kind5','reef_kind12'];
+  const ids=['reef_first','reef_dex10','reef_dex25','reef_dex40','reef_dexall','reef_shark','reef_legend','reef_gold5','reef_pts50','reef_groups','reef_kind5','reef_kind12'];
   const c=achContext();
   const items=ACHIEVEMENTS.filter(a=>ids.indexOf(a.id)>=0);
   const got=items.filter(a=>unlockedAch.has(a.id)).length;
@@ -9124,7 +9275,8 @@ function reefHowTo(){
     <p>📖 <b>Log it!</b> The first time YOU spot a species it goes into your Dex and scores its points: <b>Common 1 · Uncommon 2 · Rare 5 · Legendary 10</b>.</p>
     <p>👑 <b>Family first!</b> The FIRST explorer in the family to find a species gets a crown on it forever, plus 1 bonus point.</p>
     <p>⚔️ <b>The race:</b> whoever discovers the most creatures leads the Great Creature Race. Repeat sightings are brilliant for the feed, but each species only scores once.</p>
-    <p>🔬 <b>Expert IDs:</b> some creatures come in several exact kinds (five butterflyfish! three sharks!). Study the photos, work out WHICH one you saw, and every new exact ID grows your expert score.</p>
+    <p>🔬 <b>Expert IDs:</b> some creatures come in several exact kinds (five butterflyfish! four triggerfish!). Study the photos, work out WHICH one you saw, and every new exact ID grows your expert score.</p>
+    <p>🎴 <b>Trading cards:</b> every creature has its own card — type, HP and two powers. Cards start as mystery silhouettes and unlock in full colour when YOU spot the real thing. The regions go from Lagoonto (Gen 1 — the famous starters) all the way to Islandova (Gen 5 — dry land!).</p>
     <p>⚠️ <b>Ocean rules:</b> look, never touch. Some creatures (like the lionfish and titan triggerfish) have their own rules on their cards — read them!</p>
     <button class="btn btn-teal" type="button" onclick="renderReefLog()">🐠 Got it — to the creatures!</button>
   </div>`;
@@ -9152,7 +9304,7 @@ function renderReefLog(){
     const plainToday=new Set(), kindToday=new Set();
     s.log.forEach(x=>{ if(x.by===me&&new Date(x.ts).toDateString()===day){ if(x.k) kindToday.add(x.sp+'|'+x.k); else plainToday.add(x.sp); } });
     body.innerHTML=`<p class="reeflog-sub">Brilliant! What did you find, ${esc(catWho(me))}?</p>`+
-      REEF_GROUPS.map(g=>`<div class="reeflog-g"><h4>${g[2]} ${esc(g[1])}</h4><div class="reeflog-grid">`+
+      REEF_REGIONS.map(g=>`<div class="reeflog-g"><h4>${g[2]} ${esc(g[1])} <span class="rfx-gen">${esc(g[4])}</span></h4><div class="reeflog-grid">`+
         REEF_SPECIES.filter(x=>x.g===g[0]).map(x=>{
           /* fully cooled-down only when the plain log AND every exact kind are used up today */
           const today=plainToday.has(x.id)&&(!x.kinds||!x.kinds.length||x.kinds.every(kk=>kindToday.has(x.id+'|'+kk.id)));
@@ -9205,6 +9357,7 @@ function renderReefLog(){
         :`<p class="rc-pts muted">Already in your Dex — new exact IDs still count for your 🔬 expert score!</p>`}
       <div class="reeflog-actions">
         ${allUsed||chosenUsed?'':`<button class="btn btn-yellow" type="button" onclick="reefConfirm('${x.id}')">🤿 Yes — I spotted it!</button>`}
+        <button class="btn btn-grape" type="button" onclick="openReefCard('${x.id}')">🎴 See its trading card</button>
         <button class="btn-text" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">‹ Back to the list</button>
       </div></div>`;
     reefLogFocus();
@@ -9223,6 +9376,7 @@ function renderReefLog(){
       ${g.kindNew?`<div class="rd-pts">🔬 Expert IDs: <b>${k.kinds}</b></div>`:''}
       <div class="rd-tot">📖 Your Dex: <b>${k.species}/${REEF_SPECIES.length}</b> · Family: <b>${s.speciesCount}/${REEF_SPECIES.length}</b></div>
       <div class="reeflog-actions">
+        <button class="btn btn-grape" type="button" onclick="openReefCard('${x.id}')">🎴 Your new card!</button>
         <button class="btn btn-yellow" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">➕ Log another</button>
         <button class="btn btn-teal" type="button" onclick="closeReefLog();showView('reef')">📖 See the Reef Dex</button>
       </div></div>`;
@@ -9262,6 +9416,42 @@ function rfxCatchSplash(g){
     <div class="rfx-catch-nm">${esc(g.sp.nm)}</div></div>`;
   el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('show');
   setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hidden'); el.innerHTML=''; },1700);
+}
+
+/* ===== the trading-card viewer ===== */
+let _reefCardSp=null;
+function openReefCard(sp){
+  const m=document.getElementById('reefCardModal'); if(!m||!REEF_SP_BY_ID[sp]) return;
+  _reefCardSp=sp; if(m.classList.contains('hidden')) modalCapture();
+  m.classList.remove('hidden'); renderReefCard(); sfx('tap');
+  setTimeout(()=>{ const b=m.querySelector('.btn'); if(b) b.focus(); },40);
+}
+function closeReefCard(){ const m=document.getElementById('reefCardModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
+function renderReefCard(){
+  const host=document.getElementById('reefCardBody'); if(!host||!_reefCardSp) return;
+  const x=REEF_SP_BY_ID[_reefCardSp]; if(!x) return;
+  const c=REEF_CARDS[x.id]||{ty:'splash',hp:50,mv:[['Splash',10,''],['Bubble',10,'']]};
+  const ty=REEF_TYPES[c.ty]||REEF_TYPES.splash;
+  const s=reefStats(); const seen=rfxMySpecies(s).has(x.id);
+  const no=REEF_SPECIES.indexOf(x)+1;
+  const reg=REEF_REGIONS.find(r=>r[0]===x.g)||['','?','','',''];
+  const holo=x.tier==='l'||x.shiny;
+  host.innerHTML=`
+  <div class="tcg${holo?' holo':''}${seen?'':' tlocked'}" style="--tc:${ty.col};--rh:${x.hue}">
+    <div class="tcg-top"><span class="tcg-nm">${esc(x.nm)}</span><span class="tcg-hp">HP ${c.hp}<span class="tcg-ty" title="${esc(ty.nm)} type">${ty.em}</span></span></div>
+    <div class="tcg-art">${seen&&x.ph?rfxPhotoImg(x.ph,x.nm,560):''}<span class="tcg-artemo${seen?'':' sil'}" aria-hidden="true">${x.em}</span>${holo?'<span class="tcg-sheen" aria-hidden="true"></span>':''}</div>
+    <div class="tcg-sub">“${esc(x.nick)}” · ${esc(ty.nm)} type · ${REEF_TIERS[x.tier].nm}${x.shiny?' ✨':''}</div>
+    <div class="tcg-moves">
+      ${c.mv.map(mv=>seen?`<div class="tcg-mv"><span class="tcg-mv-e" aria-hidden="true">${ty.em}</span><div class="tcg-mv-tx"><b>${esc(mv[0])}</b><span>${esc(mv[2]||'')}</span></div><span class="tcg-mv-pw">${mv[1]}</span></div>`
+        :`<div class="tcg-mv locked"><span class="tcg-mv-e" aria-hidden="true">❓</span><div class="tcg-mv-tx"><b>?????</b><span>Spot it for real to reveal this power!</span></div><span class="tcg-mv-pw">?</span></div>`).join('')}
+    </div>
+    <div class="tcg-flavor">${seen?esc(x.fact):'A mysterious creature of the '+esc(reg[1])+' region… nobody on your team has spotted it yet.'}</div>
+    <div class="tcg-foot"><span class="tcg-rar" title="${REEF_TIERS[x.tier].nm}">${REEF_RARITY[x.tier]||'●'}</span><span>#${String(no).padStart(2,'0')}/${REEF_SPECIES.length}</span><span>${reg[2]} ${esc(reg[1])} · ${esc(reg[4]||'')}</span></div>
+  </div>
+  <div class="reeflog-actions" style="margin-top:14px">
+    ${seen?'':'<p class="tcg-hint">🔍 Spot one for real and this card unlocks in full colour!</p>'}
+    <button class="btn btn-yellow" type="button" onclick="closeReefCard();openReefLog('${x.id}')">🤿 I spotted one!</button>
+  </div>`;
 }
 
 /* ===== the Maldives destination-page panel (compact reef teaser) ===== */
