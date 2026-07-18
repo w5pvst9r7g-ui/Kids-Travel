@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{})};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{}),REEF_SPECIES:(typeof REEF_SPECIES!=="undefined"?REEF_SPECIES:[]),REEF_TIERS:(typeof REEF_TIERS!=="undefined"?REEF_TIERS:{}),renderReefDex,reefStats,reefLogSpecies,reefUnlocked,openReefLog,closeReefLog,renderReefLog,reefPanelHTML};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -79,6 +79,26 @@ if (API) {
   let okDest = true;
   for (const d of API.DESTS) { if (!d.id || !d.name || !d.country || !d.photos || !d.photos.length) { okDest = false; break; } }
   check('every destination has id/name/country/photos', okDest);
+
+  /* ---------- 3a. Reef Dex data integrity ---------- */
+  section('Reef Dex data');
+  const RS = API.REEF_SPECIES || [];
+  check('>= 40 reef species', RS.length >= 40, 'got ' + RS.length);
+  check('reef species ids are unique', new Set(RS.map(s => s.id)).size === RS.length);
+  const RTIERS = new Set(Object.keys(API.REEF_TIERS || {}));
+  let badSp = null;
+  for (const s of RS) {
+    if (!s.id || !s.nm || !s.nick || !s.em || !s.g || !s.fact || !RTIERS.has(s.tier) || typeof s.hue !== 'number') { badSp = s.id || s.nm || '?'; break; }
+  }
+  check('every reef species has id/nm/nick/em/g/tier/fact/hue', badSp === null, badSp || '');
+  const RGROUPS = new Set(RS.map(s => s.g));
+  check('reef species span 4 groups', RGROUPS.size === 4, [...RGROUPS].join(','));
+  check('a Legendary tier exists to chase', RS.some(s => s.tier === 'l'));
+  check('safety facts intact (triggerfish + lionfish warnings)',
+    /SIDEWAYS/.test(RS.find(s => s.id === 'triggerfish').fact) && /never ever touch/i.test(RS.find(s => s.id === 'lionfish').fact));
+  check('Reef tab is registered in the guide + both navs',
+    /🤿 Reef Dex/.test(html) && (html.match(/data-view="reef"/g) || []).length >= 2 && html.indexOf('#reefLogModal') !== -1);
+  check('reef achievements present (>= 8)', API.ACHIEVEMENTS.filter(a => /^reef_/.test(a.id)).length >= 8);
 
   /* ---------- 3b. food data integrity ---------- */
   section('Food data');
@@ -114,7 +134,22 @@ if (API) {
   ['paris','maldives','tirana','rabat','sunshinecoast'].forEach(id => { if (API.DESTS.find(d => d.id === id)) tryit('quiz ' + id, () => { API.openDest(id); API.startQuiz(); }); });
   tryit('quickVisit', () => API.quickVisit(API.DESTS[0].id));
   tryit('toggleWish', () => { API.toggleWish(API.DESTS[1].id); API.toggleWish(API.DESTS[1].id); });
+  tryit('renderReefDex', () => API.renderReefDex());
+  tryit('reefPanelHTML', () => API.reefPanelHTML(API.DESTS.find(d => d.id === 'maldives')));
+  tryit('reef log modal steps', () => { API.openReefLog(); API.renderReefLog(); API.openReefLog('clownfish'); API.closeReefLog(); });
   check('all screens + actions render without throwing', renderErr.length === 0, renderErr.slice(0, 4).join(' | '));
+
+  /* reef scoring is derived + consistent: log one species, stats must move */
+  tryit('reef scoring consistency', () => {
+    const before = API.reefStats();
+    const g = API.reefLogSpecies('clownfish');
+    const after = API.reefStats();
+    if (!g || after.total !== before.total + 1) throw new Error('log did not append');
+    if (after.speciesCount < before.speciesCount) throw new Error('speciesCount went backwards');
+    const recomputed = Object.keys(after.byKid).reduce((n, id) => n + after.byKid[id].points, 0);
+    if (recomputed !== after.points) throw new Error('points not recomputable from byKid');
+  });
+  check('reef scoring stays consistent after logging', renderErr.length === 0, renderErr.slice(0, 4).join(' | '));
 
   /* quiz pool depth */
   let minPool = Infinity, minId = '';
