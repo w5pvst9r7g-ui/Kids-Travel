@@ -1481,6 +1481,7 @@ html.night .rfx-xn.kinds{background:#1c3450;border-color:#2b4d74;color:#8fc3ee}
 .tcg.tlocked{filter:saturate(.55)}
 .tcg-hint{font-weight:700;color:var(--muted);text-align:center;font-size:.9rem;margin:0}
 .rfx-gen{display:inline-block;background:var(--grape,#7C6CF4);color:#fff;border-radius:99px;font-size:.64rem;font-weight:900;letter-spacing:.05em;padding:2.5px 9px;vertical-align:2px}
+.nb{white-space:nowrap}
 @media(prefers-reduced-motion:reduce){.tcg-sheen{animation:none}}
 /* —— big-catch splash (transient, click-through) —— */
 .rfx-catch{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;pointer-events:none;
@@ -9246,7 +9247,7 @@ function rfxVersus(s){
       <span class="rfx-vs-ava" style="--pc:${p.color}">${p.emoji}</span>
       <b class="rfx-vs-nm">${esc(nameFor(p.id))}${p.id===currentProfile?' <span class="rfx-you">you</span>':''}</b>
       <span class="rfx-vs-big">${k.species}</span><span class="rfx-vs-lbl">creatures</span>
-      <span class="rfx-vs-meta">🏆 ${k.points} pts · 👑 ${k.firsts} first${k.firsts===1?'':'s'} · 🔬 ${k.kinds||0} ID${(k.kinds||0)===1?'':'s'}</span>
+      <span class="rfx-vs-meta"><span class="nb">🏆 ${k.points} pts</span> · <span class="nb">👑 ${k.firsts} first${k.firsts===1?'':'s'}</span> · <span class="nb">🔬 ${k.kinds||0} ID${(k.kinds||0)===1?'':'s'}</span></span>
     </div>`;
   return `<div class="rfx-card rfx-vs"><h3 class="rfx-h">⚔️ The Great Creature Race</h3>
     <div class="rfx-vs-grid">${cell(a,ka)}<div class="rfx-vs-mid">VS</div>${cell(b,kb)}</div>
@@ -9382,7 +9383,7 @@ function openReefLog(sp){
   const m=document.getElementById('reefLogModal'); if(!m) return;
   _reefStep=sp?{stage:'confirm',sp:sp}:{stage:'pick',sp:null};
   if(m.classList.contains('hidden')) modalCapture();
-  m.classList.remove('hidden'); renderReefLog(); sfx('tap');
+  m.classList.remove('hidden'); renderReefLog(); reefLogTop(); sfx('tap');
 }
 function closeReefLog(){ const m=document.getElementById('reefLogModal'); if(m&&!m.classList.contains('hidden')){ m.classList.add('hidden'); modalRestore(); } }
 function renderReefLog(){
@@ -9492,9 +9493,11 @@ function reefLogFocus(){
     /* after a kind tap, focus the selected kind card (keeps the scroller
        where the kid is looking); otherwise the first enabled control */
     const b=m.querySelector('.rfx-kindcard.sel:not([disabled])')||m.querySelector('.reeflog-sp:not([disabled]),.btn,.btn-text');
-    if(b) b.focus({preventScroll:false}); },40);
+    if(b) b.focus({preventScroll:true}); },40);
 }
-function reefPick(sp){ _reefStep={stage:'confirm',sp:sp}; sfx('tap'); renderReefLog(); }
+/* fresh stage → modal scrolled back to the top (title + ✕ stay visible) */
+function reefLogTop(){ const c=document.querySelector('#reefLogModal .amodal-card'); if(c) c.scrollTop=0; }
+function reefPick(sp){ _reefStep={stage:'confirm',sp:sp}; sfx('tap'); renderReefLog(); reefLogTop(); }
 function reefKindPick(k){ _reefStep.kind=k; sfx('tap'); renderReefLog(); }
 function reefConfirm(sp){
   const me=currentProfile||'guest';
@@ -9553,7 +9556,7 @@ function renderReefCard(){
   <div class="tcg${holo?' holo':''}${seen?'':' tlocked'}" style="--tc:${ty.col};--rh:${x.hue}">
     <div class="tcg-top"><span class="tcg-nm">${esc(x.nm)}</span><span class="tcg-hp">HP ${c.hp}<span class="tcg-ty" title="${esc(ty.nm)} type">${ty.em}</span></span></div>
     <div class="tcg-art">${seen&&x.ph?rfxPhotoImg(x.ph,x.nm,560):''}${reefSilSVG(x.id,'tcg'+(seen?'':' sil'))||`<span class="tcg-artemo${seen?'':' sil'}" aria-hidden="true">${x.em}</span>`}${holo?'<span class="tcg-sheen" aria-hidden="true"></span>':''}</div>
-    <div class="tcg-sub">“${esc(x.nick)}” · ${esc(ty.nm)} type · ${REEF_TIERS[x.tier].nm}${x.shiny?' ✨':''}</div>
+    <div class="tcg-sub">“${esc(x.nick)}” <span class="nb">· ${esc(ty.nm)} type</span> <span class="nb">· ${REEF_TIERS[x.tier].nm}${x.shiny?' ✨':''}</span></div>
     <div class="tcg-moves">
       ${c.mv.map(mv=>seen?`<div class="tcg-mv"><span class="tcg-mv-e" aria-hidden="true">${ty.em}</span><div class="tcg-mv-tx"><b>${esc(mv[0])}</b><span>${esc(mv[2]||'')}</span></div><span class="tcg-mv-pw">${mv[1]}</span></div>`
         :`<div class="tcg-mv locked"><span class="tcg-mv-e" aria-hidden="true">❓</span><div class="tcg-mv-tx"><b>?????</b><span>Spot it for real to reveal this power!</span></div><span class="tcg-mv-pw">?</span></div>`).join('')}
