@@ -7358,7 +7358,17 @@ const ACHIEVEMENTS=[
   {id:'forty',em:'✈️',nm:'40 Adventures',ds:'Take 40 trips',ac:'#46B3F0',test:c=>c.visited.length>=40},
   {id:'fifty',em:'🎖️',nm:'50 Adventures',ds:'Take 50 trips',ac:'#F0A91E',test:c=>c.visited.length>=50},
   {id:'seven',em:'🌍',nm:'Seven Continents',ds:'Reach all 7 continents!',ac:'#FF8366',test:c=>c.continents.size>=7},
-  {id:'millionmiler',em:'🚀',nm:'Million-Miler',ds:'Fly 300,000 km in total',ac:'#C2410C',test:c=>c.km>=300000}
+  {id:'millionmiler',em:'🚀',nm:'Million-Miler',ds:'Fly 300,000 km in total',ac:'#C2410C',test:c=>c.km>=300000},
+  // —— Reef Dex (the Great Kandima Creature Hunt) ——
+  {id:'reef_first', em:'🤿',nm:'First Splash',      ds:'Log your first Reef Dex creature',            ac:'#3E9BDE',test:c=>c.reefMine>=1},
+  {id:'reef_dex10', em:'🐠',nm:'Junior Reef Ranger',ds:'The family Reef Dex reaches 10 creatures',    ac:'#2FA98C',test:c=>c.reefSpecies>=10},
+  {id:'reef_dex25', em:'🌊',nm:'Reef Explorer',     ds:'The family Reef Dex reaches 25 creatures',    ac:'#3E9BDE',test:c=>c.reefSpecies>=25},
+  {id:'reef_dexall',em:'🏆',nm:'Reef Dex Master',   ds:'Complete the whole Reef Dex — every creature!',ac:'#E8A21A',test:c=>c.reefSpecies>=c.reefTotal},
+  {id:'reef_shark', em:'🦈',nm:'Shark Friend',      ds:'Spot any shark yourself',                     ac:'#46B3F0',test:c=>c.reefSharks>=1},
+  {id:'reef_legend',em:'🌟',nm:'Legend Hunter',     ds:'Spot a Legendary creature yourself',          ac:'#E8A21A',test:c=>c.reefLegendaries>=1},
+  {id:'reef_gold5', em:'👑',nm:'Trailblazer',       ds:'Be FIRST in the family to spot 5 creatures',  ac:'#F0A91E',test:c=>c.reefMyFirsts>=5},
+  {id:'reef_pts50', em:'💯',nm:'Half-Century Snorkeller',ds:'Score 50 Reef Dex points yourself',      ac:'#8A78EA',test:c=>c.reefMyPoints>=50},
+  {id:'reef_groups',em:'🗺️',nm:'Everywhere Explorer',ds:'Spot creatures from all 4 Reef Dex groups',  ac:'#2FA98C',test:c=>c.reefMyGroups>=4}
 ];
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
@@ -7387,7 +7397,21 @@ function achContext(){
   const continentCounts={}; countries.forEach(co=>{ const k=CONTINENT_OF[co]; if(k) continentCounts[k]=(continentCounts[k]||0)+1; });
   let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
   const cs=catAtlasStats();
-  return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size,wishes:(typeof wishlist!=='undefined'?wishlist.size:0),foodsTried:(typeof triedFoods!=='undefined'?triedFoods.size:0),cats:cs.total,catCoats:cs.coatCount,catCountries:cs.countryCount,catPhotos:cs.photos};
+  /* Reef Dex: family-wide progress + the signed-in explorer's own slice */
+  let reef={species:0,mine:0,pts:0,firsts:0,sharks:0,legend:0,groups:0,total:42};
+  try{ if(typeof reefStats==='function'){
+    const rs=reefStats(); const meId=currentProfile||'guest';
+    const mySpecies=new Set(); rs.log.forEach(x=>{ if(x.by===meId) mySpecies.add(x.sp); });
+    const myGroups=new Set(); let sharks=0,legend=0;
+    mySpecies.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(!s) return; myGroups.add(s.g);
+      if(sp==='blacktip'||sp==='nurseshark'||sp==='whaleshark') sharks++;
+      if(s.tier==='l') legend++; });
+    const me=rs.byKid[meId]||{species:0,points:0,firsts:0};
+    reef={species:rs.speciesCount,mine:me.species,pts:me.points,firsts:me.firsts,
+          sharks:sharks,legend:legend,groups:myGroups.size,total:REEF_SPECIES.length};
+  } }catch(e){}
+  return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size,wishes:(typeof wishlist!=='undefined'?wishlist.size:0),foodsTried:(typeof triedFoods!=='undefined'?triedFoods.size:0),cats:cs.total,catCoats:cs.coatCount,catCountries:cs.countryCount,catPhotos:cs.photos,
+    reefSpecies:reef.species,reefMine:reef.mine,reefMyPoints:reef.pts,reefMyFirsts:reef.firsts,reefSharks:reef.sharks,reefLegendaries:reef.legend,reefMyGroups:reef.groups,reefTotal:reef.total};
 }
 function badgeProgress(a,c){
   const P={
@@ -7400,7 +7424,10 @@ function badgeProgress(a,c){
     dreamer:[c.wishes,3],dreamer10:[c.wishes,10],foodie:[c.foodsTried,5],foodie15:[c.foodsTried,15],
     cat_spot10:[c.cats,10],cat_spot25:[c.cats,25],cat_spot50:[c.cats,50],cat_spot100:[c.cats,100],
     cat_spot150:[c.cats,150],cat_spot200:[c.cats,200],cat_spot250:[c.cats,250],cat_spot300:[c.cats,300],
-    cat_coats:[c.catCoats,9],cat_world:[c.catCountries,3],cat_photog:[c.catPhotos,1]
+    cat_coats:[c.catCoats,9],cat_world:[c.catCountries,3],cat_photog:[c.catPhotos,1],
+    reef_first:[c.reefMine,1],reef_dex10:[c.reefSpecies,10],reef_dex25:[c.reefSpecies,25],
+    reef_dexall:[c.reefSpecies,c.reefTotal],reef_shark:[c.reefSharks,1],reef_legend:[c.reefLegendaries,1],
+    reef_gold5:[c.reefMyFirsts,5],reef_pts50:[c.reefMyPoints,50],reef_groups:[c.reefMyGroups,4]
   };
   const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
 }
