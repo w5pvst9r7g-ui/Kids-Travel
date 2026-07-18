@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{}),REEF_SPECIES:(typeof REEF_SPECIES!=="undefined"?REEF_SPECIES:[]),REEF_TIERS:(typeof REEF_TIERS!=="undefined"?REEF_TIERS:{}),renderReefDex,reefStats,reefLogSpecies,reefUnlocked,openReefLog,closeReefLog,renderReefLog,reefPanelHTML};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{}),REEF_SPECIES:(typeof REEF_SPECIES!=="undefined"?REEF_SPECIES:[]),REEF_TIERS:(typeof REEF_TIERS!=="undefined"?REEF_TIERS:{}),renderReefDex,reefStats,reefLogSpecies,reefUnlocked,openReefLog,closeReefLog,renderReefLog,reefPanelHTML,cloudApply};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -99,6 +99,9 @@ if (API) {
   check('Reef tab is registered in the guide + both navs',
     /🤿 Reef Dex/.test(html) && (html.match(/data-view="reef"/g) || []).length >= 2 && html.indexOf('#reefLogModal') !== -1);
   check('reef achievements present (>= 8)', API.ACHIEVEMENTS.filter(a => /^reef_/.test(a.id)).length >= 8);
+  check('kid-facing creature counts match REEF_SPECIES.length',
+    new RegExp(RS.length + ' amazing creatures').test(html) && new RegExp(RS.length + ' creatures live around Kandima').test(html),
+    'static copy out of sync with ' + RS.length + ' species');
 
   /* ---------- 3b. food data integrity ---------- */
   section('Food data');
@@ -150,6 +153,17 @@ if (API) {
     if (recomputed !== after.points) throw new Error('points not recomputable from byKid');
   });
   check('reef scoring stays consistent after logging', renderErr.length === 0, renderErr.slice(0, 4).join(' | '));
+
+  /* cloud restore must union-merge the reef log, and corrupt payloads must never wipe it */
+  tryit('reef cloud merge safety', () => {
+    const t0 = API.reefStats().total;
+    if (t0 < 1) throw new Error('expected a logged entry from the previous check');
+    API.cloudApply({ 'globie_atlas_reefdex_v1': '{corrupt json' });
+    if (API.reefStats().total !== t0) throw new Error('corrupt cloud payload wiped the local log');
+    API.cloudApply({ 'globie_atlas_reefdex_v1': JSON.stringify({ log: [{ id: 'zz_merge_1', sp: 'gecko', ts: 12345, by: 'jeanluc' }] }) });
+    if (API.reefStats().total !== t0 + 1) throw new Error('cloud restore did not union-merge (got ' + API.reefStats().total + ', want ' + (t0 + 1) + ')');
+  });
+  check('reef cloud merge: unions logs, survives corrupt payloads', renderErr.length === 0, renderErr.slice(0, 4).join(' | '));
 
   /* quiz pool depth */
   let minPool = Infinity, minId = '';
