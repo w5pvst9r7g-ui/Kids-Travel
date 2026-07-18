@@ -385,6 +385,18 @@ html.night .bp-fun{background:rgba(244,203,118,.13);color:var(--yellow)}
 .bp-stub .k{font-weight:800;color:var(--teal-d);margin-bottom:3px;font-family:var(--display);font-size:.95rem}
 .bp-stub .bp-journey{font-family:var(--hand);font-size:1.16rem;font-weight:700;color:var(--ink-2);line-height:1.2}
 
+/* —— Booked-flights strip (d.flights) —— */
+.fstrip{margin-top:18px}
+.fstrip-head{font-family:var(--display);font-size:1.05rem;color:var(--ink);margin:0 0 10px}
+.fstrip-legs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fstrip-leg{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--clay)}
+.fstrip-leg .fs-no{font-family:var(--display);font-weight:800;font-size:.8rem;color:var(--teal-d);letter-spacing:.06em}
+.fstrip-leg .fs-route{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:1.2rem;color:var(--ink);margin:2px 0}
+.fstrip-leg .fs-arrow{color:var(--yellow-d);font-size:.95rem}
+.fstrip-leg .fs-times{font-size:.86rem;font-weight:700;color:var(--ink-2)}
+.fstrip-leg .fs-note{font-family:var(--hand);font-size:1.05rem;font-weight:700;color:var(--muted);margin-top:3px}
+html.night .fstrip-leg{background:var(--surface);border-color:var(--line-2)}
+
 /* —— Passport-page "Country" tile —— */
 .ppage{position:relative;background:linear-gradient(160deg,#F2F5FB,#E7EDF7);border:2px solid #D7E0F0;
   border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--shadow-sm);overflow:hidden}
@@ -2177,8 +2189,8 @@ const DESTS = [
   tagline:'Turquoise lagoons, overwater villas and the longest waterslide in the Maldives!',
   lat:2.7167, lng:72.95,
   gettingThere:{
-    to:'MLE', toName:'Velana Int’l (Malé)', flightTime:'~13–16 h (1 stop)',
-    route:'Dublin → Doha / Abu Dhabi / Istanbul → Malé, then a 35-min seaplane to Kandima',
+    to:'MLE', toName:'Velana Int’l (Malé)', flightTime:'~14½ h flying (1 stop)',
+    route:'Etihad EY48 Dublin → Abu Dhabi (dep 20:35), then EY376 → Malé (arr 13:45 next day), then a 35-min seaplane to Kandima',
     distance:'≈ 8,800 km', tz:'GMT +5', best:'Nov–Apr (dry season); you go Jul–Aug ☀️'
   },
   country_info:{
@@ -4271,6 +4283,12 @@ const DEST_LANG = {
 const UPCOMING_EXPAND = {
   "maldives": {
     tagline:'Turquoise lagoons, an overwater villa and the longest waterslide in the Maldives — splash, snorkel and seaplane your way through Kandima!',
+    flights:[
+      {no:'EY48',  from:'DUB', to:'AUH', dep:'Thu 23 Jul · 20:35', arr:'07:05 +1', note:'Overnight to Abu Dhabi 🌙'},
+      {no:'EY376', from:'AUH', to:'MLE', dep:'Fri 24 Jul · 08:30', arr:'13:45', note:'Then the seaplane to Kandima! 🛩️'},
+      {no:'EY379', from:'MLE', to:'AUH', dep:'Sat 8 Aug · 09:50', arr:'12:50', note:'Homeward bound'},
+      {no:'EY47',  from:'AUH', to:'DUB', dep:'Sat 8 Aug · 14:00', arr:'19:05', note:'Land in Dublin 🇮🇪'}
+    ],
     attractions:[
       ['🤿','House Reef Snorkelling','Kandima’s coral reef starts right off the beach — meet parrotfish, rays and turtles.'],
       ['💦','The Big Waterslide','Whoosh down Kandima’s giant slide straight into the pool — the island’s most famous splash.'],
@@ -5727,7 +5745,7 @@ const SEED_TRIPS = [
   {id:'t34', era:'ireland', destId:null, city:'Switzerland', country:'Switzerland', flag:'🇨🇭', emoji:'🏔️', lat:46.8182, lng:8.2275, date:'2023-01-10', year:2023, planned:false, rating:5, note:'Snowy Alps, mountain trains and hot chocolate! ❄️'},
   {id:'t35', era:'ireland', destId:null, city:'Austria', country:'Austria', flag:'🇦🇹', emoji:'⛷️', lat:47.5162, lng:14.5501, date:'2023-01-18', year:2023, planned:false, rating:5, note:'Alpine snow, cosy chalets and yummy Sachertorte! 🍫'},
   // —— Coming up ——
-  {id:'t27', era:'ireland', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, date:'2026-07-23', year:2026, planned:true, rating:0, note:'The big family trip — 23 July to 9 August! Overwater villas, snorkelling and the famous waterslide await.'},
+  {id:'t27', era:'ireland', destId:'maldives', city:'Maldives', country:'Maldives', flag:'🇲🇻', emoji:'🏝️', lat:2.85, lng:72.95, date:'2026-07-23', year:2026, planned:true, rating:0, nights:16, note:'The big family trip — 23 July to 8 August! Fly Etihad via Abu Dhabi, hop on the seaplane, then two weeks of snorkelling, the famous waterslide… and the Reef Dex! 🤿'},
   {id:'t28', era:'ireland', destId:'sunshinecoast', city:'Sunshine Coast', country:'Australia', flag:'🇦🇺', emoji:'🎄', lat:-26.6500, lng:153.0667, date:'2026-12-20', year:2026, planned:true, rating:0, note:'Three weeks back on the Sunshine Coast for Christmas! 🎄🏖️'},
   {id:'t29', era:'ireland', destId:'rabat', city:'Rabat', country:'Morocco', flag:'🇲🇦', emoji:'🕌', lat:34.0209, lng:-6.8416, date:'2026-06-19', year:2026, planned:true, rating:0, note:'Exploring the blue kasbah, Hassan Tower and Rabat Zoo!'},
   {id:'t36', era:'ireland', destId:'milan', city:'Milan', country:'Italy', flag:'🇮🇹', emoji:'⛪', lat:45.4642, lng:9.1900, date:'2026-07-09', year:2026, planned:true, rating:0, note:'A long weekend in Milan (9–12 July)! The Duomo rooftop, Leonardo’s Last Supper, the knights’ castle and lots of gelato 🍨'}
@@ -5936,6 +5954,10 @@ const dataKey=base=>'globie_atlas_'+base+'_v9_'+(currentProfile||'guest');
    not resurrected. */
 const NEW_SEED_TRIP_IDS=['t36']; // Milan, Italy (Jul 2026)
 function migrateTrips(arr){
+  try{ /* idempotent fix-up: stored t27 predates the real booking (16 nights, home 8 Aug) */
+    const m=arr.find(t=>t&&t.id==='t27'), seed=SEED_TRIPS.find(t=>t.id==='t27');
+    if(m&&seed){ if(!m.nights) m.nights=seed.nights; if(/9 August/.test(m.note||'')) m.note=seed.note; }
+  }catch(e){}
   try{
     const flag=dataKey('seedmilan');
     if(localStorage.getItem(flag)==='1') return arr;
@@ -6143,6 +6165,18 @@ function flightFunFact(gt){
   if(hours){ const movies=Math.max(1,Math.round(hours/1.6)); parts.push(`long enough to watch about <b>${movies}</b> movie${movies>1?'s':''} 🍿`); }
   if(km){ const pct=Math.max(1,Math.round(km/40075*100)); parts.push(`you'll fly <b>${km.toLocaleString()} km</b> — about <b>${pct}%</b> of the way around the whole planet 🌍`); }
   return parts.length?`Fun fact: ${parts.join(', and ')}!`:'';
+}
+/* Booked-itinerary strip for the Getting-there panel — renders d.flights
+   (set per-destination in the expand blocks) as claymorphic leg chips. */
+function flightStripHTML(d){
+  if(!d||!d.flights||!d.flights.length) return '';
+  return `<div class="fstrip"><h4 class="fstrip-head">🎫 Our booked flights</h4><div class="fstrip-legs">`+
+    d.flights.map(f=>`<div class="fstrip-leg">
+      <div class="fs-no">${esc(f.no)}</div>
+      <div class="fs-route"><span class="fs-ap">${esc(f.from)}</span><span class="fs-arrow" aria-hidden="true">✈</span><span class="fs-ap">${esc(f.to)}</span></div>
+      <div class="fs-times">${esc(f.dep||'')}${f.arr?` → ${esc(f.arr)}`:''}</div>
+      ${f.note?`<div class="fs-note">${esc(f.note)}</div>`:''}
+    </div>`).join('')+`</div></div>`;
 }
 function tripDate(t){ return t.date?new Date(t.date+'T00:00:00'):(t.year?new Date(t.year+'-07-01T00:00:00'):null); }
 function daysUntil(t){ const d=tripDate(t); if(!d) return null; return Math.max(0,Math.ceil((d-new Date())/86400000)); }
@@ -6435,7 +6469,7 @@ function openDest(id){
           ${funFact?`<div class="bp-fun"><span class="ff" aria-hidden="true">✨</span><span>${funFact}</span></div>`:''}
         </div>
         <div class="bp-stub"><div class="k">✈️ The journey</div><div class="bp-journey">${esc(gt.route)}</div></div>
-      </div>`,
+      </div>${flightStripHTML(d)}`,
     info:`<h3 class="blockhead">🌍 All about ${d.country}</h3><p class="sub">The facts that make it special</p>
       <div class="ppage">
         <div class="pp-head"><div class="pp-title"><span class="pp-crest">${d.flag}</span><div><div class="pp-kicker">Passport</div><div class="pp-country">${esc(d.country)}</div></div></div><div class="pp-stamp">${d.emoji}</div></div>
