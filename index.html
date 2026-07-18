@@ -1360,6 +1360,36 @@ html.night .catx-empty{background:var(--surface);border-color:var(--line-2)}
 .rd-tot{font-weight:800;color:var(--ink-2);font-size:.92rem}
 .reeflog-help p{font-size:.94rem;font-weight:700;color:var(--ink-2);line-height:1.5;margin:0 0 10px;text-align:left}
 .reeflog-help .btn{width:100%;margin-top:4px}
+/* —— species photos + exact-kind picker (Wikimedia pipeline, emoji fallback) —— */
+.rfx-photo{position:relative;width:min(100%,340px);aspect-ratio:3/2;border-radius:var(--r);overflow:hidden;margin:10px auto 2px;
+  background:linear-gradient(160deg,hsl(var(--rh,200) 70% 88%),hsl(var(--rh,200) 55% 74%));border:2px solid var(--line);box-shadow:var(--shadow-sm)}
+.rfx-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rfx-photo img.failed{display:none}
+.rfx-photoemo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.75}
+.rc-kindhead{font-family:var(--display);font-size:1rem;color:var(--ink);margin:14px 0 2px;align-self:flex-start}
+.rc-kindhead .rc-kindsub{display:block;font-family:var(--sans);font-weight:700;font-size:.78rem;color:var(--muted)}
+.rfx-kindrow{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 10px;width:100%;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.rfx-kindcard{position:relative;flex:none;width:138px;display:flex;flex-direction:column;gap:3px;padding:8px 8px 9px;scroll-snap-align:start;
+  border-radius:var(--r-sm);border:2.5px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--sans);text-align:left;
+  box-shadow:0 3px 0 0 var(--line);transition:transform .15s,border-color .15s}
+.rfx-kindcard:hover{transform:translateY(-2px)}
+.rfx-kindcard.sel{border-color:var(--teal-d);box-shadow:0 3px 0 0 var(--teal-d),0 0 0 3px rgba(31,159,208,.22)}
+.rfx-kindcard[disabled]{opacity:.55;cursor:default}
+.rfx-kindpic{position:relative;width:100%;aspect-ratio:4/3;border-radius:9px;overflow:hidden;
+  background:linear-gradient(160deg,hsl(var(--rh,200) 70% 90%),hsl(var(--rh,200) 55% 78%))}
+.rfx-kindpic.plain{background:linear-gradient(160deg,var(--surface-2),var(--line))}
+.rfx-kindpic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rfx-kindpic img.failed{display:none}
+.rfx-kindemo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.9rem;opacity:.8}
+.rfx-kindnm{font-family:var(--display);font-weight:800;font-size:.8rem;color:var(--ink);line-height:1.12}
+.rfx-kindnote{font-size:.7rem;font-weight:700;color:var(--muted);line-height:1.25}
+.rfx-kindtick{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--green-d);color:#fff;font-weight:900;font-size:.8rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+.rfx-kindcard .rl-today{position:absolute;bottom:6px;right:8px}
+.rfx-xn.kinds{background:#EAF3FB;border-color:#BBD7EE;color:#2270AD}
+html.night .rfx-photo,html.night .rfx-kindpic{background:linear-gradient(160deg,hsl(var(--rh,200) 30% 30%),hsl(var(--rh,200) 26% 22%))}
+html.night .rfx-kindcard{background:var(--surface);border-color:var(--line-2);box-shadow:0 3px 0 0 var(--line-2)}
+html.night .rfx-kindcard.sel{border-color:var(--teal);box-shadow:0 3px 0 0 var(--teal),0 0 0 3px rgba(31,159,208,.3)}
+html.night .rfx-xn.kinds{background:#1c3450;border-color:#2b4d74;color:#8fc3ee}
 /* —— big-catch splash (transient, click-through) —— */
 .rfx-catch{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;pointer-events:none;
   background:radial-gradient(60% 60% at 50% 45%,rgba(8,44,96,.55),rgba(5,20,48,.82));opacity:0;transition:opacity .25s}
@@ -7584,7 +7614,9 @@ const ACHIEVEMENTS=[
   {id:'reef_legend',em:'🌟',nm:'Legend Hunter',     ds:'Spot a Legendary creature yourself',          ac:'#E8A21A',test:c=>c.reefLegendaries>=1},
   {id:'reef_gold5', em:'👑',nm:'Trailblazer',       ds:'Be FIRST in the family to spot 5 creatures',  ac:'#F0A91E',test:c=>c.reefMyFirsts>=5},
   {id:'reef_pts50', em:'💯',nm:'Half-Century Snorkeller',ds:'Score 50 Reef Dex points yourself',      ac:'#6650C9',test:c=>c.reefMyPoints>=50},
-  {id:'reef_groups',em:'🗺️',nm:'Everywhere Explorer',ds:'Spot creatures from all 4 Reef Dex groups',  ac:'#1E7F66',test:c=>c.reefMyGroups>=4}
+  {id:'reef_groups',em:'🗺️',nm:'Everywhere Explorer',ds:'Spot creatures from all 4 Reef Dex groups',  ac:'#1E7F66',test:c=>c.reefMyGroups>=4},
+  {id:'reef_kind5', em:'🔬',nm:'Junior Marine Biologist',ds:'Make 5 exact-species IDs yourself',      ac:'#2270AD',test:c=>c.reefMyKinds>=5},
+  {id:'reef_kind12',em:'🧬',nm:'Professor of the Reef', ds:'Make 12 exact-species IDs yourself',      ac:'#6650C9',test:c=>c.reefMyKinds>=12}
 ];
 function loadAch(){ try{const s=localStorage.getItem(dataKey('ach')); if(s) return new Set(JSON.parse(s));}catch(e){} return new Set(); }
 function saveAch(set){ try{localStorage.setItem(dataKey('ach'),JSON.stringify([...set]));}catch(e){} }
@@ -7614,7 +7646,7 @@ function achContext(){
   let km=0; visited.forEach(t=>{ if(t.lat!=null&&t.lng!=null) km+=haversine(originFor(t),{lat:t.lat,lng:t.lng})*2; });
   const cs=catAtlasStats();
   /* Reef Dex: family-wide progress + the signed-in explorer's own slice */
-  let reef={species:0,mine:0,pts:0,firsts:0,sharks:0,legend:0,groups:0,total:42};
+  let reef={species:0,mine:0,pts:0,firsts:0,kinds:0,sharks:0,legend:0,groups:0,total:42};
   try{ if(typeof reefStats==='function'){
     const rs=reefStats(); const meId=currentProfile||'guest';
     const mySpecies=new Set(); rs.log.forEach(x=>{ if(x.by===meId) mySpecies.add(x.sp); });
@@ -7622,12 +7654,12 @@ function achContext(){
     mySpecies.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(!s) return; myGroups.add(s.g);
       if(sp==='blacktip'||sp==='nurseshark'||sp==='whaleshark') sharks++;
       if(s.tier==='l') legend++; });
-    const me=rs.byKid[meId]||{species:0,points:0,firsts:0};
-    reef={species:rs.speciesCount,mine:me.species,pts:me.points,firsts:me.firsts,
+    const me=rs.byKid[meId]||{species:0,points:0,firsts:0,kinds:0};
+    reef={species:rs.speciesCount,mine:me.species,pts:me.points,firsts:me.firsts,kinds:me.kinds||0,
           sharks:sharks,legend:legend,groups:myGroups.size,total:REEF_SPECIES.length};
   } }catch(e){}
   return {visited,planned,countries,continents,regions,continentCounts,km,catsRead:catsRead.size,wishes:(typeof wishlist!=='undefined'?wishlist.size:0),foodsTried:(typeof triedFoods!=='undefined'?triedFoods.size:0),cats:cs.total,catCoats:cs.coatCount,catCountries:cs.countryCount,catPhotos:cs.photos,
-    reefSpecies:reef.species,reefMine:reef.mine,reefMyPoints:reef.pts,reefMyFirsts:reef.firsts,reefSharks:reef.sharks,reefLegendaries:reef.legend,reefMyGroups:reef.groups,reefTotal:reef.total};
+    reefSpecies:reef.species,reefMine:reef.mine,reefMyPoints:reef.pts,reefMyFirsts:reef.firsts,reefMyKinds:reef.kinds,reefSharks:reef.sharks,reefLegendaries:reef.legend,reefMyGroups:reef.groups,reefTotal:reef.total};
 }
 function badgeProgress(a,c){
   const P={
@@ -7643,7 +7675,8 @@ function badgeProgress(a,c){
     cat_coats:[c.catCoats,9],cat_world:[c.catCountries,3],cat_photog:[c.catPhotos,1],
     reef_first:[c.reefMine,1],reef_dex10:[c.reefSpecies,10],reef_dex25:[c.reefSpecies,25],
     reef_dexall:[c.reefSpecies,c.reefTotal],reef_shark:[c.reefSharks,1],reef_legend:[c.reefLegendaries,1],
-    reef_gold5:[c.reefMyFirsts,5],reef_pts50:[c.reefMyPoints,50],reef_groups:[c.reefMyGroups,4]
+    reef_gold5:[c.reefMyFirsts,5],reef_pts50:[c.reefMyPoints,50],reef_groups:[c.reefMyGroups,4],
+    reef_kind5:[c.reefMyKinds,5],reef_kind12:[c.reefMyKinds,12]
   };
   const e=P[a.id]; return e?{have:e[0],need:e[1],unit:e[2]||''}:null;
 }
@@ -8789,6 +8822,14 @@ const REEF_SPECIES=[
   {id:'koel',         nm:'Asian koel',             nick:'The Invisible Alarm Clock',em:'🎵', g:'land', tier:'u', hue:0,   fact:'You’ll HEAR its loud "ko-EL! ko-EL!" all over the island — but it hides in the leaves. Spotting the singer is the real challenge.'}
 ];
 const REEF_SP_BY_ID={}; REEF_SPECIES.forEach(s=>{ REEF_SP_BY_ID[s.id]=s; });
+/* photos ride the same curated Wikimedia pipeline as PLACE_PHOTOS (wmURL +
+   imgFail fallback chain). Offline / never-loads → the emoji art stays. */
+function reefKind(sp,k){ const s=REEF_SP_BY_ID[sp]; return (s&&s.kinds&&k)?s.kinds.find(x=>x.id===k)||null:null; }
+function rfxPhotoImg(files,alt,w){
+  if(!files||!files.length) return '';
+  const cands=files.map(f=>wmURL(f,Math.max(w||420,420)));
+  return `<img class="fade" loading="lazy" decoding="async" alt="${esc(alt||'')}" src="${cands[0]}" data-fallbacks="${esc(JSON.stringify(cands.slice(1)))}" onload="this.classList.add('ld')" onerror="imgFail(this)">`;
+}
 /* snorkel-rank ladder on a kid's PERSONAL points. Base max = 88 (24×1 + 12×2
    + 4×5 + 2×10) + family-first bonuses — so the top rank at 85 is reachable
    by EITHER kid on personal completion alone, even with zero firsts. */
@@ -8829,48 +8870,59 @@ function reefCloudMerge(raw){
     return raw;
   }
 }
-/* each explorer can log each species once per calendar day (feed hygiene —
-   repeats never score anyway, points are once-per-kid-per-species) */
-function reefLoggedToday(sp,by){
+/* daily re-log cooldown, per exact option: the plain "not sure" log and each
+   exact kind cool down separately, so a kid can log Butterflyfish at breakfast
+   and still come back to ID it as a Threadfin after studying the photos.
+   kind undefined = the plain no-kind log; a string = that exact kind. */
+function reefLoggedToday(sp,by,kind){
   const day=new Date().toDateString();
-  return reefDex().log.some(x=>x.sp===sp && x.by===by && new Date(x.ts).toDateString()===day);
+  return reefDex().log.some(x=>x.sp===sp && x.by===by && (kind===undefined?!x.k:x.k===kind) && new Date(x.ts).toDateString()===day);
 }
 /* the one roll-up everything reads: per-kid points/species/firsts derived
    fresh from the shared log every time (nothing competitive is stored) */
 function reefStats(){
   const o=reefDex(); const kidIds=PROFILES.map(p=>p.id);
   const log=o.log.filter(x=>REEF_SP_BY_ID[x.sp]);   /* unknown ids stay stored, never scored */
-  const counts={}, spotters={}, firstTs={}, firstBy={};
-  const byKid={}; kidIds.concat(['guest']).forEach(id=>{ byKid[id]={n:0,species:new Set(),points:0,firsts:0}; });
+  const counts={}, spotters={}, firstTs={}, firstBy={}, kindsFound={};
+  const byKid={}; kidIds.concat(['guest']).forEach(id=>{ byKid[id]={n:0,species:new Set(),points:0,firsts:0,kinds:new Set()}; });
   log.forEach(x=>{
     counts[x.sp]=(counts[x.sp]||0)+1;
     (spotters[x.sp]=spotters[x.sp]||new Set()).add(x.by);
-    const k=byKid[x.by]||(byKid[x.by]={n:0,species:new Set(),points:0,firsts:0});
+    const k=byKid[x.by]||(byKid[x.by]={n:0,species:new Set(),points:0,firsts:0,kinds:new Set()});
     k.n++; k.species.add(x.sp);
+    if(x.k&&reefKind(x.sp,x.k)){
+      k.kinds.add(x.sp+'|'+x.k);
+      const kf=kindsFound[x.sp]=kindsFound[x.sp]||{};
+      (kf[x.k]=kf[x.k]||new Set()).add(x.by);
+    }
     if(kidIds.indexOf(x.by)>=0 && (firstTs[x.sp]===undefined || x.ts<firstTs[x.sp])){ firstTs[x.sp]=x.ts; firstBy[x.sp]=x.by; }
   });
   Object.keys(byKid).forEach(id=>{ const k=byKid[id];
     k.species.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(!s) return;
       if(kidIds.indexOf(id)>=0){ k.points+=REEF_TIERS[s.tier].pts; if(firstBy[sp]===id){ k.points+=1; k.firsts++; } } });
-    k.species=k.species.size; });
+    k.species=k.species.size; k.kinds=k.kinds.size; });
   const familySpecies=Object.keys(counts);
   const groups={}, tiers={c:0,u:0,r:0,l:0};
   familySpecies.forEach(sp=>{ const s=REEF_SP_BY_ID[sp]; if(s){ groups[s.g]=(groups[s.g]||0)+1; tiers[s.tier]++; } });
   let points=0; Object.keys(byKid).forEach(id=>{ points+=byKid[id].points; });
-  return {total:o.log.length, speciesCount:familySpecies.length, species:counts, spotters:spotters,
-          firstBy:firstBy, byKid:byKid, groups:groups, tiers:tiers, points:points, log:o.log};
+  return {total:log.length, speciesCount:familySpecies.length, species:counts, spotters:spotters,
+          firstBy:firstBy, byKid:byKid, groups:groups, tiers:tiers, points:points, kindsFound:kindsFound, log:log};
 }
-/* append a sighting; returns what the celebration UI needs */
-function reefLogSpecies(sp){
+/* append a sighting (kind = optional exact-species id); returns what the
+   celebration UI needs */
+function reefLogSpecies(sp,kind){
   const s=REEF_SP_BY_ID[sp]; if(!s) return null;
   const by=currentProfile||'guest'; const o=reefDex(); const ts=Date.now();
   const isKid=PROFILES.some(p=>p.id===by);
   const personalNew=!o.log.some(x=>x.sp===sp&&x.by===by);
   const familyFirst=isKid && !o.log.some(x=>x.sp===sp&&PROFILES.some(p=>p.id===x.by));
+  const kd=reefKind(sp,kind);
+  const kindNew=!!kd && !o.log.some(x=>x.sp===sp&&x.k===kind&&x.by===by);
   const e={id:'r'+ts+'_'+by+'_'+Math.random().toString(36).slice(2,6), sp:sp, ts:ts, by:by};
+  if(kd) e.k=kd.id;
   o.log.push(e); saveReefDex(o);
   const pts=(personalNew&&isKid)?(REEF_TIERS[s.tier].pts+(familyFirst?1:0)):0;
-  return {entry:e, sp:s, pts:pts, personalNew:personalNew, familyFirst:familyFirst};
+  return {entry:e, sp:s, pts:pts, personalNew:personalNew, familyFirst:familyFirst, kind:kd, kindNew:kindNew&&isKid};
 }
 /* —— trip gate: the Reef tab appears 30 days before departure, stays for the
    whole trip, and lives forever once anything has been logged —— */
@@ -8974,7 +9026,7 @@ function rfxVersus(s){
       <span class="rfx-vs-ava" style="--pc:${p.color}">${p.emoji}</span>
       <b class="rfx-vs-nm">${esc(nameFor(p.id))}${p.id===currentProfile?' <span class="rfx-you">you</span>':''}</b>
       <span class="rfx-vs-big">${k.species}</span><span class="rfx-vs-lbl">creatures</span>
-      <span class="rfx-vs-meta">🏆 ${k.points} pts · 👑 ${k.firsts} first${k.firsts===1?'':'s'}</span>
+      <span class="rfx-vs-meta">🏆 ${k.points} pts · 👑 ${k.firsts} first${k.firsts===1?'':'s'} · 🔬 ${k.kinds||0} ID${(k.kinds||0)===1?'':'s'}</span>
     </div>`;
   return `<div class="rfx-card rfx-vs"><h3 class="rfx-h">⚔️ The Great Creature Race</h3>
     <div class="rfx-vs-grid">${cell(a,ka)}<div class="rfx-vs-mid">VS</div>${cell(b,kb)}</div>
@@ -9010,14 +9062,16 @@ function rfxCard(x,s,mine){
     const p=PROFILES.find(pp=>pp.id===id);
     if(!p) return `<span class="rfx-chip guest" title="a guest">🧑</span>`;
     return `<span class="rfx-chip${crown===id?' crown':''}" style="--pc:${p.color}" title="${esc(nameFor(id))}${crown===id?' — first in the family! 👑':''}">${p.emoji}</span>`;}).join('');
+  const nk=x.kinds&&x.kinds.length?Object.keys(s.kindsFound[x.id]||{}).length:0;
+  const kindChip=x.kinds&&x.kinds.length?`<span class="rfx-xn kinds" title="exact kinds identified by the family">🔬 ${nk}/${x.kinds.length} kinds</span>`:'';
   return `<button type="button" class="rfx-cardx${seen?'':' locked'}${holo}" style="--rh:${x.hue}" onclick="openReefLog('${x.id}')"
       aria-label="${esc(x.nm)}, ${esc(x.nick)} — ${REEF_TIERS[x.tier].nm}${seen?' — spotted by you! '+esc(x.fact):' — not spotted by you yet'}">
     <span class="rfx-emo" aria-hidden="true">${x.em}</span>
     <span class="rfx-cnm">${esc(x.nm)}</span>
     <span class="rfx-cnick">“${esc(x.nick)}”</span>
     ${rfxTierPill(x.tier)}${x.shiny?'<span class="rfx-shinytag">✨ SHINY</span>':''}
-    ${seen?`<span class="rfx-fact">${esc(x.fact)}</span><span class="rfx-cfoot">${n?`<span class="rfx-xn">×${n}</span>`:''}${chips}</span>`
-          :`<span class="rfx-fact hidden-fact">❓ Spot it to unlock its secret!</span>${chips?`<span class="rfx-cfoot">${chips}</span>`:''}`}
+    ${seen?`<span class="rfx-fact">${esc(x.fact)}</span><span class="rfx-cfoot">${n?`<span class="rfx-xn">×${n}</span>`:''}${kindChip}${chips}</span>`
+          :`<span class="rfx-fact hidden-fact">❓ Spot it to unlock its secret!</span>${(chips||kindChip)?`<span class="rfx-cfoot">${kindChip}${chips}</span>`:''}`}
   </button>`;
 }
 function rfxFeed(s){
@@ -9031,15 +9085,16 @@ function rfxFeed(s){
       const crowned=s.firstBy[x.sp]===x.by && scored;
       const pts=scored?REEF_TIERS[sp.tier].pts+(crowned?1:0):0;
       const d=x.ts?new Date(x.ts).toLocaleDateString():'';
+      const kd=x.k?reefKind(x.sp,x.k):null;
       return `<div class="rfx-feed-it" style="--rh:${sp.hue}">
         <span class="rfx-feed-e">${sp.em}</span>
         <div class="rfx-feed-tx"><b>${esc(catWho(x.by))} spotted “${esc(sp.nick)}”</b>
-          <span class="rfx-feed-meta">${esc(sp.nm)}${pts?' · +'+pts+' pts':''}${crowned?' · 👑 family first!':''}${d?' · '+d:''}</span></div>
+          <span class="rfx-feed-meta">${esc(kd?kd.nm+' 🔬':sp.nm)}${pts?' · +'+pts+' pts':''}${crowned?' · 👑 family first!':''}${d?' · '+d:''}</span></div>
         ${sp.tier==='l'?'<span class="rfx-feed-l" title="Legendary">🌟</span>':''}
       </div>`;}).join('')}</div></div>`;
 }
 function rfxBadges(){
-  const ids=['reef_first','reef_dex10','reef_dex25','reef_dexall','reef_shark','reef_legend','reef_gold5','reef_pts50','reef_groups'];
+  const ids=['reef_first','reef_dex10','reef_dex25','reef_dexall','reef_shark','reef_legend','reef_gold5','reef_pts50','reef_groups','reef_kind5','reef_kind12'];
   const c=achContext();
   const items=ACHIEVEMENTS.filter(a=>ids.indexOf(a.id)>=0);
   const got=items.filter(a=>unlockedAch.has(a.id)).length;
@@ -9069,6 +9124,7 @@ function reefHowTo(){
     <p>📖 <b>Log it!</b> The first time YOU spot a species it goes into your Dex and scores its points: <b>Common 1 · Uncommon 2 · Rare 5 · Legendary 10</b>.</p>
     <p>👑 <b>Family first!</b> The FIRST explorer in the family to find a species gets a crown on it forever, plus 1 bonus point.</p>
     <p>⚔️ <b>The race:</b> whoever discovers the most creatures leads the Great Creature Race. Repeat sightings are brilliant for the feed, but each species only scores once.</p>
+    <p>🔬 <b>Expert IDs:</b> some creatures come in several exact kinds (five butterflyfish! three sharks!). Study the photos, work out WHICH one you saw, and every new exact ID grows your expert score.</p>
     <p>⚠️ <b>Ocean rules:</b> look, never touch. Some creatures (like the lionfish and titan triggerfish) have their own rules on their cards — read them!</p>
     <button class="btn btn-teal" type="button" onclick="renderReefLog()">🐠 Got it — to the creatures!</button>
   </div>`;
@@ -9093,11 +9149,13 @@ function renderReefLog(){
     const s=reefStats(); const mine=rfxMySpecies(s);
     /* one pass over the log for the whole grid (not one parse per species) */
     const day=new Date().toDateString();
-    const todaySet=new Set(s.log.filter(x=>x.by===me&&new Date(x.ts).toDateString()===day).map(x=>x.sp));
+    const plainToday=new Set(), kindToday=new Set();
+    s.log.forEach(x=>{ if(x.by===me&&new Date(x.ts).toDateString()===day){ if(x.k) kindToday.add(x.sp+'|'+x.k); else plainToday.add(x.sp); } });
     body.innerHTML=`<p class="reeflog-sub">Brilliant! What did you find, ${esc(catWho(me))}?</p>`+
       REEF_GROUPS.map(g=>`<div class="reeflog-g"><h4>${g[2]} ${esc(g[1])}</h4><div class="reeflog-grid">`+
         REEF_SPECIES.filter(x=>x.g===g[0]).map(x=>{
-          const today=todaySet.has(x.id);
+          /* fully cooled-down only when the plain log AND every exact kind are used up today */
+          const today=plainToday.has(x.id)&&(!x.kinds||!x.kinds.length||x.kinds.every(kk=>kindToday.has(x.id+'|'+kk.id)));
           return `<button type="button" class="reeflog-sp${today?' today':''}${mine.has(x.id)?' seen':''}" style="--rh:${x.hue}" ${today?'disabled':''} onclick="reefPick('${x.id}')" aria-label="${esc(x.nm)}${today?' — already logged today':''}">
             <span class="rl-em">${x.em}</span><span class="rl-nm">${esc(x.nm)}</span>${today?'<span class="rl-today">✓ today</span>':''}</button>`;}).join('')+
       `</div></div>`).join('');
@@ -9111,18 +9169,42 @@ function renderReefLog(){
     const isKid=PROFILES.some(p=>p.id===me);
     const personalNew=!mine.has(x.id);
     const familyFirst=isKid&&!s.firstBy[x.id];
-    const today=reefLoggedToday(x.id,me);
     const pts=(personalNew&&isKid)?REEF_TIERS[x.tier].pts+(familyFirst?1:0):0;
+    const kinds=x.kinds||[];
+    const plainUsed=reefLoggedToday(x.id,me);
+    /* default selection: "not sure" unless that's on cooldown */
+    if(_reefStep.kind===undefined) _reefStep.kind=plainUsed&&kinds.length?null:'';
+    if(_reefStep.kind===null){ const free=kinds.find(kk=>!reefLoggedToday(x.id,me,kk.id)); _reefStep.kind=free?free.id:''; }
+    const kf=s.kindsFound[x.id]||{};
+    const kindRow=kinds.length?`<div class="rc-kindhead">🔬 Which one exactly? <span class="rc-kindsub">look at the photos — new IDs grow your expert score</span></div>
+      <div class="rfx-kindrow">
+        ${kinds.map(kk=>{ const used=reefLoggedToday(x.id,me,kk.id); const found=kf[kk.id]; const sel=_reefStep.kind===kk.id;
+          return `<button type="button" class="rfx-kindcard${sel?' sel':''}${found?' found':''}" ${used?'disabled':''} onclick="reefKindPick('${kk.id}')" aria-pressed="${sel}" aria-label="${esc(kk.nm)}${found?' — already in the family Dex':''}${used?' — logged today':''}">
+            <span class="rfx-kindpic" style="--rh:${x.hue}"><span class="rfx-kindemo" aria-hidden="true">${x.em}</span>${rfxPhotoImg(kk.photos,kk.nm,420)}</span>
+            <span class="rfx-kindnm">${esc(kk.nm)}</span>
+            <span class="rfx-kindnote">${esc(kk.note||'')}</span>
+            ${found?`<span class="rfx-kindtick" title="found by the family">✓</span>`:''}${used?'<span class="rl-today">✓ today</span>':''}
+          </button>`;}).join('')}
+        <button type="button" class="rfx-kindcard notsure${_reefStep.kind===''?' sel':''}" ${plainUsed?'disabled':''} onclick="reefKindPick('')" aria-pressed="${_reefStep.kind===''}">
+          <span class="rfx-kindpic plain"><span class="rfx-kindemo" aria-hidden="true">🤷</span></span>
+          <span class="rfx-kindnm">Not sure</span><span class="rfx-kindnote">just a ${esc(x.nm.toLowerCase())}!</span>
+          ${plainUsed?'<span class="rl-today">✓ today</span>':''}
+        </button>
+      </div>`:'';
+    const chosenUsed=_reefStep.kind===''?plainUsed:reefLoggedToday(x.id,me,_reefStep.kind);
+    const allUsed=plainUsed&&(!kinds.length||kinds.every(kk=>reefLoggedToday(x.id,me,kk.id)));
     body.innerHTML=`<div class="reeflog-confirm" style="--rh:${x.hue}">
       <div class="rc-emo${x.tier==='l'||x.shiny?' holo':''}">${x.em}</div>
       <div class="rc-nick">“${esc(x.nick)}”</div>
       <div class="rc-tier">${rfxTierPill(x.tier)}${x.shiny?'<span class="rfx-shinytag">✨ SHINY</span>':''}</div>
-      ${today?`<p class="rc-pts muted">You already logged this one today — try again tomorrow, or pick something new!</p>`
+      ${x.ph&&x.ph.length?`<div class="rfx-photo" style="--rh:${x.hue}"><span class="rfx-photoemo" aria-hidden="true">${x.em}</span>${rfxPhotoImg(x.ph,x.nm,560)}</div>`:''}
+      ${kindRow}
+      ${allUsed?`<p class="rc-pts muted">You’ve logged every version of this one today — back tomorrow, or pick something new!</p>`
         :pts?`<p class="rc-pts">${familyFirst?'👑 <b>Nobody in the family has found this yet — be the FIRST!</b><br>':''}Worth <b>+${pts} point${pts===1?'':'s'}</b> for you${familyFirst?' (includes the +1 crown bonus)':''}</p>`
         :personalNew?`<p class="rc-pts">A brand-new creature for your Dex!</p>`
-        :`<p class="rc-pts muted">Already in your Dex — logging it again is just for glory (and the feed) 😄</p>`}
+        :`<p class="rc-pts muted">Already in your Dex — new exact IDs still count for your 🔬 expert score!</p>`}
       <div class="reeflog-actions">
-        ${today?'':`<button class="btn btn-yellow" type="button" onclick="reefConfirm('${x.id}')">🤿 Yes — I spotted it!</button>`}
+        ${allUsed||chosenUsed?'':`<button class="btn btn-yellow" type="button" onclick="reefConfirm('${x.id}')">🤿 Yes — I spotted it!</button>`}
         <button class="btn-text" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">‹ Back to the list</button>
       </div></div>`;
     reefLogFocus();
@@ -9131,12 +9213,14 @@ function renderReefLog(){
   if(_reefStep.stage==='done'){
     const g=_reefStep.gains; const x=g.sp;
     if(title) title.innerHTML='🎉 Logged!';
-    const s=reefStats(); const k=s.byKid[me]||{points:0,species:0};
+    const s=reefStats(); const k=s.byKid[me]||{points:0,species:0,kinds:0};
+    const what=g.kind?g.kind.nm:x.nm;
     body.innerHTML=`<div class="reeflog-done" style="--rh:${x.hue}">
       <div class="rc-emo big${x.tier==='l'||x.shiny?' holo':''}">${x.em}</div>
-      <p class="rd-head">${g.familyFirst?'👑 FAMILY FIRST! ':''}${g.personalNew?esc(x.nm)+' joins your Dex!':'Another '+esc(x.nm)+' for the feed!'}</p>
+      <p class="rd-head">${g.familyFirst?'👑 FAMILY FIRST! ':''}${g.personalNew?esc(what)+' joins your Dex!':(g.kindNew?'🔬 Expert ID — '+esc(what)+'!':'Another '+esc(what)+' for the feed!')}</p>
       <p class="rd-fact">${esc(x.fact)}</p>
       ${g.pts?`<div class="rd-pts">+${g.pts} point${g.pts===1?'':'s'} → you have <b>${k.points}</b></div>`:''}
+      ${g.kindNew?`<div class="rd-pts">🔬 Expert IDs: <b>${k.kinds}</b></div>`:''}
       <div class="rd-tot">📖 Your Dex: <b>${k.species}/${REEF_SPECIES.length}</b> · Family: <b>${s.speciesCount}/${REEF_SPECIES.length}</b></div>
       <div class="reeflog-actions">
         <button class="btn btn-yellow" type="button" onclick="_reefStep={stage:'pick',sp:null};renderReefLog()">➕ Log another</button>
@@ -9154,11 +9238,16 @@ function reefLogFocus(){
     const b=m.querySelector('.reeflog-sp:not([disabled]),.btn,.btn-text'); if(b) b.focus(); },40);
 }
 function reefPick(sp){ _reefStep={stage:'confirm',sp:sp}; sfx('tap'); renderReefLog(); }
+function reefKindPick(k){ _reefStep.kind=k; sfx('tap'); renderReefLog(); }
 function reefConfirm(sp){
-  const g=reefLogSpecies(sp); if(!g) return;
+  const me=currentProfile||'guest';
+  const kind=_reefStep.kind||undefined;   /* '' (not sure) → plain log */
+  if(kind===undefined?reefLoggedToday(sp,me):reefLoggedToday(sp,me,kind)){ toast('Already logged that one today! Try a different ID 😄'); return; }
+  const g=reefLogSpecies(sp,kind); if(!g) return;
   _reefStep={stage:'done',sp:sp,gains:g};
   sfx('good'); renderReefLog();
-  toast(g.sp.em+' '+g.sp.nm+' logged!'+(g.pts?(' +'+g.pts+' point'+(g.pts===1?'':'s')):'')+(g.familyFirst?' 👑':''));
+  const label=g.kind?g.kind.nm:g.sp.nm;
+  toast(g.sp.em+' '+label+' logged!'+(g.pts?(' +'+g.pts+' point'+(g.pts===1?'':'s')):'')+(g.familyFirst?' 👑':'')+(g.kindNew?' 🔬':''));
   if(!reduceMotion) confetti();
   if(g.personalNew&&(g.sp.tier==='l'||g.sp.tier==='r'||g.familyFirst)) rfxCatchSplash(g);
   checkAchievements(); reefUIRefresh();   /* achievements first so the badge card renders fresh */
