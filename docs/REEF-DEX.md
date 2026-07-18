@@ -7,15 +7,24 @@ section; renderers directly after; CSS after the cat-atlas block).
 
 ## Data
 
-- `REEF_SPECIES[]` — 42 defs `{id, nm, nick, em, g, tier, fact, hue, shiny?}`.
-  Groups (`g`): `fish` Reef Fish · `giants` Ocean Giants · `crit` Beach & Reef
-  Critters · `land` Island Life (`REEF_GROUPS` holds titles/blurbs).
-  Tiers (`REEF_TIERS`): `c`ommon 1 pt · `u`ncommon 2 · `r`are 5 · `l`egendary 10.
-  `hue` tints the card so repeated emoji still look distinct. `shiny:1` marks the
-  glowing plankton (holo treatment). **The titan-triggerfish and lionfish facts
-  are real safety advice — never edit them away** (the smoke test asserts them).
-- `REEF_RANKS` — snorkel-rank ladder on a kid's *personal* points (0→90+,
-  Beach Peeker → Ocean Legend).
+- `REEF_SPECIES[]` — 63 defs `{id, nm, nick, em, g, tier, fact, hue, shiny?,
+  ph?[], kinds?[]}`. `g` is a **region** id from `REEF_REGIONS` (Pokémon-style
+  generations): `lagoonto` Gen 1 famous starters · `coraljo` Gen 2 coral city ·
+  `deepenn` Gen 3 big blue · `shadowsinn` Gen 4 hidden tricksters · `islandova`
+  Gen 5 land. Tiers (`REEF_TIERS`): `c` 1 pt · `u` 2 · `r` 5 · `l` 10.
+  `ph` = verified Wikimedia Commons filenames (rendered via `wmURL` with the
+  `imgFail` fallback chain — offline degrades to the emoji art). `kinds[]` =
+  exact-species variants `{id, nm, sci, note, photos}` on 16 generic entries
+  (butterflyfish ×5, triggerfish ×4, sharks/turtles/rays ×3…). **Safety facts
+  (titan triggerfish, lionfish, urchin, jellyfish, cone shell) are real advice —
+  never edit them away** (the smoke test asserts the first two).
+- `REEF_CARDS` + `REEF_TYPES` + `REEF_RARITY` — the trading-card layer: every
+  species has `{ty, hp, mv:[[name,power,desc]×2]}` over 9 types. Rendered by
+  `renderReefCard` into `#reefCardModal` (MODAL_SEL + Escape registered);
+  locked cards show a silhouette + hidden powers until the signed-in kid has
+  spotted the species; Legendary/Shiny get the gold holo frame.
+- `REEF_RANKS` — snorkel-rank ladder on a kid's *personal* points (base max
+  140; top rank 135 reachable on personal completion with zero firsts).
 
 ## Storage & scoring (the important invariants)
 
@@ -64,7 +73,9 @@ section; renderers directly after; CSS after the cat-atlas block).
 
 ## Tests
 
-`test/smoke.test.js` §"Reef Dex data": ≥40 unique species with full schema,
-4 groups, Legendary present, safety facts intact, tab in both navs, modal
-registered, ≥8 reef achievements, render fns don't throw, and a live logging
-pass asserting points stay recomputable from the log.
+`test/smoke.test.js` §"Reef Dex data": ≥60 unique species with full schema,
+5 regions, Legendary present, safety facts intact, ≥55 species with photos,
+≥30 exact kinds (validated schema), a valid trading card for every species,
+tab in both navs, modals registered, ≥8 reef achievements, render fns don't
+throw, a live logging pass asserting points stay recomputable, and a
+cloud-merge pass asserting corrupt payloads can't wipe the log.

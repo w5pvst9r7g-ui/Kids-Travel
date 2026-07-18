@@ -120,6 +120,7 @@ coat-collection "Catdex", by-country, feed, stats, badges), photo capture with m
 thumbnails, and a full-screen photo **slideshow**. Full spec in docs/CAT-ATLAS.md.
 
 For the Jul–Aug 2026 Kandima trip the **Reef Dex** joined it as the second big
-game: a 42-species marine-spotting Pokédex with per-kid reveal, once-per-kid
+game: a 63-species marine-spotting Pokédex (5 Pokémon-style regions, verified
+Commons photos, exact-kind IDs, TCG-style trading cards) with per-kid reveal, once-per-kid
 scoring, family-first crowns and a head-to-head race view. Spec in
 docs/REEF-DEX.md.
