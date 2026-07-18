@@ -59,7 +59,7 @@ global.confetti = () => {}; global.alert = () => {}; global.confirm = () => true
 section('App boots');
 let API = null;
 try {
-  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{}),REEF_SPECIES:(typeof REEF_SPECIES!=="undefined"?REEF_SPECIES:[]),REEF_TIERS:(typeof REEF_TIERS!=="undefined"?REEF_TIERS:{}),REEF_CARDS:(typeof REEF_CARDS!=="undefined"?REEF_CARDS:{}),REEF_TYPES:(typeof REEF_TYPES!=="undefined"?REEF_TYPES:{}),renderReefDex,reefStats,reefLogSpecies,reefUnlocked,openReefLog,closeReefLog,renderReefLog,reefPanelHTML,cloudApply};';
+  const exposed = '\n;globalThis.__API={openDest,DESTS,renderWorld,setWorldDim,renderStats,renderUpcoming,renderFeatured,renderGrid,startQuiz,buildQuizPool,quickVisit,toggleWish,renderPassport,printPassport,EGG_LINES,ACHIEVEMENTS:(typeof ACHIEVEMENTS!=="undefined"?ACHIEVEMENTS:[]),WORLD_COUNTRIES:(typeof WORLD_COUNTRIES!=="undefined"?WORLD_COUNTRIES:[]),LOCAL_CATS:(typeof LOCAL_CATS!=="undefined"?LOCAL_CATS:{}),catStories,applyNight,applySound,sfx,cloudGather,PLANE_SVG,trips:(typeof trips!=="undefined"?trips:[]),PLACE_PHOTOS:(typeof PLACE_PHOTOS!=="undefined"?PLACE_PHOTOS:{}),matchGalleryIndex,FOOD_BY_COUNTRY:(typeof FOOD_BY_COUNTRY!=="undefined"?FOOD_BY_COUNTRY:{}),FOOD_FACTS:(typeof FOOD_FACTS!=="undefined"?FOOD_FACTS:{}),REEF_SPECIES:(typeof REEF_SPECIES!=="undefined"?REEF_SPECIES:[]),REEF_TIERS:(typeof REEF_TIERS!=="undefined"?REEF_TIERS:{}),REEF_CARDS:(typeof REEF_CARDS!=="undefined"?REEF_CARDS:{}),REEF_TYPES:(typeof REEF_TYPES!=="undefined"?REEF_TYPES:{}),REEF_SIL:(typeof REEF_SIL!=="undefined"?REEF_SIL:{}),renderReefDex,reefStats,reefLogSpecies,reefUnlocked,openReefLog,closeReefLog,renderReefLog,reefPanelHTML,cloudApply};';
   new Function(main + exposed)();
   API = globalThis.__API;
   ok('app initialises without throwing');
@@ -109,6 +109,9 @@ if (API) {
   check('every kind has id/nm/note/photos + unique ids', badKind === null, badKind || '');
   check('>= 55 species have a photo', photoCount >= 55, photoCount + ' with photos');
   check('>= 30 exact kinds to identify', kindCount >= 30, 'got ' + kindCount);
+  check('every species has a GO-style silhouette path',
+    RS.every(s => typeof API.REEF_SIL[s.id] === 'string' && /^M/.test(API.REEF_SIL[s.id])),
+    'missing: ' + RS.filter(s => !API.REEF_SIL[s.id]).map(s => s.id).join(','));
   check('every species has a trading card (type/hp/2 moves)',
     RS.every(s => { const c = API.REEF_CARDS[s.id]; return c && API.REEF_TYPES[c.ty] && c.hp > 0 && Array.isArray(c.mv) && c.mv.length === 2 && c.mv.every(m => m[0] && typeof m[1] === 'number' && m[2]); }),
     'missing/invalid cards: ' + RS.filter(s => !API.REEF_CARDS[s.id]).map(s => s.id).join(','));
